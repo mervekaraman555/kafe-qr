@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f59e0b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kafe Yönetim">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon-192.png">
+<title>Çoklu İşletim Sistemi Kurulum Merkezi — Kafe QR Sipariş</title>
+<style>
+  :root {
+    --bg: #090d16;
+    --panel: #111827;
+    --card: #1e293b;
+    --ink: #f8fafc;
+    --muted: #94a3b8;
+    --border: #334155;
+    --amber: #f59e0b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body {
+    background: radial-gradient(circle at top, #1e293b 0%, #090d16 70%);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 28px 18px 60px;
+  }
+  .container { max-width: 1180px; margin: 0 auto; }
+  .top-bar {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+    gap: 14px; background: rgba(17, 24, 39, 0.92); border: 1px solid var(--border);
+    padding: 20px 24px; border-radius: 20px; margin-bottom: 24px;
+  }
+  .top-bar h1 { font-size: 1.45rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+  .top-bar p { color: var(--muted); font-size: 0.88rem; margin-top: 4px; }
+  .back-btn {
+    background: linear-gradient(135deg, #f59e0b, #d97706); color: #090d16;
+    text-decoration: none; font-weight: 800; padding: 11px 18px; border-radius: 12px;
+    font-size: 0.9rem;
+  }
+
+  .os-filter {
+    display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px;
+  }
+  .os-tab {
+    background: #111827; color: #cbd5e1; border: 1.5px solid var(--border);
+    padding: 10px 16px; border-radius: 12px; font-weight: 700; font-size: 0.88rem;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .os-tab.active {
+    background: #f59e0b; color: #090d16; border-color: #f59e0b;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+  }
+  .os-card {
+    background: rgba(17, 24, 39, 0.95);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+  }
+  .os-card.win { border-top: 4px solid #3b82f6; }
+  .os-card.mac { border-top: 4px solid #a855f7; }
+  .os-card.android { border-top: 4px solid #22c55e; }
+  .os-card.harmony { border-top: 4px solid #ef4444; }
+  .os-card.ios { border-top: 4px solid #38bdf8; }
+
+  .os-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .os-icon {
+    width: 48px; height: 48px; border-radius: 14px; background: #1e293b;
+    display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
+  }
+  .os-title h2 { font-size: 1.18rem; font-weight: 800; }
+  .os-title span { font-size: 0.76rem; color: var(--muted); font-weight: 600; }
+  .os-desc { font-size: 0.86rem; color: #cbd5e1; line-height: 1.55; margin-bottom: 16px; }
+  .steps {
+    background: #0b1120; border: 1px solid #1e293b; border-radius: 12px;
+    padding: 12px 14px; font-size: 0.8rem; color: #94a3b8; line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .steps strong { color: #e2e8f0; }
+
+  .qr-mini {
+    display: flex; align-items: center; gap: 12px; background: #0b1120;
+    border: 1px solid #1e293b; padding: 10px; border-radius: 12px; margin-bottom: 14px;
+  }
+  .qr-mini img { width: 76px; height: 76px; background: #fff; padding: 4px; border-radius: 8px; }
+  .qr-mini div { font-size: 0.78rem; color: #cbd5e1; line-height: 1.45; }
+
+  .btn-group { display: flex; flex-direction: column; gap: 8px; }
+  .btn {
+    display: block; width: 100%; text-align: center; text-decoration: none;
+    padding: 12px 14px; border-radius: 11px; font-weight: 800; font-size: 0.88rem;
+    border: none; cursor: pointer; transition: transform 0.12s;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-win { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; }
+  .btn-mac { background: linear-gradient(135deg, #a855f7, #7e22ce); color: #fff; }
+  .btn-android { background: linear-gradient(135deg, #22c55e, #15803d); color: #052e16; }
+  .btn-harmony { background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff; }
+  .btn-ios { background: linear-gradient(135deg, #38bdf8, #0284c7); color: #090d16; }
+  .btn-sub { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="top-bar">
+    <div>
+      <h1>📲 Kafe QR Sipariş — İşletim Sistemi Kurulum Yükleyicileri</h1>
+      <p>Windows, macOS, Android, HarmonyOS ve iOS cihazlar için ayrı ayrı yapılandırılmış kurulum paketleri.</p>
+    </div>
+    <a class="back-btn" id="backGirisBtn" href="/giris">🔐 Giriş Ekranına Dön</a>
+  </div>
+
+  <div class="os-filter">
+    <button class="os-tab active" onclick="filterOS('all', this)">🌐 Tüm İşletim Sistemleri (5)</button>
+    <button class="os-tab" onclick="filterOS('win', this)">🪟 Windows</button>
+    <button class="os-tab" onclick="filterOS('mac', this)">🍎 macOS</button>
+    <button class="os-tab" onclick="filterOS('android', this)">🤖 Android</button>
+    <button class="os-tab" onclick="filterOS('harmony', this)">🔴 HarmonyOS</button>
+    <button class="os-tab" onclick="filterOS('ios', this)">📱 iOS (iPhone/iPad)</button>
+  </div>
+
+  <div class="grid">
+    <!-- 1. WINDOWS -->
+    <div class="os-card win" data-os="win">
+      <div>
+        <div class="os-head">
+          <div class="os-icon">🪟</div>
+          <div class="os-title">
+            <h2>1. Windows Yükleyicisi</h2>
+            <span>Windows 10 / Windows 11 (Kasa & POS Bilgisayarı)</span>
+          </div>
+        </div>
+        <p class="os-desc">Windows kasa bilgisayarında güvenlik duvarı portlarını (8090/8091) otomatik açar, masaüstüne uygulama kısayolu kurar ve sistemi başlatır.</p>
+        <div class="steps">
+          <strong>Kurulum Adımları:</strong><br>
+          1. <code>Windows_Kurulum_Yukleyici.bat</code> dosyasını indirin.<br>
+          2. Dosyaya çift tıklayarak çalıştırın.<br>
+          3. Masaüstüne <b>Kafe_Giris_Ekrani</b> kısayolu otomatik kurulur.
+        </div>
+      </div>
+      <div class="btn-group">
+        <a class="btn btn-win" id="dlWinBtn" href="/kurulum/windows.bat" download="Windows_Kurulum_Yukleyici.bat">⬇️ Windows Yükleyicisini İndir (.bat)</a>
+        <button class="btn btn-sub" onclick="triggerPWAInstall('Windows')">🖥️ Tarayıcıdan Masaüstü Uygulaması Olarak Kur</button>
+      </div>
+    </div>
+
+    <!-- 2. MACOS -->
+    <div class="os-card mac" data-os="mac">
+      <div>
+        <div class="os-head">
+          <div class="os-icon">🍎</div>
+          <div class="os-title">
+            <h2>2. macOS Yükleyicisi</h2>
+            <span>Apple Mac / MacBook / iMac (Intel & Apple Silicon)</span>
+          </div>
+        </div>
+        <p class="os-desc">Mac bilgisayarınızın masaüstüne gerçek bir <b>"Kafe Giriş Ekranı.app"</b> macOS uygulaması kurar ve arka plan sunucusunu otomatik başlatır.</p>
+        <div class="steps">
+          <strong>Kurulum Adımları:</strong><br>
+          1. <code>Mac_Kurulum_Yukleyici.command</code> dosyasını indirin.<br>
+          2. Çift tıklayarak çalıştırın.<br>
+          3. Masaüstünüzde <b>☕ Kafe Giriş Ekranı.app</b> uygulaması oluşur.
+        </div>
+      </div>
+      <div class="btn-group">
+        <a class="btn btn-mac" id="dlMacBtn" href="/kurulum/mac.command" download="Mac_Kurulum_Yukleyici.command">⬇️ macOS Yükleyicisini İndir (.command)</a>
+        <button class="btn btn-sub" onclick="triggerPWAInstall('macOS')">💻 Mac Dock Uygulaması Olarak Kur</button>
+      </div>
+    </div>
+
+    <!-- 3. ANDROID -->
+    <div class="os-card android" data-os="android">
+      <div>
+        <div class="os-head">
+          <div class="os-icon">🤖</div>
+          <div class="os-title">
+            <h2>3. Android Yükleyicisi</h2>
+            <span>Android Telefonlar & Garson Tabletleri</span>
+          </div>
+        </div>
+        <p class="os-desc">Samsung, Xiaomi, Lenovo ve tüm Android telefon/tabletlere Play Store gerekmeden tam ekran Kafe Yönetim uygulamasını yükler.</p>
+        <div class="qr-mini">
+          <img id="qrAndroid" alt="Android QR">
+          <div><b>Android Kamera ile Okutun:</b><br>Telefon veya tabletten okutarak doğrudan Android yükleyicisini açın.</div>
+        </div>
+        <div class="steps">
+          <strong>Kurulum Adımları:</strong><br>
+          1. Android cihazdan aşağıdaki <b>"Android Cihaza Kur"</b> butonuna basın.<br>
+          2. Veya Chrome sağ üst <b>⋮ ➔ Uygulamayı Yükle</b> seçeneğine dokunun.
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-android" onclick="triggerPWAInstall('Android')">📲 Tek Tıkla Android Cihaza Kur</button>
+        <a class="btn btn-sub" id="openAndroidPage" href="/kurulum/android">🤖 Özel Android Yükleyici Ekranını Aç →</a>
+      </div>
+    </div>
+
+    <!-- 4. HARMONYOS -->
+    <div class="os-card harmony" data-os="harmony">
+      <div>
+        <div class="os-head">
+          <div class="os-icon">🔴</div>
+          <div class="os-title">
+            <h2>4. HarmonyOS Yükleyicisi</h2>
+            <span>Huawei Telefonlar & MatePad Tabletler (HarmonyOS)</span>
+          </div>
+        </div>
+        <p class="os-desc">Huawei HarmonyOS cihazlar için özel yapılandırılmış manifest ve Huawei Tarayıcı / QuickApp tam ekran uygulama kurulum paketi.</p>
+        <div class="qr-mini">
+          <img id="qrHarmony" alt="HarmonyOS QR">
+          <div><b>Huawei Kamera ile Okutun:</b><br>HarmonyOS telefon veya MatePad tabletten okutarak kurun.</div>
+        </div>
+        <div class="steps">
+          <strong>Kurulum Adımları:</strong><br>
+          1. Huawei Tarayıcıda aşağıdaki yükleme butonuna basın.<br>
+          2. Veya sağ alt <b>☰ Menü ➔ Araçlar ➔ Ana ekrana ekle</b> seçeneğine dokunun.
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-harmony" onclick="triggerPWAInstall('HarmonyOS')">📲 Tek Tıkla HarmonyOS Cihaza Kur</button>
+        <a class="btn btn-sub" id="openHarmonyPage" href="/kurulum/harmonyos">🔴 Özel HarmonyOS Yükleyici Ekranını Aç →</a>
+      </div>
+    </div>
+
+    <!-- 5. iOS / iPadOS -->
+    <div class="os-card ios" data-os="ios">
+      <div>
+        <div class="os-head">
+          <div class="os-icon">📱</div>
+          <div class="os-title">
+            <h2>5. iOS / iPadOS Yükleyicisi</h2>
+            <span>Apple iPhone & iPad Cihazlar</span>
+          </div>
+        </div>
+        <p class="os-desc">App Store hesabı gerekmeden Apple imzalı WebClip Kurulum Profili (<code>.mobileconfig</code>) veya Safari Ana Ekran paketiyle iPhone/iPad'e kurar.</p>
+        <div class="qr-mini">
+          <img id="qrIos" alt="iOS QR">
+          <div><b>iPhone/iPad Kamera ile Okutun:</b><br>Safari'de açıp iOS profilini tek tıkla yükleyin.</div>
+        </div>
+        <div class="steps">
+          <strong>Kurulum Adımları:</strong><br>
+          1. <b>".mobileconfig Profil İndir"</b>e basıp <b>Ayarlar ➔ İndirilen Profil ➔ Yükle</b> deyin.<br>
+          2. Veya Safari'de <b>Paylaş (⬆️) ➔ Ana Ekrana Ekle</b> seçeneğine dokunun.
+        </div>
+      </div>
+      <div class="btn-group">
+        <a class="btn btn-ios" id="dlIosProfile" href="/kurulum/ios.mobileconfig">📥 iOS Kurulum Profilini İndir (.mobileconfig)</a>
+        <a class="btn btn-sub" id="openIosPage" href="/kurulum/ios">🍎 Özel iOS Yükleyici Ekranını Aç →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let deferredPrompt = null;
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  }
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+
+  async function triggerPWAInstall(osName) {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      return;
+    }
+    if (osName === "Android") {
+      alert("Android Chrome tarayıcınızda sağ üstteki ⋮ (Üç Nokta) menüsüne dokunup 'Uygulamayı Yükle' veya 'Ana ekrana ekle' seçeneğine basın.");
+    } else if (osName === "HarmonyOS") {
+      alert("Huawei Tarayıcıda sağ alttaki ☰ (Menü) tuşuna basıp 'Ana ekrana ekle' seçeneğine dokunun.");
+    } else {
+      alert("Tarayıcınızın adres çubuğunun sağındaki 'Uygulamayı Yükle' (➕/📥) simgesine tıklayarak masaüstüne kurabilirsiniz.");
+    }
+  }
+
+  function filterOS(os, btn) {
+    document.querySelectorAll(".os-tab").forEach(b => b.classList.remove("active"));
+    if (btn) btn.classList.add("active");
+    document.querySelectorAll(".os-card").forEach(card => {
+      if (os === "all" || card.dataset.os === os) {
+        card.style.display = "flex";
+      } else {
+        card.style.display = "none";
+      }
+    });
+  }
+
+  const lanBase = "__LAN_STAFF_ORIGIN__";
+  const isFile = window.location.protocol === "file:";
+  const base = (!isFile && lanBase.startsWith("http")) ? lanBase : (isFile ? "http://localhost:8091" : window.location.origin);
+
+  document.getElementById("backGirisBtn").href = `${base}/giris`;
+  document.getElementById("dlWinBtn").href = isFile ? "Kurulum_Paketleri/1_Windows_Kurulum/Windows_Kurulum_Yukleyici.bat" : `${base}/kurulum/windows.bat`;
+  document.getElementById("dlMacBtn").href = isFile ? "Kurulum_Paketleri/2_Mac_Kurulum/Mac_Kurulum_Yukleyici.command" : `${base}/kurulum/mac.command`;
+  document.getElementById("openAndroidPage").href = isFile ? "Kurulum_Paketleri/3_Android_Kurulum/Android_Kurulum_Yukleyici.html" : `${base}/kurulum/android`;
+  document.getElementById("openHarmonyPage").href = isFile ? "Kurulum_Paketleri/4_HarmonyOS_Kurulum/HarmonyOS_Kurulum_Yukleyici.html" : `${base}/kurulum/harmonyos`;
+  document.getElementById("dlIosProfile").href = isFile ? "Kurulum_Paketleri/5_iOS_Kurulum/Kafe_Yonetim_iOS.mobileconfig" : `${base}/kurulum/ios.mobileconfig`;
+  document.getElementById("openIosPage").href = isFile ? "Kurulum_Paketleri/5_iOS_Kurulum/iOS_Kurulum_Yukleyici.html" : `${base}/kurulum/ios`;
+
+  document.getElementById("qrAndroid").src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&margin=6&data=${encodeURIComponent(base + "/kurulum/android")}`;
+  document.getElementById("qrHarmony").src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&margin=6&data=${encodeURIComponent(base + "/kurulum/harmonyos")}`;
+  document.getElementById("qrIos").src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&margin=6&data=${encodeURIComponent(base + "/kurulum/ios")}`;
+
+  // URL parametresine göre filtrele (?os=android vb.)
+  const params = new URLSearchParams(window.location.search);
+  const osParam = params.get("os");
+  if (osParam) {
+    const map = { windows: "win", win: "win", mac: "mac", macos: "mac", android: "android", harmonyos: "harmony", harmony: "harmony", ios: "ios" };
+    if (map[osParam]) filterOS(map[osParam]);
+  }
+</script>
+</body>
+</html>
+

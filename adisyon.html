@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artisan Kafe — Masa Hesap Adisyonu</title>
+<style>
+  :root {
+    --bg: #f1f5f9;
+    --paper: #fffdf9;
+    --ink: #1e293b;
+    --muted: #64748b;
+    --accent: #b45309;
+    --green: #15803d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 24px 16px;
+    min-height: 100vh;
+  }
+  .toolbar {
+    max-width: 440px;
+    margin: 0 auto 18px;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  }
+  .toolbar select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    font-weight: 700;
+    font-size: 0.9rem;
+    background: #f8fafc;
+  }
+  .btn {
+    border: none;
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+  }
+  .btn-print { background: #0f172a; color: #fff; }
+  .btn-pay { background: var(--green); color: #fff; }
+
+  /* Termal Fiş / Adisyon Kağıdı Tasarımı */
+  .receipt-paper {
+    max-width: 440px;
+    margin: 0 auto;
+    background: var(--paper);
+    border: 1px solid #e2d9c8;
+    border-radius: 6px;
+    padding: 26px 24px;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+    font-family: "Courier New", Courier, monospace;
+    position: relative;
+  }
+  .receipt-paper::before,
+  .receipt-paper::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background-image: radial-gradient(circle, var(--bg) 3px, transparent 4px);
+    background-size: 12px 12px;
+  }
+  .receipt-paper::before { top: -4px; }
+  .receipt-paper::after { bottom: -4px; }
+
+  .r-header {
+    text-align: center;
+    border-bottom: 2px dashed #94a3b8;
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+  }
+  .r-logo { font-size: 2rem; margin-bottom: 4px; }
+  .r-title { font-size: 1.3rem; font-weight: 900; letter-spacing: 1px; color: #0f172a; }
+  .r-sub { font-size: 0.8rem; color: var(--muted); margin-top: 2px; font-family: sans-serif; }
+
+  .r-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.86rem;
+    margin-bottom: 6px;
+  }
+  .r-table-box {
+    background: #1e293b;
+    color: #fff;
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.15rem;
+    padding: 8px;
+    border-radius: 6px;
+    margin: 10px 0 14px;
+    letter-spacing: 1px;
+  }
+
+  .r-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 14px;
+  }
+  .r-table th {
+    text-align: left;
+    font-size: 0.78rem;
+    border-bottom: 1.5px solid #334155;
+    padding: 6px 2px;
+    text-transform: uppercase;
+  }
+  .r-table th.num, .r-table td.num { text-align: right; }
+  .r-table th.qty, .r-table td.qty { text-align: center; width: 48px; }
+  .r-table td {
+    padding: 8px 2px;
+    font-size: 0.9rem;
+    border-bottom: 1px dotted #cbd5e1;
+    vertical-align: top;
+  }
+
+  .r-orders-log {
+    background: #f8f4ec;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 14px;
+    font-size: 0.78rem;
+    font-family: sans-serif;
+  }
+  .r-orders-log-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #475569;
+  }
+  .r-order-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    border-bottom: 1px dashed #e2e8f0;
+  }
+  .r-order-item:last-child { border-bottom: none; }
+
+  .r-totals {
+    border-top: 2px dashed #334155;
+    padding-top: 12px;
+    margin-top: 6px;
+  }
+  .r-total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+  }
+  .r-grand-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.35rem;
+    font-weight: 900;
+    background: #fef3c7;
+    border: 2px solid #f59e0b;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+    color: #78350f;
+  }
+
+  .r-footer {
+    text-align: center;
+    margin-top: 18px;
+    padding-top: 12px;
+    border-top: 1px dashed #cbd5e1;
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: sans-serif;
+    line-height: 1.5;
+  }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .toolbar, .staff-actions { display: none !important; }
+    .receipt-paper { box-shadow: none; border: none; max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar" id="toolbar">
+  <div style="display:flex; align-items:center; gap:8px;">
+    <span style="font-weight:700; font-size:0.88rem;">🧾 Masa:</span>
+    <select id="tableSelect" onchange="changeTable(this.value)"></select>
+  </div>
+  <div style="display:flex; gap:8px;">
+    <button class="btn btn-print" onclick="window.print()">🖨️ Adisyonu Yazdır</button>
+    <button class="btn btn-pay" id="closeBillBtn" onclick="closeTableBill()">💳 Hesabı Kapat</button>
+  </div>
+</div>
+
+<div class="receipt-paper">
+  <div class="r-header">
+    <div class="r-logo">☕</div>
+    <div class="r-title">ARTİSAN KAFE</div>
+    <div class="r-sub">HESAP ADİSYON FİŞİ</div>
+  </div>
+
+  <div class="r-meta">
+    <span>TARİH: <b id="adisyonDate">--.--.----</b></span>
+    <span>SAAT: <b id="adisyonTime">--:--</b></span>
+  </div>
+  <div class="r-meta">
+    <span>ADİSYON NO: <b id="adisyonNo">#---</b></span>
+    <span>DURUM: <b id="adisyonStatus">AÇIK HESAP</b></span>
+  </div>
+
+  <div class="r-table-box" id="adisyonTableTitle">MASA 1</div>
+
+  <div id="adisyonBody">
+    <p style="text-align:center; padding: 20px 0; color:#64748b; font-family:sans-serif;">Yükleniyor...</p>
+  </div>
+
+  <div class="r-footer">
+    <b>Teşekkür Ederiz · Afiyet Olsun!</b><br>
+    Bu fiş bilgi ve hesap kontrol amaçlı masa adisyonudur.
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  let tableNo = parseInt(params.get("no") || params.get("masa") || params.get("table_no") || "1", 10);
+  if (isNaN(tableNo) || tableNo < 1) tableNo = 1;
+  const isCustomerView = params.get("musteri") === "1";
+
+  // Müşteri kendi ekranından açtıysa başka masaları seçme menüsünü ve hesap kapatma butonunu gizle
+  if (isCustomerView) {
+    document.getElementById("tableSelect").style.display = "none";
+    document.getElementById("closeBillBtn").style.display = "none";
+  } else {
+    const sel = document.getElementById("tableSelect");
+    for (let i = 1; i <= 20; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `Masa ${i}`;
+      if (i === tableNo) opt.selected = true;
+      sel.appendChild(opt);
+    }
+  }
+
+  async function closeTableBill() {
+    await fetch(`/api/tables/${tableNo}/pay`, { method: "POST" });
+    await loadAdisyon();
+  }
+
+  function changeTable(val) {
+    tableNo = parseInt(val, 10);
+    const url = new URL(window.location.href);
+    url.searchParams.set("no", tableNo);
+    window.history.replaceState({}, "", url.toString());
+    loadAdisyon();
+  }
+
+  function updateClock() {
+    const now = new Date();
+    document.getElementById("adisyonDate").textContent = now.toLocaleDateString("tr-TR");
+    document.getElementById("adisyonTime").textContent = now.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  async function loadAdisyon() {
+    updateClock();
+    document.getElementById("adisyonTableTitle").textContent = `MASA ${tableNo}`;
+
+    const res = await fetch(`/api/orders?table_no=${tableNo}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const activeOrders = data.orders.filter(o => o.status !== "odendi");
+    const bodyEl = document.getElementById("adisyonBody");
+
+    if (activeOrders.length === 0) {
+      document.getElementById("adisyonNo").textContent = "#-";
+      document.getElementById("adisyonStatus").textContent = "SİPARİŞ YOK";
+      bodyEl.innerHTML = `
+        <p style="text-align:center; padding: 24px 0; color:#64748b; font-family:sans-serif; font-size:0.9rem;">
+          Masa ${tableNo} için şu anda açık sipariş / adisyon bulunmuyor.
+        </p>
+      `;
+      return;
+    }
+
+    const firstId = activeOrders[activeOrders.length - 1].id;
+    const lastId = activeOrders[0].id;
+    document.getElementById("adisyonNo").textContent = firstId === lastId ? `#${firstId}` : `#${firstId}-${lastId}`;
+    const allDone = activeOrders.every(o => o.status === "tamamlandi");
+    document.getElementById("adisyonStatus").textContent = allDone ? "SERVİS EDİLDİ" : "AÇIK / HAZIRLANIYOR";
+
+    // Ürünleri birleştir (Aynı üründen birden fazla siparişte varsa toplam adedini göster)
+    const grouped = {};
+    let grandTotal = 0;
+    for (const ord of activeOrders) {
+      grandTotal += ord.total;
+      for (const item of ord.items) {
+        const key = `${item.name}_${item.price}`;
+        if (!grouped[key]) {
+          grouped[key] = { name: item.name, price: item.price, qty: 0, lineTotal: 0 };
+        }
+        grouped[key].qty += item.qty;
+        grouped[key].lineTotal += item.price * item.qty;
+      }
+    }
+
+    const rowsHtml = Object.values(grouped).map(g => `
+      <tr>
+        <td><b>${g.name}</b></td>
+        <td class="qty">${g.qty}x</td>
+        <td class="num">${g.price} ₺</td>
+        <td class="num"><b>${g.lineTotal} ₺</b></td>
+      </tr>
+    `).join("");
+
+    const kdvHaric = (grandTotal / 1.10).toFixed(2);
+    const kdvTutar = (grandTotal - grandTotal / 1.10).toFixed(2);
+
+    const ordersLogHtml = activeOrders.slice().reverse().map(o => {
+      const st = o.status === "tamamlandi" ? "✅ Servis Edildi" : (o.status === "hazirlaniyor" ? "👨‍🍳 Hazırlanıyor" : "⏳ Bekliyor");
+      return `
+        <div class="r-order-item">
+          <span>Sipariş #${o.id} (${o.created_at}) — ${st}</span>
+          <b>${o.total} ₺</b>
+        </div>
+      `;
+    }).join("");
+
+    bodyEl.innerHTML = `
+      <table class="r-table">
+        <thead>
+          <tr>
+            <th>ÜRÜN</th>
+            <th class="qty">ADET</th>
+            <th class="num">FİYAT</th>
+            <th class="num">TUTAR</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+        </tbody>
+      </table>
+
+      <div class="r-orders-log">
+        <div class="r-orders-log-title">📋 Sipariş Geçmişi (${activeOrders.length} Sipariş)</div>
+        ${ordersLogHtml}
+      </div>
+
+      <div class="r-totals">
+        <div class="r-total-row">
+          <span>Ara Toplam (KDV Hariç):</span>
+          <span>${kdvHaric} ₺</span>
+        </div>
+        <div class="r-total-row">
+          <span>KDV (%10):</span>
+          <span>${kdvTutar} ₺</span>
+        </div>
+        <div class="r-grand-total">
+          <span>GENEL TOPLAM</span>
+          <span>${grandTotal} ₺</span>
+        </div>
+      </div>
+    `;
+  }
+
+  loadAdisyon();
+  setInterval(loadAdisyon, 3000);
+</script>
+</body>
+</html>

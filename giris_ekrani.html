@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f59e0b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kafe Yönetim">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon-192.png">
+<title>Giriş Ekranı — Artisan Kafe</title>
+<style>
+  :root {
+    --bg: #090d16;
+    --panel: #111827;
+    --card: #1f2937;
+    --ink: #f8fafc;
+    --muted: #94a3b8;
+    --amber: #f59e0b;
+    --amber-dark: #d97706;
+    --blue: #38bdf8;
+    --green: #22c55e;
+    --red: #ef4444;
+    --border: #334155;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body {
+    background: radial-gradient(circle at top, #1e293b 0%, #090d16 70%);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .login-wrapper {
+    width: 100%;
+    max-width: 460px;
+    background: rgba(17, 24, 39, 0.95);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 32px 28px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+  }
+  .brand-head {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .brand-logo {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #f59e0b, #b45309);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 12px;
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
+  }
+  .brand-head h1 { font-size: 1.4rem; font-weight: 800; margin-bottom: 4px; }
+  .brand-head p { font-size: 0.85rem; color: var(--muted); }
+
+  /* Rol Seçim Sekmeleri */
+  .role-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    background: #0b1120;
+    padding: 6px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    margin-bottom: 22px;
+  }
+  .role-tab {
+    padding: 12px 10px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-weight: 800;
+    font-size: 0.88rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+  }
+  .role-tab span.icon { font-size: 1.35rem; }
+  .role-tab.active.personel {
+    background: linear-gradient(135deg, #0284c7, #0369a1);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+  }
+  .role-tab.active.yetkili {
+    background: linear-gradient(135deg, #f59e0b, #b45309);
+    color: #090d16;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+  }
+
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #cbd5e1;
+    margin-bottom: 6px;
+  }
+  .form-input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: #0b1120;
+    color: #fff;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus { border-color: var(--amber); }
+
+  .error-box {
+    display: none;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid var(--red);
+    color: #fca5a5;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  .btn-login {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.98rem;
+    cursor: pointer;
+    transition: transform 0.12s, opacity 0.15s;
+  }
+  .btn-login.personel {
+    background: linear-gradient(135deg, #38bdf8, #0284c7);
+    color: #090d16;
+  }
+  .btn-login.yetkili {
+    background: linear-gradient(135deg, #fbbf24, #d97706);
+    color: #090d16;
+  }
+  .btn-login:hover { transform: translateY(-1px); }
+</style>
+</head>
+<body>
+
+<div class="login-wrapper">
+  <div class="brand-head">
+    <div class="brand-logo">☕</div>
+    <h1>Giriş Ekranı</h1>
+    <p>Yetkili & Çalışan Personel Girişi</p>
+  </div>
+
+  <div class="role-tabs">
+    <button type="button" class="role-tab personel active" id="tabPersonel" onclick="selectRole('personel')">
+      <span class="icon">👨‍🍳</span>
+      <span>Çalışan Personel</span>
+    </button>
+    <button type="button" class="role-tab yetkili" id="tabYetkili" onclick="selectRole('yetkili')">
+      <span class="icon">👔</span>
+      <span>Yetkili / Yönetici</span>
+    </button>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <form onsubmit="handleLogin(event)">
+    <div class="form-group">
+      <label id="userLabel">Personel Kullanıcı Adı</label>
+      <input type="text" id="username" class="form-input" placeholder="Örn: personel" required autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label id="passLabel">Şifre / PIN Kodu</label>
+      <input type="password" id="password" class="form-input" placeholder="••••" required autocomplete="current-password">
+    </div>
+    <button type="submit" class="btn-login personel" id="submitBtn">
+      👨‍🍳 Çalışan Ekranına Giriş Yap
+    </button>
+  </form>
+
+  <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid #334155; text-align: center;">
+    <a href="/kurulum" id="installCenterLink" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:11px 14px; border-radius:12px; background:#0b1120; border:1px solid #334155; color:#f8fafc; text-decoration:none; font-size:0.82rem; font-weight:700;">
+      📲 Cihaza Yükle (Windows • Mac • Android • HarmonyOS • iOS)
+    </a>
+  </div>
+</div>
+
+<script>
+  const API_BASE = window.location.protocol === "file:" ? "http://localhost:8091" : "";
+  if (window.location.protocol === "file:") {
+    fetch("http://localhost:8091/api/me", { mode: "no-cors" })
+      .then(() => { window.location.replace("http://localhost:8091/giris"); })
+      .catch(() => {});
+  }
+
+  let selectedRole = "personel";
+
+  function selectRole(role) {
+    selectedRole = role;
+    document.getElementById("tabPersonel").classList.toggle("active", role === "personel");
+    document.getElementById("tabYetkili").classList.toggle("active", role === "yetkili");
+
+    const userLabel = document.getElementById("userLabel");
+    const usernameInput = document.getElementById("username");
+    const submitBtn = document.getElementById("submitBtn");
+
+    if (role === "yetkili") {
+      userLabel.textContent = "Yetkili / Yönetici Kullanıcı Adı";
+      usernameInput.placeholder = "Örn: yetkili";
+      submitBtn.className = "btn-login yetkili";
+      submitBtn.textContent = "👔 Yetkili Paneline Giriş Yap";
+    } else {
+      userLabel.textContent = "Personel Kullanıcı Adı";
+      usernameInput.placeholder = "Örn: personel";
+      submitBtn.className = "btn-login personel";
+      submitBtn.textContent = "👨‍🍳 Çalışan Ekranına Giriş Yap";
+    }
+    document.getElementById("errorBox").style.display = "none";
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+    await doLogin(user, pass, selectedRole);
+  }
+
+  async function doLogin(username, password, role) {
+    const errEl = document.getElementById("errorBox");
+    errEl.style.display = "none";
+    try {
+      const res = await fetch(`${API_BASE}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password, role })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        errEl.textContent = data.error || "Kullanıcı adı veya şifre hatalı!";
+        errEl.style.display = "block";
+        return;
+      }
+      const target = data.redirect || (role === "yetkili" ? "/yetkili" : "/personel");
+      window.location.href = `${API_BASE}${target}`;
+    } catch (err) {
+      errEl.textContent = "Sunucuya bağlanılamadı! Lütfen sistemin açık olduğundan emin olun.";
+      errEl.style.display = "block";
+    }
+  }
+</script>
+</body>
+</html>
+

@@ -1,0 +1,26 @@
+{
+  "name": "Artisan Kafe — QR Sipariş & Yönetim Sistemi",
+  "short_name": "Kafe Yönetim",
+  "description": "Kafe QR Sipariş, Personel ve Yetkili Yönetim Uygulaması",
+  "start_url": "/giris",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#090d16",
+  "theme_color": "#f59e0b",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
+

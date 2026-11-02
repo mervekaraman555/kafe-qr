@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kafe Personel Ekranı — Masa Siparişleri</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --card: #334155;
+    --ink: #f8fafc;
+    --muted: #94a3b8;
+    --amber: #f59e0b;
+    --blue: #38bdf8;
+    --green: #22c55e;
+    --red: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { background: var(--bg); color: var(--ink); min-height: 100vh; }
+  header {
+    background: #020617; padding: 16px 24px; border-bottom: 1px solid #334155;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+  }
+  .title-area h1 { font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+  .live-pill {
+    background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid #22c55e;
+    padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;
+  }
+  .nav-btns { display: flex; gap: 10px; align-items: center; }
+  .nav-btns a {
+    background: var(--panel); color: var(--ink); text-decoration: none;
+    padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; border: 1px solid #475569; font-weight: 700;
+  }
+
+  /* Garson Zili Çağrı Alanı */
+  .calls-container {
+    max-width: 1400px; margin: 18px auto 0; padding: 0 20px;
+  }
+  .calls-box {
+    background: rgba(239, 68, 68, 0.16); border: 2px solid var(--red);
+    border-radius: 16px; padding: 16px 18px;
+    box-shadow: 0 0 28px rgba(239, 68, 68, 0.35);
+    animation: staffBoxBlink 0.9s ease-in-out infinite;
+  }
+  @keyframes staffBoxBlink {
+    0%, 100% {
+      background: rgba(239, 68, 68, 0.14);
+      border-color: #ef4444;
+      box-shadow: 0 0 24px rgba(239, 68, 68, 0.35);
+    }
+    50% {
+      background: rgba(245, 158, 11, 0.24);
+      border-color: #facc15;
+      box-shadow: 0 0 34px rgba(250, 204, 21, 0.65);
+    }
+  }
+  .calls-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+  }
+  .calls-title {
+    font-size: 1.05rem; font-weight: 800; color: #fca5a5;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .calls-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px;
+  }
+  .call-card {
+    background: #0f172a; border: 2px solid var(--red); border-radius: 12px;
+    padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    animation: callPulse 0.75s ease-in-out infinite;
+  }
+  @keyframes callPulse {
+    0%, 100% {
+      border-color: #ef4444;
+      background: #0f172a;
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      transform: scale(1);
+    }
+    50% {
+      border-color: #facc15;
+      background: #3b0d0d;
+      box-shadow: 0 0 18px 4px rgba(250, 204, 21, 0.55);
+      transform: scale(1.02);
+    }
+  }
+  .call-table-badge {
+    background: var(--red); color: #fff; font-weight: 900; font-size: 1rem;
+    padding: 4px 10px; border-radius: 8px; display: inline-block; margin-bottom: 4px;
+    animation: badgeFlash 0.75s ease-in-out infinite;
+  }
+  @keyframes badgeFlash {
+    0%, 100% { background: #ef4444; color: #fff; }
+    50% { background: #facc15; color: #020617; }
+  }
+  .call-reason { font-weight: 700; font-size: 0.9rem; color: #f8fafc; }
+  .call-time { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  .btn-resolve-call {
+    background: var(--green); color: #020617; border: none; padding: 9px 12px;
+    border-radius: 8px; font-weight: 800; font-size: 0.82rem; cursor: pointer; white-space: nowrap;
+  }
+
+  /* Sadece Masa Siparişleri Tam Genişlik Görünümü */
+  .layout { padding: 20px; max-width: 1400px; margin: 0 auto; }
+
+  .section-box { background: var(--panel); border-radius: 16px; padding: 20px; border: 1px solid #334155; }
+  .section-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+
+  .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .order-card {
+    background: #0f172a; border: 2px solid #475569; border-radius: 14px; padding: 16px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .order-card.bekliyor { border-color: var(--amber); box-shadow: 0 0 18px rgba(245,158,11,0.18); }
+  .order-card.hazirlaniyor { border-color: var(--blue); }
+  .order-card.tamamlandi { border-color: var(--green); opacity: 0.92; }
+
+  .table-tag {
+    font-size: 1.2rem; font-weight: 900; background: var(--amber); color: #020617;
+    padding: 5px 14px; border-radius: 8px; display: inline-block;
+  }
+  .order-card.hazirlaniyor .table-tag { background: var(--blue); }
+  .order-card.tamamlandi .table-tag { background: var(--green); }
+
+  .items-list { margin: 14px 0; font-size: 0.98rem; line-height: 1.6; }
+  .items-list div { padding: 5px 0; border-bottom: 1px dashed #1e293b; display: flex; justify-content: space-between; align-items: center; }
+  .qty-badge {
+    background: #1e293b; color: #fbbf24; font-weight: 900; padding: 2px 8px;
+    border-radius: 6px; margin-right: 6px; font-size: 0.92rem;
+  }
+  .note-box {
+    background: rgba(245,158,11,0.12); color: #fcd34d; padding: 8px 10px;
+    border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px;
+  }
+  .action-row { display: flex; gap: 8px; margin-top: 8px; }
+  .btn-act {
+    flex: 1; padding: 10px 12px; border: none; border-radius: 8px;
+    font-weight: 800; font-size: 0.86rem; cursor: pointer;
+  }
+  .btn-prep { background: var(--blue); color: #020617; }
+  .btn-done { background: var(--green); color: #020617; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-area">
+    <h1>👨‍🍳 Personel Masa Sipariş Ekranı <span class="live-pill">● CANLI</span> <span id="staffUserBadge" style="font-size:0.8rem; color:#94a3b8; font-weight:600;"></span></h1>
+  </div>
+  <div class="nav-btns">
+    <a href="/yetkili" id="yetkiliLink" style="display:none; background:#f59e0b; color:#020617; border-color:#f59e0b;">👔 Yetkili Paneli</a>
+    <a href="/giris" onclick="logoutStaff(event)" style="background:rgba(239,68,68,0.18); border-color:#ef4444; color:#fca5a5;">🚪 Çıkış Yap</a>
+  </div>
+</header>
+
+<div class="calls-container" id="callsWrapper" style="display:none;">
+  <div class="calls-box">
+    <div class="calls-header">
+      <div class="calls-title">🔔 GARSON ZİLİ ÇAĞRILARI (Masadan Çağrı Var!)</div>
+      <span id="activeCallsCount" style="font-size:0.82rem; color:#fca5a5; font-weight:700;">0 aktif çağrı</span>
+    </div>
+    <div class="calls-grid" id="callsGrid"></div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="section-box">
+    <div class="section-title">
+      <span>🍽️ Masa Siparişleri (Hangi Masa Ne İstedi?)</span>
+      <span id="activeCount" style="font-size:0.88rem; color:var(--muted);">0 aktif masa siparişi</span>
+    </div>
+    <div class="orders-grid" id="ordersGrid"></div>
+  </div>
+</div>
+
+<script>
+  let knownOrderIds = new Set();
+  let knownCallIds = new Set();
+  let firstLoad = true;
+  let firstCallLoad = true;
+
+  function beep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.18);
+    } catch (e) {}
+  }
+
+  function bellSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = ctx.currentTime;
+      const notes = [1046.5, 880.0, 1046.5];
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(freq, now + idx * 0.16);
+        gain.gain.setValueAtTime(0.25, now + idx * 0.16);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.16 + 0.35);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.16);
+        osc.stop(now + idx * 0.16 + 0.35);
+      });
+    } catch (e) {}
+  }
+
+  async function resolveCall(callId) {
+    await fetch(`/api/calls/${callId}/resolve`, { method: "POST" });
+    loadAllCalls();
+  }
+
+  async function loadAllCalls() {
+    const res = await fetch("/api/calls");
+    if (!res.ok) return;
+    const data = await res.json();
+    const activeCalls = data.calls.filter(c => c.status === "bekliyor");
+
+    for (const c of activeCalls) {
+      if (!knownCallIds.has(c.id)) {
+        knownCallIds.add(c.id);
+        if (!firstCallLoad) bellSound();
+      }
+    }
+    firstCallLoad = false;
+
+    const wrapper = document.getElementById("callsWrapper");
+    const grid = document.getElementById("callsGrid");
+    const countEl = document.getElementById("activeCallsCount");
+
+    if (activeCalls.length === 0) {
+      wrapper.style.display = "none";
+      grid.innerHTML = "";
+      return;
+    }
+
+    wrapper.style.display = "block";
+    countEl.textContent = `${activeCalls.length} aktif çağrı`;
+    grid.innerHTML = activeCalls.map(c => `
+      <div class="call-card">
+        <div>
+          <span class="call-table-badge">🔔 MASA ${c.table_no}</span>
+          <div class="call-reason">${c.reason}</div>
+          <div class="call-time">Saat: ${c.created_at}</div>
+        </div>
+        <button class="btn-resolve-call" onclick="resolveCall(${c.id})">✅ İlgilenildi</button>
+      </div>
+    `).join("");
+  }
+
+  async function setStatus(orderId, status) {
+    await fetch(`/api/orders/${orderId}/status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status })
+    });
+    loadAllOrders();
+  }
+
+  async function loadAllOrders() {
+    const res = await fetch("/api/orders");
+    const data = await res.json();
+    const active = data.orders.filter(o => o.status !== "odendi");
+
+    const byTableMap = {};
+    for (const o of active) {
+      const keySig = `${o.id}_${o.updated_at}`;
+      if (!knownOrderIds.has(keySig)) {
+        knownOrderIds.add(keySig);
+        if (!firstLoad) beep();
+      }
+      const tNo = o.table_no;
+      if (!byTableMap[tNo]) {
+        byTableMap[tNo] = {
+          id: o.id,
+          table_no: tNo,
+          itemsMap: {},
+          notes: [],
+          status: o.status,
+          created_at: o.created_at,
+          updated_at: o.updated_at
+        };
+      }
+      const grp = byTableMap[tNo];
+      if (o.note && !grp.notes.includes(o.note)) grp.notes.push(o.note);
+      if (o.status === "bekliyor") grp.status = "bekliyor";
+      else if (o.status === "hazirlaniyor" && grp.status !== "bekliyor") grp.status = "hazirlaniyor";
+      for (const it of o.items) {
+        const ikey = `${it.name}_${it.price}`;
+        if (!grp.itemsMap[ikey]) {
+          grp.itemsMap[ikey] = { name: it.name, qty: 0 };
+        }
+        grp.itemsMap[ikey].qty += it.qty;
+      }
+    }
+    firstLoad = false;
+
+    const combinedOrders = Object.values(byTableMap).sort((a, b) => a.table_no - b.table_no);
+    document.getElementById("activeCount").textContent = `${combinedOrders.length} aktif masa siparişi`;
+
+    const grid = document.getElementById("ordersGrid");
+    if (combinedOrders.length === 0) {
+      grid.innerHTML = `<p style="color:var(--muted); font-size:0.95rem;">Şu anda bekleyen veya hazırlanan masa siparişi yok.</p>`;
+    } else {
+      grid.innerHTML = combinedOrders.map(o => {
+        const itemsList = Object.values(o.itemsMap);
+        const itemsHtml = itemsList.map(i => `
+          <div>
+            <span><span class="qty-badge">${i.qty}x</span> <b>${i.name}</b></span>
+          </div>
+        `).join("");
+        let statusBadge = "⏳ Yeni / Ek Sipariş Bekliyor";
+        if (o.status === "hazirlaniyor") statusBadge = "👨‍🍳 Hazırlanıyor";
+        if (o.status === "tamamlandi") statusBadge = "✅ Masaya Servis Edildi";
+        const noteText = o.notes.join(" | ");
+
+        return `
+          <div class="order-card ${o.status}">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="table-tag">MASA ${o.table_no}</span>
+                <span style="font-size:0.78rem; color:var(--muted);">Saat: ${o.updated_at}</span>
+              </div>
+              <div style="font-size:0.82rem; color:var(--muted); margin-top:8px;">${statusBadge}</div>
+              <div class="items-list">${itemsHtml}</div>
+              ${noteText ? `<div class="note-box">📝 Sipariş Notu: ${noteText}</div>` : ""}
+            </div>
+            <div class="action-row">
+              ${o.status === "bekliyor" ? `<button class="btn-act btn-prep" onclick="setStatus(${o.id}, 'hazirlaniyor')">👨‍🍳 Hazırlanıyor</button>` : ""}
+              ${o.status !== "tamamlandi" ? `<button class="btn-act btn-done" onclick="setStatus(${o.id}, 'tamamlandi')">✅ Servis Edildi (Tamamla)</button>` : `<div style="width:100%; text-align:center; padding:8px; border-radius:8px; background:rgba(34,197,94,0.15); color:#4ade80; font-size:0.84rem; font-weight:700;">✅ Tüm Siparişler Teslim Edildi</div>`}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+  }
+
+  async function checkStaffAuth() {
+    try {
+      const res = await fetch("/api/me");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data.user) {
+        window.location.href = "/giris";
+        return;
+      }
+      document.getElementById("staffUserBadge").textContent = `· 👤 ${data.user.name}`;
+      if (data.user.role === "yetkili") {
+        document.getElementById("yetkiliLink").style.display = "inline-block";
+      }
+    } catch (e) {}
+  }
+
+  async function logoutStaff(e) {
+    e.preventDefault();
+    await fetch("/api/logout", { method: "POST" });
+    window.location.href = "/giris";
+  }
+
+  checkStaffAuth();
+  loadAllOrders();
+  loadAllCalls();
+  setInterval(() => {
+    loadAllOrders();
+    loadAllCalls();
+  }, 2000);
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kafe Masa QR Kodları — Yazdırılabilir</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 24px; }
+  .toolbar {
+    max-width: 1080px; margin: 0 auto 24px; background: #fff; padding: 18px 22px;
+    border-radius: 14px; border: 1px solid #e2e8f0; display: flex; flex-wrap: wrap;
+    justify-content: space-between; align-items: center; gap: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  }
+  .toolbar h1 { font-size: 1.2rem; margin: 0 0 4px; }
+  .toolbar p { font-size: 0.85rem; color: #475569; margin: 0; }
+  .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  input { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; }
+  button, .nav-link {
+    background: #b45309; color: #fff; border: none; padding: 9px 16px;
+    border-radius: 8px; font-weight: 700; cursor: pointer; text-decoration: none; font-size: 0.88rem;
+  }
+  button.print-btn { background: #0f172a; }
+  .nav-link.staff { background: #1e293b; }
+  .qr-grid {
+    max-width: 1080px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px;
+  }
+  .qr-card {
+    background: #fff; border: 2px solid #1e293b; border-radius: 18px; padding: 18px;
+    text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,0.04); page-break-inside: avoid;
+  }
+  .qr-card h2 { font-size: 1.35rem; margin: 0 0 4px; color: #b45309; }
+  .qr-card .sub { font-size: 0.78rem; color: #64748b; margin-bottom: 10px; }
+  .qr-box {
+    width: 170px; height: 170px; margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: #f8fafc; border-radius: 10px;
+  }
+  .qr-box img { width: 170px; height: 170px; border-radius: 8px; }
+  .qr-url { font-size: 0.72rem; color: #475569; word-break: break-all; margin-bottom: 8px; }
+  .test-link {
+    display: inline-block; font-size: 0.8rem; font-weight: 700; color: #15803d;
+    text-decoration: none; border: 1px solid #86efac; background: #dcfce7;
+    padding: 5px 10px; border-radius: 999px;
+  }
+  @media print {
+    .toolbar, .test-link { display: none !important; }
+    body { background: #fff; padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div>
+    <h1>🔳 Masa Sipariş Kare Kodları (QR)</h1>
+    <p>Her masanın kendi QR kodu vardır. Müşteri okuttuğunda yalnızca o masanın sipariş ekranı açılır.</p>
+  </div>
+  <div class="controls">
+    <label style="font-size:0.85rem;">Masa Sayısı:
+      <input type="number" id="tableCount" value="12" min="1" max="100" style="width:70px;">
+    </label>
+    <label style="font-size:0.85rem;">Müşteri QR Adresi:
+      <input type="text" id="baseUrl" style="width:230px;">
+    </label>
+    <button onclick="renderQRs()">Güncelle</button>
+    <button class="print-btn" onclick="window.print()">🖨️ Yazdır / PDF Kaydet</button>
+    <a class="nav-link staff" href="/personel">👨‍🍳 Çalışan Ekranı</a>
+  </div>
+</div>
+
+<div class="qr-grid" id="qrGrid"></div>
+
+<script>
+  const defaultHost = "__LAN_ORIGIN__";
+  const initialUrl = defaultHost.startsWith("http") ? defaultHost : window.location.origin;
+  document.getElementById("baseUrl").value = initialUrl;
+
+  function renderQRs() {
+    const count = parseInt(document.getElementById("tableCount").value || "12", 10);
+    const base = document.getElementById("baseUrl").value.replace(/\/+$/, "");
+    const grid = document.getElementById("qrGrid");
+    const cards = [];
+    for (let i = 1; i <= count; i++) {
+      const targetUrl = `${base}/?no=${i}`;
+      const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=${encodeURIComponent(targetUrl)}`;
+      cards.push(`
+        <div class="qr-card">
+          <h2>☕ MASA ${i}</h2>
+          <div class="sub">Menüyü görmek ve sipariş vermek için kameranızla okutun</div>
+          <div class="qr-box">
+            <img src="${qrApi}" alt="Masa ${i} QR">
+          </div>
+          <div class="qr-url">${targetUrl}</div>
+          <a class="test-link" href="${targetUrl}" target="_blank">Masa ${i} Müşteri Ekranını Aç →</a>
+        </div>
+      `);
+    }
+    grid.innerHTML = cards.join("");
+  }
+
+  renderQRs();
+</script>
+</body>
+</html>

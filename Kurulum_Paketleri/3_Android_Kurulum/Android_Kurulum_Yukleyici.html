@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#22c55e">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon-192.png">
+<title>Android Kurulum Yükleyicisi — Kafe QR Sipariş</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { background: #090d16; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .card { max-width: 500px; width: 100%; background: #111827; border: 1.5px solid #22c55e; border-radius: 22px; padding: 28px; box-shadow: 0 24px 60px rgba(0,0,0,0.65); }
+  .badge { display: inline-block; background: rgba(34,197,94,0.18); color: #4ade80; border: 1px solid #22c55e; padding: 5px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 800; margin-bottom: 12px; }
+  h1 { font-size: 1.45rem; margin-bottom: 8px; }
+  p { color: #94a3b8; font-size: 0.9rem; line-height: 1.5; margin-bottom: 18px; }
+  .btn { display: block; width: 100%; text-align: center; text-decoration: none; background: linear-gradient(135deg, #22c55e, #15803d); color: #052e16; font-weight: 800; padding: 14px; border-radius: 12px; border: none; font-size: 1rem; cursor: pointer; margin-bottom: 12px; }
+  .btn-sec { background: #1f2937; color: #e2e8f0; border: 1px solid #334155; }
+  .steps { background: #0b1120; border: 1px solid #1e293b; border-radius: 14px; padding: 16px; margin-top: 14px; font-size: 0.86rem; line-height: 1.7; color: #cbd5e1; }
+  .qr-wrap { text-align: center; margin: 16px 0; background: #fff; padding: 14px; border-radius: 14px; width: 190px; margin-left: auto; margin-right: auto; }
+  .qr-wrap img { width: 160px; height: 160px; display: block; margin: 0 auto; }
+</style>
+</head>
+<body>
+<div class="card">
+  <span class="badge">🤖 ANDROID İŞLETİM SİSTEMİ YÜKLEYİCİSİ</span>
+  <h1>Android Uygulama Kurulumu</h1>
+  <p>Samsung, Xiaomi, Oppo, Vivo ve tüm Android telefon/tabletlere Kafe Yönetim & Sipariş sistemini tam ekran uygulama olarak kurun.</p>
+
+  <button class="btn" id="installAndroidBtn" onclick="installAndroidApp()">📲 Tek Tıkla Android Cihaza Yükle</button>
+  <a class="btn btn-sec" id="openGirisBtn" href="/giris">🔐 Giriş Ekranını Aç</a>
+
+  <div class="qr-wrap" id="qrBox" style="display:none;">
+    <img id="qrImg" alt="Android Kurulum QR">
+    <div style="color:#0f172a; font-size:0.74rem; font-weight:700; margin-top:6px;">Android Kamera ile Okutun</div>
+  </div>
+
+  <div class="steps">
+    <strong>📌 Android'e Nasıl Kurulur?</strong><br>
+    1. Android telefon veya tabletinizden yukarıdaki <b>"Tek Tıkla Android Cihaza Yükle"</b> butonuna basın.<br>
+    2. Otomatik pencere açılmazsa Chrome sağ üst <b>⋮ (Üç Nokta)</b> menüsünden <b>"Uygulamayı Yükle"</b> veya <b>"Ana ekrana ekle"</b> seçeneğine dokunun.<br>
+    3. Ana ekranınıza <b>☕ Kafe Yönetim</b> uygulaması tam ekran olarak kurulacaktır.
+  </div>
+</div>
+
+<script>
+  let deferredPrompt = null;
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  }
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+
+  async function installAndroidApp() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+    } else {
+      alert("Android Chrome tarayıcınızda sağ üstteki ⋮ (Üç Nokta) menüsüne dokunup 'Uygulamayı Yükle' veya 'Ana ekrana ekle' seçeneğine basın.");
+    }
+  }
+
+  const hostUrl = window.location.protocol === "file:" ? "http://localhost:8091/giris" : `${window.location.origin}/giris`;
+  document.getElementById("openGirisBtn").href = hostUrl;
+  if (window.location.protocol.startsWith("http")) {
+    const qrBox = document.getElementById("qrBox");
+    const qrImg = document.getElementById("qrImg");
+    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=6&data=${encodeURIComponent(window.location.origin + "/kurulum?os=android")}`;
+    qrBox.style.display = "block";
+  }
+</script>
+</body>
+</html>
+

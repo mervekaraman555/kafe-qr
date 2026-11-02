@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>PayloadContent</key>
+    <array>
+        <dict>
+            <key>FullScreen</key>
+            <true/>
+            <key>Icon</key>
+            <data>iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAFbUlEQVR4nO3dS27bSBQFUEvoDWSWAefZYy+g95g5B5l5CQnUgBruxJYlsYr1ivccwFPboO6tV/xIOr0U8+Xrt5+j/wf6ef3x/fRSyNB/RtgZXYrd/7DQU6kMu/0xwadiEbr/EcGnchG6/XLBZ4YiNP+lgs9MRTi3/GXCT2+tM9akTYLPrNNg8wQQfkZpkb1NBRB+RtuawacLIPxUsSWLTxVA+Knm2Uw+XADhp6pnsvlQAYSf6h7N6Gm28K//rKP/BW5Y/l5eZrpEeqoefoGf2zKwEPeU4FQx/EJ/TMuAMnxWgjIFEPosy05l+KwAN0+ChZ/ZF7zPMnwaGX6rPntNg48mQdOnQR8h/FTIwmnv1V/wGTUN3psCu04A4adaRs57rf7Cz+isvJftXSaA8FM1M+feq7/wUyk7v2e86wQQfqpn6Nxr9Rd+qmbpbdaH3QeACroUwOrPLJk6t97+CD+9tMzWNfO2QERrWgCrP721zlizAgg/e2mZNVsgop2rvNkd9nbJfpMJYPvD3lplzhaIaApAtM0FsP1hlBbZMwGIpgBEUwCibSqA/T+jbc2gCUA0BSCaAhBNAYj21+h/YNaP6tty8jXL70xgAhBNAYimAERTAKIpANEUgGgKQDQFIJoCEE0BiKYARFMAoikA0RSAaApANAUgmgIQTQGIpgBEO235ggzvN6WCj94PfQ8TgGgKQDQFIJoCEE0BiBb/yXBbriAcxRr86XGxBRD8P49FYhEit0DC77hETgDBv/8YrSHTIHICQFwBrP6OV2wBhN9xiy4AxBbA6u/43RJ1FYg+i8o68RWjw08A9inEMukddQUguggKQHMzlUABiC6BAhBdAgXgYZerPtef2UugAGxybxGqUgCauFWCylNAAWhmxkmgAOyi6hRQAKKngAIQTQHYbQpU3AYpANEUgGgKQDQFIJoCEE0BiKYARFMAmvvoen/Fu8QKQDQFoKmKd3tvUQB2UXH7c6EAxK7+FwpA9/BXXf0vfDQicav+WwpA19BXXv0vbIHopnr4LxSA2PBfKACx4b9wDkBk8K8UgMjgXykAUYH/nXMAoikA0RSAaApANAUg2uELcKQrFiOsBz9+hy8AvKQX4OirWC9rwHGLKEDKi9nSGnK8YgoAL+mPQlxXtdnfxdTTGrLyR0+AtBf5XmvgcYmaAG+ZBn8ei0SxBbhKfvEJ3QLBISaAk9k61kkn6bQTQPhrWSa9sjZlAWY92Ee3TPi6TFkAaEUBiKYARFMAoikA0RSAaApAtCkLMOtdx6NbJ3xdpizArAf7yNZJX4+pnwWa9aBTx7QTAIYXYMZnPziWZWMGTQCiKQDRFIBomwvgPIBRWmTPBCCaAhCtSQFsg9hbq8ydX398PzX5TTCZS/ZtgYjWrAC2QeylZdaaTgAloLfWGbMFItq/BWh5ImwK0EvLbF0z32UCKAGzZMoWiGj/FaD1/QBTgKpZepv1rhNACaieof8VoMddYSWgUnZ+z/gu5wBKQNXM/FGAXs8GKQGjs/Jetne9CqQEVMvIh6v9l6/ffvb8wz7Thz2D/9HOZth9ANOAClm4ud/vPQWuTINMy07Bv3Vee3MC7PVmGdMgz1Ig/BefBnyvKfCWiXBMy4CtzuYCjCrBlTLMbRm4v79nB3P3FmdkCd5SiNqWIp8Xe+/2/aE9fpUSQKtz14cug/oECap7NKMP3wdQAqp6JptP3QhTAqp5NpNP3wlWAqrYksVNj0IoAaNtzeDmZ4GUgFFaZK/pow4uk7KHlotu06dBTQN6a52xbg+7mQbMsLh2f9pTEai8q9jtuwEUgYrb6d2/HEMRqHQeOfTbYZSB0RdPyn09klIc22uxr+T6BTOd2Rn2yhiNAAAAAElFTkSuQmCC</data>
+            <key>IgnoreManifestScope</key>
+            <true/>
+            <key>IsRemovable</key>
+            <true/>
+            <key>Label</key>
+            <string>Kafe Yönetim</string>
+            <key>PayloadDescription</key>
+            <string>Kafe QR Sipariş ve Yönetim Uygulaması</string>
+            <key>PayloadDisplayName</key>
+            <string>Kafe Yönetim WebClip</string>
+            <key>PayloadIdentifier</key>
+            <string>com.artisankafe.qrsiparis.webclip</string>
+            <key>PayloadType</key>
+            <string>com.apple.webClip.managed</string>
+            <key>PayloadUUID</key>
+            <string>A1B2C3D4-E5F6-4789-9012-3456789ABCDE</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>Precomposed</key>
+            <true/>
+            <key>URL</key>
+            <string>http://192.168.1.7:8091/giris</string>
+        </dict>
+    </array>
+    <key>PayloadDescription</key>
+    <string>Artisan Kafe iOS ve iPadOS Tam Ekran Uygulama Kurulum Profili</string>
+    <key>PayloadDisplayName</key>
+    <string>Kafe Yönetim — iOS Uygulaması</string>
+    <key>PayloadIdentifier</key>
+    <string>com.artisankafe.qrsiparis.profile</string>
+    <key>PayloadOrganization</key>
+    <string>Artisan Kafe</string>
+    <key>PayloadRemovalDisallowed</key>
+    <false/>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadUUID</key>
+    <string>F1E2D3C4-B5A6-4987-8012-3456789EDCBA</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+</dict>
+</plist>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kafe Yönetim">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="manifest" href="/manifest.json">
+<title>iOS (iPhone & iPad) Kurulum Yükleyicisi — Kafe QR Sipariş</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { background: #090d16; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .card { max-width: 500px; width: 100%; background: #111827; border: 1.5px solid #38bdf8; border-radius: 22px; padding: 28px; box-shadow: 0 24px 60px rgba(0,0,0,0.65); }
+  .badge { display: inline-block; background: rgba(56,189,248,0.18); color: #7dd3fc; border: 1px solid #38bdf8; padding: 5px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 800; margin-bottom: 12px; }
+  h1 { font-size: 1.45rem; margin-bottom: 8px; }
+  p { color: #94a3b8; font-size: 0.9rem; line-height: 1.5; margin-bottom: 18px; }
+  .btn { display: block; width: 100%; text-align: center; text-decoration: none; background: linear-gradient(135deg, #38bdf8, #0284c7); color: #090d16; font-weight: 800; padding: 14px; border-radius: 12px; border: none; font-size: 1rem; cursor: pointer; margin-bottom: 12px; }
+  .btn-sec { background: #1f2937; color: #e2e8f0; border: 1px solid #334155; }
+  .steps { background: #0b1120; border: 1px solid #1e293b; border-radius: 14px; padding: 16px; margin-top: 14px; font-size: 0.86rem; line-height: 1.7; color: #cbd5e1; }
+  .qr-wrap { text-align: center; margin: 16px 0; background: #fff; padding: 14px; border-radius: 14px; width: 190px; margin-left: auto; margin-right: auto; }
+  .qr-wrap img { width: 160px; height: 160px; display: block; margin: 0 auto; }
+</style>
+</head>
+<body>
+<div class="card">
+  <span class="badge">🍎 APPLE iOS / iPadOS YÜKLEYİCİSİ</span>
+  <h1>iPhone & iPad Uygulama Kurulumu</h1>
+  <p>App Store gerekmeden iPhone ve iPad cihazlarınıza Kafe Yönetim & Sipariş uygulamasını tam ekran olarak yükleyin.</p>
+
+  <a class="btn" id="profileBtn" href="/kurulum/ios.mobileconfig">📥 1. Yol: iOS Kurulum Profili İndir (.mobileconfig)</a>
+  <a class="btn btn-sec" id="openGirisBtn" href="/giris">🔐 Giriş Ekranını Aç</a>
+
+  <div class="qr-wrap" id="qrBox" style="display:none;">
+    <img id="qrImg" alt="iOS Kurulum QR">
+    <div style="color:#0f172a; font-size:0.74rem; font-weight:700; margin-top:6px;">iPhone Kamera ile Okutun</div>
+  </div>
+
+  <div class="steps">
+    <strong>📌 1. Yol: Doğrudan iOS Profil Yükleyici ile Kurulum:</strong><br>
+    • Yukarıdaki <b>"iOS Kurulum Profili İndir"</b> butonuna dokunun.<br>
+    • iPhone/iPad'de <b>Ayarlar ➔ İndirilen Profil ➔ Yükle</b> adımlarını onaylayın. Uygulama ana ekranınıza kurulacaktır.<br><br>
+    <strong>📌 2. Yol: Safari "Ana Ekrana Ekle" ile Hızlı Kurulum:</strong><br>
+    • Safari'de alt ortadaki <b>Paylaş (⬆️)</b> simgesine dokunun.<br>
+    • Menüden <b>"Ana Ekrana Ekle"</b> seçeneğine basıp sağ üstten <b>Ekle</b>'ye dokunun.
+  </div>
+</div>
+
+<script>
+  const isFile = window.location.protocol === "file:";
+  const base = isFile ? "http://localhost:8091" : window.location.origin;
+  document.getElementById("profileBtn").href = `${base}/kurulum/ios.mobileconfig`;
+  document.getElementById("openGirisBtn").href = `${base}/giris`;
+  if (!isFile) {
+    const qrBox = document.getElementById("qrBox");
+    const qrImg = document.getElementById("qrImg");
+    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=6&data=${encodeURIComponent(base + "/kurulum?os=ios")}`;
+    qrBox.style.display = "block";
+  }
+</script>
+</body>
+</html>
+

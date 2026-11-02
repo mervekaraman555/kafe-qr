@@ -1,0 +1,22 @@
+{
+  "package": "com.artisankafe.harmonyos",
+  "name": "Kafe Yönetim",
+  "versionName": "1.0.0",
+  "versionCode": 1,
+  "minPlatformVersion": 1080,
+  "icon": "/icon-512.png",
+  "features": [
+    { "name": "system.webview" },
+    { "name": "system.network" }
+  ],
+  "router": {
+    "entry": "GirisEkrani",
+    "pages": {
+      "GirisEkrani": {
+        "component": "index",
+        "path": "/giris"
+      }
+    }
+  }
+}
+
