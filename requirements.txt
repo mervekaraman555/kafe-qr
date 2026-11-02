@@ -1,0 +1,1 @@
+# Sıfır dış bağımlılık - yalnızca Python standart kütüphanesi kullanılır

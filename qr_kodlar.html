@@ -74,7 +74,8 @@
 
 <script>
   const defaultHost = "__LAN_ORIGIN__";
-  const initialUrl = defaultHost.startsWith("http") ? defaultHost : window.location.origin;
+  const isCloudHost = window.location.protocol === "https:" || (!window.location.hostname.startsWith("192.168.") && !window.location.hostname.startsWith("10.") && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1");
+  const initialUrl = isCloudHost ? window.location.origin : (defaultHost.startsWith("http") ? defaultHost : window.location.origin);
   document.getElementById("baseUrl").value = initialUrl;
 
   function renderQRs() {

@@ -431,12 +431,15 @@ class BaseKafeHandler(BaseHTTPRequestHandler):
         return None
 
     def _read_json_body(self) -> dict:
+        if hasattr(self, "_cached_json_body"):
+            return self._cached_json_body
         length = int(self.headers.get("Content-Length", "0"))
         body = self.rfile.read(length).decode("utf-8") if length > 0 else "{}"
         try:
-            return json.loads(body or "{}")
+            self._cached_json_body = json.loads(body or "{}")
         except json.JSONDecodeError:
-            return {}
+            self._cached_json_body = {}
+        return self._cached_json_body
 
     def _serve_upload(self, path: str) -> bool:
         if not path.startswith("/uploads/"):
@@ -613,8 +616,7 @@ class BaseKafeHandler(BaseHTTPRequestHandler):
 
 class MusteriHandler(BaseKafeHandler):
     """
-    Sadece Müşteri QR Sipariş Ekranına hizmet verir (Port 8090).
-    Çalışan ekranı (/personel) ve yönetim uç noktaları bu sunucuda tamamen kapalıdır.
+    Müşteri QR Sipariş Ekranına ve bulut ortamında tek port üzerinden tüm uç noktalara hizmet verir.
     """
 
     def do_GET(self):
@@ -625,6 +627,38 @@ class MusteriHandler(BaseKafeHandler):
         if path in ("/", "/masa"):
             with open(MUSTERI_HTML_PATH, "r", encoding="utf-8") as f:
                 return self._send_html(f.read())
+
+        if path in ("/giris", "/login", "/giris_ekrani.html"):
+            with open(GIRIS_HTML_PATH, "r", encoding="utf-8") as f:
+                return self._send_html(f.read())
+
+        if path == "/personel":
+            with open(CALISAN_HTML_PATH, "r", encoding="utf-8") as f:
+                return self._send_html(f.read())
+
+        if path == "/yetkili":
+            with open(YETKILI_HTML_PATH, "r", encoding="utf-8") as f:
+                return self._send_html(f.read())
+
+        if path == "/reklam":
+            reklam_path = os.path.join(BASE_DIR, "reklam_videosu.html")
+            if os.path.exists(reklam_path):
+                with open(reklam_path, "r", encoding="utf-8") as f:
+                    return self._send_html(f.read())
+
+        if path.startswith("/audio/"):
+            fname = os.path.basename(path)
+            audio_path = os.path.join(BASE_DIR, "audio", fname)
+            if os.path.exists(audio_path) and fname.endswith(".mp3"):
+                with open(audio_path, "rb") as f:
+                    raw = f.read()
+                self.send_response(200)
+                self.send_header("Content-Type", "audio/mpeg")
+                self.send_header("Content-Length", str(len(raw)))
+                self.send_header("Accept-Ranges", "bytes")
+                self.end_headers()
+                self.wfile.write(raw)
+                return
 
         if self._serve_upload(path) or self._serve_pwa_and_installers(path):
             return
@@ -638,6 +672,16 @@ class MusteriHandler(BaseKafeHandler):
             with open(QR_HTML_PATH, "r", encoding="utf-8") as f:
                 return self._send_html(f.read().replace("__LAN_ORIGIN__", lan_origin))
 
+        if path == "/api/me":
+            user = self._get_session_user()
+            return self._send_json({"user": user})
+
+        if path == "/api/users":
+            conn = db_conn()
+            rows = conn.execute("SELECT id, name, username, role FROM users ORDER BY id ASC").fetchall()
+            conn.close()
+            return self._send_json({"users": [dict(r) for r in rows]})
+
         if path == "/api/menu":
             conn = db_conn()
             rows = conn.execute("SELECT * FROM menu ORDER BY id ASC").fetchall()
@@ -645,26 +689,30 @@ class MusteriHandler(BaseKafeHandler):
             return self._send_json({"items": [dict(r) for r in rows]})
 
         if path == "/api/orders":
-            table_no = qs.get("table_no", [None])[0]
-            if table_no is None:
-                return self._send_json({"error": "Masa numarası gerekli"}, status=400)
             conn = db_conn()
-            rows = conn.execute(
-                "SELECT * FROM orders WHERE table_no = ? ORDER BY id DESC",
-                (int(table_no),),
-            ).fetchall()
+            table_no = qs.get("table_no", [None])[0]
+            if table_no is not None:
+                rows = conn.execute(
+                    "SELECT * FROM orders WHERE table_no = ? ORDER BY id DESC",
+                    (int(table_no),),
+                ).fetchall()
+            else:
+                rows = conn.execute("SELECT * FROM orders ORDER BY id DESC").fetchall()
             conn.close()
             return self._send_json({"orders": [serialize_order(r) for r in rows]})
 
         if path == "/api/calls":
-            table_no = qs.get("table_no", [None])[0]
-            if table_no is None:
-                return self._send_json({"error": "Masa numarası gerekli"}, status=400)
             conn = db_conn()
-            rows = conn.execute(
-                "SELECT * FROM waiter_calls WHERE table_no = ? AND status = 'bekliyor' ORDER BY id DESC",
-                (int(table_no),),
-            ).fetchall()
+            table_no = qs.get("table_no", [None])[0]
+            if table_no is not None:
+                rows = conn.execute(
+                    "SELECT * FROM waiter_calls WHERE table_no = ? AND status = 'bekliyor' ORDER BY id DESC",
+                    (int(table_no),),
+                ).fetchall()
+            else:
+                rows = conn.execute(
+                    "SELECT * FROM waiter_calls WHERE status = 'bekliyor' ORDER BY id DESC"
+                ).fetchall()
             conn.close()
             return self._send_json({"calls": [serialize_call(r) for r in rows]})
 
@@ -674,6 +722,11 @@ class MusteriHandler(BaseKafeHandler):
         parsed = urlparse(self.path)
         path = parsed.path
         payload = self._read_json_body()
+
+        if path == "/api/login":
+            return PersonelHandler.do_POST(self)
+        if path in ("/api/logout", "/api/menu", "/api/users") or path.startswith("/api/menu/") or path.startswith("/api/users/") or (path.startswith("/api/orders/") and path.endswith("/status")):
+            return PersonelHandler.do_POST(self)
 
         if path == "/api/orders":
             table_no = int(payload.get("table_no", 1))
