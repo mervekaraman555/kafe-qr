@@ -225,7 +225,6 @@
   </div>
   <div style="display:flex; align-items:center; gap:8px; margin-left:auto;">
     <button class="btn btn-print" onclick="window.print()">🖨️ Adisyonu Yazdır</button>
-    <button class="btn btn-pay" id="closeBillBtn" onclick="closeTableBill()">💳 Hesabı Kapat</button>
   </div>
 </div>
 
@@ -310,7 +309,6 @@
   if (isCustomerView) {
     document.getElementById("tableSelect").style.display = "none";
     document.getElementById("tableSelectLabel").style.display = "none";
-    document.getElementById("closeBillBtn").style.display = "none";
   } else {
     const localCount = parseInt(localStorage.getItem("kafe_table_count") || "20", 10);
     populateTableSelect(localCount);
