@@ -24,8 +24,11 @@ FILES = [
     "icon-512.png",
 ]
 
-project_dir = os.path.dirname(os.path.abspath(__file__))
 home_dir = os.path.expanduser("~")
+try:
+    project_dir = os.path.dirname(os.path.abspath(__file__))
+except NameError:
+    project_dir = os.path.join(home_dir, "kafe_1") if os.path.isdir(os.path.join(home_dir, "kafe_1")) else os.path.join(home_dir, "kafe-qr")
 target_dirs = {project_dir}
 for dname in ("kafe_1", "kafe-qr"):
     cand = os.path.join(home_dir, dname)
