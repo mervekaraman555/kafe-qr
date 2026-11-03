@@ -1,4 +1,4 @@
-const CACHE_NAME = "kafe-qr-v3";
+const CACHE_NAME = "kafe-qr-v4";
 self.addEventListener("install", (event) => {
   self.skipWaiting();
 });

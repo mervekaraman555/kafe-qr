@@ -340,11 +340,17 @@
   </div>
   <div class="nav-btns">
     <a href="/personel" class="staff-btn">👨‍🍳 Çalışan Sipariş Ekranı</a>
-    <a href="/adisyon?no=1">🧾 Masa Adisyonları</a>
-    <a href="/qr">🔳 Masa QR Kodları</a>
+    <a href="/adisyon?no=1" onclick="openOverlayModal(event, '/adisyon?no=1')">🧾 Masa Adisyonları</a>
+    <a href="/qr" onclick="openOverlayModal(event, '/qr')">🔳 Masa QR Kodları</a>
     <button class="logout-btn" onclick="logout()">🚪 Çıkış Yap</button>
   </div>
 </header>
+
+<!-- Uygulama İçi Adisyon / QR Kapatılabilir Tam Ekran Modal -->
+<div id="overlayModal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(9,13,22,0.92); backdrop-filter:blur(4px); flex-direction:column;">
+  <button type="button" onclick="closeOverlayModal()" title="Kapat (✕)" style="position:fixed; top:14px; right:16px; z-index:100001; width:46px; height:46px; border-radius:50%; background:#ef4444; color:#fff; border:2px solid #fff; font-size:1.35rem; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 20px rgba(0,0,0,0.5);">✕</button>
+  <iframe id="overlayIframe" src="about:blank" style="width:100%; height:100%; border:none; flex:1; background:#f8fafc;"></iframe>
+</div>
 
 <div class="container">
   <!-- Ciro & Masa İstatistikleri -->
@@ -1042,7 +1048,7 @@
               <div style="text-align:right; flex-shrink:0;">
                 <div style="font-size:1.25rem; font-weight:900; color:#4ade80; margin-bottom:6px;">${t.total} ₺</div>
                 <div style="display:flex; gap:6px;">
-                  <a href="/adisyon?no=${t.table_no}" style="background:#f59e0b; color:#090d16; text-decoration:none; padding:6px 10px; border-radius:7px; font-size:0.78rem; font-weight:800;">🧾 Adisyon</a>
+                  <a href="/adisyon?no=${t.table_no}" onclick="openOverlayModal(event, '/adisyon?no=${t.table_no}')" style="background:#f59e0b; color:#090d16; text-decoration:none; padding:6px 10px; border-radius:7px; font-size:0.78rem; font-weight:800;">🧾 Adisyon</a>
                   <button onclick="closeTableBill(${t.table_no})" style="background:#ef4444; color:#fff; border:none; padding:6px 10px; border-radius:7px; font-size:0.78rem; font-weight:800; cursor:pointer;">💳 Hesabı Kapat</button>
                 </div>
               </div>
@@ -1066,6 +1072,25 @@
       `;
     }).join("");
   }
+
+  function openOverlayModal(e, url) {
+    if (e) e.preventDefault();
+    const modal = document.getElementById("overlayModal");
+    const frame = document.getElementById("overlayIframe");
+    frame.src = url;
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeOverlayModal() {
+    const modal = document.getElementById("overlayModal");
+    const frame = document.getElementById("overlayIframe");
+    modal.style.display = "none";
+    frame.src = "about:blank";
+    document.body.style.overflow = "";
+    loadStatsAndOrders();
+  }
+  window.closeOverlayModal = closeOverlayModal;
 
   checkAuth();
   loadMenu();

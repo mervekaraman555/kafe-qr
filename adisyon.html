@@ -60,12 +60,19 @@
   .btn-back { background: #f1f5f9; color: #0f172a; border: 1.5px solid #cbd5e1; }
   .btn-back:hover { background: #e2e8f0; }
   .btn-close-x {
-    background: #fee2e2; color: #991b1b; border: 1.5px solid #fca5a5;
-    width: 36px; height: 36px; border-radius: 50%; font-size: 1.05rem; font-weight: 900;
+    background: #ef4444; color: #ffffff; border: 2px solid #fca5a5;
+    width: 42px; height: 42px; border-radius: 50%; font-size: 1.25rem; font-weight: 900;
     cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
-    padding: 0; flex-shrink: 0;
+    padding: 0; flex-shrink: 0; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
   }
-  .btn-close-x:hover { background: #fecaca; }
+  .btn-close-x:hover { background: #dc2626; }
+  .floating-close-x {
+    position: fixed; top: 14px; right: 14px; z-index: 9999;
+    background: #ef4444; color: #ffffff; border: 2px solid #ffffff;
+    width: 46px; height: 46px; border-radius: 50%; font-size: 1.35rem; font-weight: 900;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35); text-decoration: none;
+  }
   .paper-close-x {
     position: absolute; top: 12px; right: 12px;
     background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1;
@@ -216,12 +223,14 @@
 
   @media print {
     body { background: #fff; padding: 0; }
-    .toolbar, .staff-actions, .paper-close-x, .bottom-back-wrap { display: none !important; }
+    .toolbar, .staff-actions, .paper-close-x, .floating-close-x, .bottom-back-wrap { display: none !important; }
     .receipt-paper { box-shadow: none; border: none; max-width: 100%; }
   }
 </style>
 </head>
 <body>
+
+<button type="button" class="floating-close-x" onclick="goBackFromAdisyon()" title="Kapat (✕)" aria-label="Kapat">✕</button>
 
 <div class="toolbar" id="toolbar">
   <div style="display:flex; align-items:center; gap:8px;">
@@ -271,15 +280,16 @@
   const isCustomerView = params.get("musteri") === "1";
 
   function goBackFromAdisyon() {
+    try {
+      if (window.parent && window.parent !== window && typeof window.parent.closeOverlayModal === "function") {
+        window.parent.closeOverlayModal();
+        return;
+      }
+    } catch (e) {}
     const targetFallback = isCustomerView ? `/?no=${tableNo}` : "/yetkili";
     if (window.opener && !window.opener.closed) {
       window.close();
-      setTimeout(() => { window.location.href = targetFallback; }, 150);
-      return;
-    }
-    if (document.referrer && document.referrer.indexOf(window.location.host) !== -1) {
-      window.history.back();
-      setTimeout(() => { window.location.href = targetFallback; }, 250);
+      setTimeout(() => { window.location.href = targetFallback; }, 120);
       return;
     }
     window.location.href = targetFallback;

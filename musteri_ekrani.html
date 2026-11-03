@@ -362,6 +362,12 @@
   </div>
 </div>
 
+<!-- Uygulama İçi Adisyon Fişi Kapatılabilir Modal -->
+<div id="overlayModal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(15,12,10,0.92); backdrop-filter:blur(4px); flex-direction:column;">
+  <button type="button" onclick="closeOverlayModal()" title="Kapat (✕)" style="position:fixed; top:14px; right:16px; z-index:100001; width:46px; height:46px; border-radius:50%; background:#ef4444; color:#fff; border:2px solid #fff; font-size:1.35rem; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 20px rgba(0,0,0,0.5);">✕</button>
+  <iframe id="overlayIframe" src="about:blank" style="width:100%; height:100%; border:none; flex:1; background:#f1f5f9;"></iframe>
+</div>
+
 <!-- Alt Sepet Barı -->
 <div class="cart-bar">
   <div class="cart-inner">
@@ -729,7 +735,7 @@
 
     const adisyonBtnHTML = `
       <div style="margin-top: 10px; text-align: right;">
-        <a href="/adisyon?no=${tableNo}&musteri=1" style="display:inline-flex; align-items:center; gap:6px; background:#1f1a17; color:#fff; text-decoration:none; padding:9px 14px; border-radius:10px; font-size:0.84rem; font-weight:700;">
+        <a href="/adisyon?no=${tableNo}&musteri=1" onclick="openOverlayModal(event, '/adisyon?no=${tableNo}&musteri=1')" style="display:inline-flex; align-items:center; gap:6px; background:#1f1a17; color:#fff; text-decoration:none; padding:9px 14px; border-radius:10px; font-size:0.84rem; font-weight:700;">
           🧾 Hesap Adisyonu Fişini Görüntüle (${totalAll} ₺)
         </a>
       </div>
@@ -737,6 +743,25 @@
 
     box.innerHTML = bannerHTML + rowsHTML + adisyonBtnHTML;
   }
+
+  function openOverlayModal(e, url) {
+    if (e) e.preventDefault();
+    const modal = document.getElementById("overlayModal");
+    const frame = document.getElementById("overlayIframe");
+    frame.src = url;
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeOverlayModal() {
+    const modal = document.getElementById("overlayModal");
+    const frame = document.getElementById("overlayIframe");
+    modal.style.display = "none";
+    frame.src = "about:blank";
+    document.body.style.overflow = "";
+    loadTableOrders();
+  }
+  window.closeOverlayModal = closeOverlayModal;
 
   updateTableUI();
   loadMenu();
