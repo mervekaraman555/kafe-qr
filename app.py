@@ -628,6 +628,35 @@ class BaseKafeHandler(BaseHTTPRequestHandler):
             self.wfile.write(raw)
             return True
 
+        if path == "/guncelle":
+            import subprocess, glob
+            logs = []
+            try:
+                out = subprocess.check_output(
+                    ["git", "-C", BASE_DIR, "pull", "--rebase", "origin", "main"],
+                    stderr=subprocess.STDOUT,
+                    timeout=20,
+                ).decode("utf-8", errors="ignore")
+                logs.append(out.strip())
+            except Exception as e:
+                logs.append(f"Git pull bilgi: {e}")
+            for wsgi_file in glob.glob("/var/www/*_wsgi.py"):
+                try:
+                    os.utime(wsgi_file, None)
+                    logs.append(f"WSGI yenilendi: {wsgi_file}")
+                except Exception as e:
+                    logs.append(f"WSGI hata: {e}")
+            msg_html = "<br>".join(logs) or "Güncelleme tamamlandı."
+            self._send_html(
+                f"<!DOCTYPE html><html lang='tr'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
+                f"<title>Sistem Güncellendi</title></head><body style='background:#0f0d0b;color:#f5f0eb;font-family:sans-serif;padding:30px;text-align:center;'>"
+                f"<h2 style='color:#10b981;'>✅ Bulut Sunucu Güncellendi!</h2>"
+                f"<p style='color:#c2b29f;font-size:14px;'>{msg_html}</p>"
+                f"<a href='/giris' style='display:inline-block;margin-top:16px;padding:12px 24px;background:#d97706;color:#fff;text-decoration:none;border-radius:10px;font-weight:bold;'>Giriş Ekranına Dön</a>"
+                f"</body></html>"
+            )
+            return True
+
         return False
 
 
