@@ -1183,8 +1183,8 @@ class PersonelHandler(BaseKafeHandler):
             new_status = payload.get("status", "tamamlandi")
             now = datetime.now().strftime("%H:%M:%S")
             conn = db_conn()
+            row = conn.execute("SELECT table_no FROM orders WHERE id = ?", (order_id,)).fetchone()
             if new_status == "odendi":
-                row = conn.execute("SELECT table_no FROM orders WHERE id = ?", (order_id,)).fetchone()
                 if row:
                     t_no = row["table_no"]
                     conn.execute(
@@ -1196,10 +1196,17 @@ class PersonelHandler(BaseKafeHandler):
                         (now, t_no),
                     )
             else:
-                conn.execute(
-                    "UPDATE orders SET status = ?, updated_at = ? WHERE id = ?",
-                    (new_status, now, order_id),
-                )
+                if row:
+                    t_no = row["table_no"]
+                    conn.execute(
+                        "UPDATE orders SET status = ?, updated_at = ? WHERE table_no = ? AND status != 'odendi'",
+                        (new_status, now, t_no),
+                    )
+                else:
+                    conn.execute(
+                        "UPDATE orders SET status = ?, updated_at = ? WHERE id = ?",
+                        (new_status, now, order_id),
+                    )
             conn.commit()
             conn.close()
             return self._send_json({"ok": True})

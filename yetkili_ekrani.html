@@ -1039,10 +1039,14 @@
         openTablesList.map(t => {
           const itemsStr = Object.values(t.itemsMap).map(i => `${i.qty}x ${i.name}`).join(", ");
           const done = t.status === "tamamlandi";
+          let stText = "📋 Onaylandı";
+          if (t.status === "hazirlaniyor") stText = "👨‍🍳 Hazırlanıyor";
+          else if (t.status === "hazir") stText = "🍽️ Hazır";
+          else if (done) stText = "✅ Teslim Edildi";
           return `
             <div style="background:#090d16; border:1px solid #334155; border-radius:12px; padding:14px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
               <div>
-                <div style="font-weight:800; font-size:1rem;">📍 Masa ${t.table_no} <span style="font-size:0.75rem; color:${done ? '#4ade80' : '#fbbf24'};">(${done ? '✅ Servis Edildi' : '⏳ Hazırlanıyor'})</span></div>
+                <div style="font-weight:800; font-size:1rem;">📍 Masa ${t.table_no} <span style="font-size:0.75rem; color:${done ? '#4ade80' : '#fbbf24'};">(${stText})</span></div>
                 <div style="font-size:0.8rem; color:#cbd5e1; margin-top:4px;">${itemsStr}</div>
               </div>
               <div style="text-align:right; flex-shrink:0;">

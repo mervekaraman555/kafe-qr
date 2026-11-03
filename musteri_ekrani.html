@@ -151,9 +151,145 @@
   .badge {
     font-size: 0.75rem; font-weight: 700; padding: 3px 9px; border-radius: 999px;
   }
-  .badge.bekliyor { background: var(--amber-bg); color: #92400e; }
+  .badge.bekliyor, .badge.onaylandi { background: var(--amber-bg); color: #92400e; }
   .badge.hazirlaniyor { background: var(--blue-bg); color: var(--blue); }
+  .badge.hazir { background: #f3e8ff; color: #7e22ce; border: 1px solid #d8b4fe; }
   .badge.tamamlandi { background: var(--green-bg); color: var(--green); }
+
+  /* Sipariş Aşamaları (Onaylandı -> Hazırlanıyor -> Hazır -> Teslim Edildi) Sıralama İkonları */
+  .order-stepper-box {
+    background: linear-gradient(180deg, #fffdf9 0%, #f8f3eb 100%);
+    border: 1.5px solid #e5dccb;
+    border-radius: 14px;
+    padding: 16px 12px 14px;
+    margin-bottom: 12px;
+    box-shadow: inset 0 1px 0 #fff, 0 4px 12px rgba(31, 26, 23, 0.04);
+  }
+  .order-stepper-track {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    align-items: start;
+    gap: 4px;
+  }
+  .stepper-line-bg {
+    position: absolute;
+    top: 23px;
+    left: 12.5%;
+    right: 12.5%;
+    height: 5px;
+    background: #e5dccb;
+    border-radius: 999px;
+    z-index: 1;
+  }
+  .stepper-line-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f59e0b, #16a34a);
+    border-radius: 999px;
+    transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .step-item {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .step-icon-circle {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #f3ede2;
+    border: 2.5px solid #d6cbb9;
+    color: #8c7f70;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+  .step-item.done .step-icon-circle {
+    background: #16a34a;
+    border-color: #15803d;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  }
+  .step-item.active .step-icon-circle {
+    background: #fffbeb;
+    border-color: #f59e0b;
+    color: #b45309;
+    transform: scale(1.1);
+    animation: stepActivePulse 1.5s ease-in-out infinite;
+  }
+  .step-item.active.step-done-final .step-icon-circle {
+    background: #16a34a;
+    border-color: #15803d;
+    color: #ffffff;
+    animation: none;
+    box-shadow: 0 0 0 5px rgba(22, 163, 74, 0.22);
+  }
+  @keyframes stepActivePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.55), 0 4px 12px rgba(245, 158, 11, 0.25); }
+    50% { box-shadow: 0 0 0 7px rgba(245, 158, 11, 0), 0 6px 16px rgba(245, 158, 11, 0.4); }
+  }
+  .step-check-mini {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #15803d;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 900;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+  }
+  .step-item.done .step-check-mini,
+  .step-item.active.step-done-final .step-check-mini {
+    display: flex;
+  }
+  .step-label {
+    margin-top: 8px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #8c7f70;
+    line-height: 1.2;
+  }
+  .step-item.done .step-label {
+    color: #15803d;
+    font-weight: 800;
+  }
+  .step-item.active .step-label {
+    color: #1f1a17;
+    font-weight: 900;
+  }
+  .step-sub {
+    font-size: 0.66rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .stepper-status-caption {
+    margin-top: 12px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #e7e0d6;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #433228;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+  }
 
   /* Kategori sekmeleri */
   .tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 14px; }
@@ -649,11 +785,75 @@
     }
   }
 
+  let lastCustomerOrderStage = null;
+
   function statusLabel(st) {
-    if (st === "bekliyor") return "⏳ Sipariş Alındı";
+    if (st === "bekliyor" || st === "onaylandi") return "✔️ Onaylandı";
     if (st === "hazirlaniyor") return "👨‍🍳 Hazırlanıyor";
-    if (st === "tamamlandi") return "✅ Servis Edildi";
+    if (st === "hazir") return "🍽️ Hazır";
+    if (st === "tamamlandi") return "✅ Teslim Edildi";
     return st;
+  }
+
+  function getStageIndex(st) {
+    if (st === "bekliyor" || st === "onaylandi") return 0;
+    if (st === "hazirlaniyor") return 1;
+    if (st === "hazir") return 2;
+    if (st === "tamamlandi") return 3;
+    return 0;
+  }
+
+  function renderOrderStepperHTML(st) {
+    const currentIdx = getStageIndex(st);
+    const fillPercents = [0, 33.33, 66.66, 100];
+    const fillPct = fillPercents[currentIdx] || 0;
+
+    const stages = [
+      { idx: 0, icon: "📋", title: "Onaylandı", sub: "Sipariş alındı" },
+      { idx: 1, icon: "👨‍🍳", title: "Hazırlanıyor", sub: "Mutfağa iletildi" },
+      { idx: 2, icon: "🍽️", title: "Hazır", sub: "Servise hazır" },
+      { idx: 3, icon: "✅", title: "Teslim Edildi", sub: "Afiyet olsun" }
+    ];
+
+    const captions = [
+      "📋 Siparişiniz onaylandı ve sıraya alındı.",
+      "👨‍🍳 Siparişiniz şu anda baristamız / mutfağımız tarafından hazırlanıyor...",
+      "🍽️ Siparişiniz hazır! Garsonumuz masanıza getiriyor.",
+      "✅ Siparişiniz masanıza teslim edildi. Afiyet olsun!"
+    ];
+
+    const stepsHTML = stages.map(s => {
+      let cls = "step-item";
+      if (s.idx < currentIdx) cls += " done";
+      else if (s.idx === currentIdx) {
+        cls += " active";
+        if (currentIdx === 3) cls += " step-done-final";
+      }
+      return `
+        <div class="${cls}">
+          <div class="step-icon-circle">
+            <span>${s.icon}</span>
+            <span class="step-check-mini">✓</span>
+          </div>
+          <div class="step-label">${s.idx + 1}. ${s.title}</div>
+          <div class="step-sub">${s.sub}</div>
+        </div>
+      `;
+    }).join("");
+
+    return `
+      <div class="order-stepper-box">
+        <div class="order-stepper-track">
+          <div class="stepper-line-bg">
+            <div class="stepper-line-fill" style="width:${fillPct}%;"></div>
+          </div>
+          ${stepsHTML}
+        </div>
+        <div class="stepper-status-caption">
+          <span>${captions[currentIdx]}</span>
+        </div>
+      </div>
+    `;
   }
 
   async function loadTableOrders() {
@@ -663,6 +863,7 @@
     const box = document.getElementById("billContent");
 
     if (activeOrders.length === 0) {
+      lastCustomerOrderStage = null;
       box.innerHTML = `<p style="font-size:0.86rem; color:var(--muted);">Henüz aktif siparişiniz bulunmuyor. Aşağıdaki menüden ürün seçip sipariş oluşturabilirsiniz.</p>`;
       return;
     }
@@ -671,13 +872,18 @@
     const combinedMap = {};
     const notes = [];
     let totalAll = 0;
+    const rankMap = { bekliyor: 0, onaylandi: 0, hazirlaniyor: 1, hazir: 2, tamamlandi: 3 };
+    let minRank = 3;
     let combinedStatus = "tamamlandi";
 
     for (const o of activeOrders) {
       totalAll += o.total;
       if (o.note && !notes.includes(o.note)) notes.push(o.note);
-      if (o.status === "bekliyor") combinedStatus = "bekliyor";
-      else if (o.status === "hazirlaniyor" && combinedStatus !== "bekliyor") combinedStatus = "hazirlaniyor";
+      const r = rankMap[o.status] !== undefined ? rankMap[o.status] : 0;
+      if (r <= minRank) {
+        minRank = r;
+        combinedStatus = o.status;
+      }
       for (const i of o.items) {
         const key = `${i.name}_${i.price}`;
         if (!combinedMap[key]) {
@@ -687,13 +893,20 @@
       }
     }
 
+    if (lastCustomerOrderStage !== null && lastCustomerOrderStage !== combinedStatus) {
+      playCustomerBellChime();
+    }
+    lastCustomerOrderStage = combinedStatus;
+
+    const stepperHTML = renderOrderStepperHTML(combinedStatus);
+
     const allCompleted = combinedStatus === "tamamlandi";
     let bannerHTML = "";
     if (allCompleted) {
       bannerHTML = `
         <div class="bill-summary-banner">
           <div>
-            <div style="font-weight:800; font-size:0.95rem;">✅ Siparişleriniz Servis Edildi</div>
+            <div style="font-weight:800; font-size:0.95rem;">✅ Siparişleriniz Teslim Edildi</div>
             <div style="font-size:0.8rem;">Verdiğiniz tüm siparişlerin toplam tutarı:</div>
           </div>
           <div class="bill-total-num">${totalAll} ₺</div>
@@ -741,7 +954,7 @@
       </div>
     `;
 
-    box.innerHTML = bannerHTML + rowsHTML + adisyonBtnHTML;
+    box.innerHTML = stepperHTML + bannerHTML + rowsHTML + adisyonBtnHTML;
   }
 
   function openOverlayModal(e, url) {

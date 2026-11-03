@@ -111,8 +111,9 @@
     background: #0f172a; border: 2px solid #475569; border-radius: 14px; padding: 16px;
     display: flex; flex-direction: column; justify-content: space-between;
   }
-  .order-card.bekliyor { border-color: var(--amber); box-shadow: 0 0 18px rgba(245,158,11,0.18); }
+  .order-card.bekliyor, .order-card.onaylandi { border-color: var(--amber); box-shadow: 0 0 18px rgba(245,158,11,0.18); }
   .order-card.hazirlaniyor { border-color: var(--blue); }
+  .order-card.hazir { border-color: #a855f7; box-shadow: 0 0 18px rgba(168,85,247,0.22); }
   .order-card.tamamlandi { border-color: var(--green); opacity: 0.92; }
 
   .table-tag {
@@ -120,7 +121,77 @@
     padding: 5px 14px; border-radius: 8px; display: inline-block;
   }
   .order-card.hazirlaniyor .table-tag { background: var(--blue); }
+  .order-card.hazir .table-tag { background: #a855f7; color: #fff; }
   .order-card.tamamlandi .table-tag { background: var(--green); }
+
+  /* Personel Kartı 4 Aşamalı Sıralama İkonları */
+  .staff-stepper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #1e293b;
+  }
+  .staff-step-btn {
+    background: #1e293b;
+    border: 1.5px solid #334155;
+    border-radius: 10px;
+    padding: 8px 4px;
+    color: #94a3b8;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    transition: all 0.15s;
+  }
+  .staff-step-btn:hover {
+    border-color: #64748b;
+    color: #f8fafc;
+    transform: translateY(-1px);
+  }
+  .staff-step-btn .st-icon {
+    font-size: 1.15rem;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .staff-step-btn.done {
+    border-color: #16a34a;
+    color: #86efac;
+    background: rgba(22, 163, 74, 0.12);
+  }
+  .staff-step-btn.done .st-icon {
+    background: #16a34a;
+    color: #fff;
+  }
+  .staff-step-btn.active {
+    border-color: #f59e0b;
+    color: #fef08a;
+    background: rgba(245, 158, 11, 0.18);
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+  }
+  .staff-step-btn.active .st-icon {
+    background: #f59e0b;
+    color: #020617;
+  }
+  .staff-step-btn.active.final-done {
+    border-color: #22c55e;
+    color: #4ade80;
+    background: rgba(34, 197, 94, 0.18);
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.25);
+  }
+  .staff-step-btn.active.final-done .st-icon {
+    background: #22c55e;
+    color: #020617;
+  }
 
   .items-list { margin: 14px 0; font-size: 0.98rem; line-height: 1.6; }
   .items-list div { padding: 5px 0; border-bottom: 1px dashed #1e293b; display: flex; justify-content: space-between; align-items: center; }
@@ -292,8 +363,10 @@
       }
       const grp = byTableMap[tNo];
       if (o.note && !grp.notes.includes(o.note)) grp.notes.push(o.note);
-      if (o.status === "bekliyor") grp.status = "bekliyor";
-      else if (o.status === "hazirlaniyor" && grp.status !== "bekliyor") grp.status = "hazirlaniyor";
+      const rankMap = { bekliyor: 0, onaylandi: 0, hazirlaniyor: 1, hazir: 2, tamamlandi: 3 };
+      const rNew = rankMap[o.status] !== undefined ? rankMap[o.status] : 0;
+      const rCur = rankMap[grp.status] !== undefined ? rankMap[grp.status] : 0;
+      if (rNew < rCur) grp.status = o.status;
       for (const it of o.items) {
         const ikey = `${it.name}_${it.price}`;
         if (!grp.itemsMap[ikey]) {
@@ -311,6 +384,14 @@
     if (combinedOrders.length === 0) {
       grid.innerHTML = `<p style="color:var(--muted); font-size:0.95rem;">Şu anda bekleyen veya hazırlanan masa siparişi yok.</p>`;
     } else {
+      const rankMap = { bekliyor: 0, onaylandi: 0, hazirlaniyor: 1, hazir: 2, tamamlandi: 3 };
+      const stages = [
+        { key: "onaylandi", idx: 0, icon: "📋", label: "Onaylandı" },
+        { key: "hazirlaniyor", idx: 1, icon: "👨‍🍳", label: "Hazırlanıyor" },
+        { key: "hazir", idx: 2, icon: "🍽️", label: "Hazır" },
+        { key: "tamamlandi", idx: 3, icon: "✅", label: "Teslim Edildi" }
+      ];
+
       grid.innerHTML = combinedOrders.map(o => {
         const itemsList = Object.values(o.itemsMap);
         const itemsHtml = itemsList.map(i => `
@@ -318,10 +399,27 @@
             <span><span class="qty-badge">${i.qty}x</span> <b>${i.name}</b></span>
           </div>
         `).join("");
-        let statusBadge = "⏳ Yeni / Ek Sipariş Bekliyor";
-        if (o.status === "hazirlaniyor") statusBadge = "👨‍🍳 Hazırlanıyor";
-        if (o.status === "tamamlandi") statusBadge = "✅ Masaya Servis Edildi";
+        const curIdx = rankMap[o.status] !== undefined ? rankMap[o.status] : 0;
+        let statusBadge = "📋 1/4 — Sipariş Onaylandı";
+        if (curIdx === 1) statusBadge = "👨‍🍳 2/4 — Mutfak / Barista Hazırlıyor";
+        if (curIdx === 2) statusBadge = "🍽️ 3/4 — Sipariş Hazır (Garson Bekliyor)";
+        if (curIdx === 3) statusBadge = "✅ 4/4 — Masaya Teslim Edildi";
         const noteText = o.notes.join(" | ");
+
+        const stepperBtns = stages.map(s => {
+          let cls = "staff-step-btn";
+          if (s.idx < curIdx) cls += " done";
+          else if (s.idx === curIdx) {
+            cls += " active";
+            if (curIdx === 3) cls += " final-done";
+          }
+          return `
+            <button type="button" class="${cls}" onclick="setStatus(${o.id}, '${s.key}')">
+              <span class="st-icon">${s.idx < curIdx ? "✓" : s.icon}</span>
+              <span>${s.idx + 1}. ${s.label}</span>
+            </button>
+          `;
+        }).join("");
 
         return `
           <div class="order-card ${o.status}">
@@ -330,13 +428,15 @@
                 <span class="table-tag">MASA ${o.table_no}</span>
                 <span style="font-size:0.78rem; color:var(--muted);">Saat: ${o.updated_at}</span>
               </div>
-              <div style="font-size:0.82rem; color:var(--muted); margin-top:8px;">${statusBadge}</div>
+              <div style="font-size:0.82rem; color:var(--muted); margin-top:8px; font-weight:700;">${statusBadge}</div>
               <div class="items-list">${itemsHtml}</div>
               ${noteText ? `<div class="note-box">📝 Sipariş Notu: ${noteText}</div>` : ""}
             </div>
-            <div class="action-row">
-              ${o.status === "bekliyor" ? `<button class="btn-act btn-prep" onclick="setStatus(${o.id}, 'hazirlaniyor')">👨‍🍳 Hazırlanıyor</button>` : ""}
-              ${o.status !== "tamamlandi" ? `<button class="btn-act btn-done" onclick="setStatus(${o.id}, 'tamamlandi')">✅ Servis Edildi (Tamamla)</button>` : `<div style="width:100%; text-align:center; padding:8px; border-radius:8px; background:rgba(34,197,94,0.15); color:#4ade80; font-size:0.84rem; font-weight:700;">✅ Tüm Siparişler Teslim Edildi</div>`}
+            <div>
+              <div style="font-size:0.72rem; color:var(--muted); font-weight:700; margin-bottom:2px;">SİPARİŞ AŞAMASI (Müşteri Ekranında Canlı Görünür):</div>
+              <div class="staff-stepper">
+                ${stepperBtns}
+              </div>
             </div>
           </div>
         `;
