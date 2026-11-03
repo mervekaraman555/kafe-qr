@@ -422,6 +422,51 @@
     from { opacity: 0; transform: translateY(20px) scale(0.97); }
     to { opacity: 1; transform: translateY(0) scale(1); }
   }
+
+  /* Google Çeviri Stilleri & Üst Bar Gizleme */
+  .goog-te-banner-frame.skiptranslate, .goog-te-gadget-simple, .goog-te-banner-frame {
+    display: none !important;
+  }
+  body {
+    top: 0px !important;
+    position: static !important;
+  }
+  .skiptranslate iframe {
+    display: none !important;
+  }
+  #goog-gt-tt, .goog-te-balloon-frame {
+    display: none !important;
+  }
+  .goog-text-highlight {
+    background: none !important;
+    box-shadow: none !important;
+  }
+  .lang-selector-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .lang-select-btn {
+    background: rgba(255,255,255,0.16);
+    color: #fff;
+    border: 1.5px solid rgba(255,255,255,0.3);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.15s ease;
+  }
+  .lang-select-btn:hover {
+    background: rgba(255,255,255,0.26);
+    border-color: #fbbf24;
+  }
+  .lang-select-btn option {
+    background: #1f1a17;
+    color: #fff;
+    font-weight: 700;
+  }
 </style>
 </head>
 <body>
@@ -435,6 +480,20 @@
     </div>
   </div>
   <div class="header-right">
+    <div class="lang-selector-wrap">
+      <select id="customLangSelect" class="lang-select-btn" onchange="applyLanguage(this.value)" title="Dil Seçimi / Select Language">
+        <option value="tr">🇹🇷 TR</option>
+        <option value="en">🇬🇧 EN</option>
+        <option value="ru">🇷🇺 RU</option>
+        <option value="ar">🇸🇦 AR</option>
+        <option value="de">🇩🇪 DE</option>
+        <option value="fr">🇫🇷 FR</option>
+        <option value="es">🇪🇸 ES</option>
+        <option value="it">🇮🇹 IT</option>
+        <option value="fa">🇮🇷 FA</option>
+        <option value="zh-CN">🇨🇳 CN</option>
+      </select>
+    </div>
     <button class="bell-header-btn" id="headerBellBtn" onclick="ringWaiterBell('🔔 Garson Çağrısı')">
       🔔 Garson Zili
     </button>
@@ -545,7 +604,59 @@
   </div>
 </div>
 
+<!-- Otomatik Çok Dilli Çeviri Widget'ı (Google Translate) -->
+<div id="google_translate_element" style="display:none;"></div>
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'tr',
+      autoDisplay: false
+    }, 'google_translate_element');
+  }
+</script>
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 <script>
+  // Otomatik Dil Algılama: Cihaz dili Türkçe değilse otomatik o dile çevir
+  (function initAutoLanguage() {
+    const rawLang = (navigator.languages && navigator.languages[0] ? navigator.languages[0] : navigator.language || "tr").toLowerCase();
+    const shortLang = rawLang.split("-")[0];
+    const m = document.cookie.match(/googtrans=([^;]+)/);
+    // Eğer kullanıcı daha önce manuel dil seçmediyse ve cihaz dili Türkçe değilse:
+    if (!m && shortLang && shortLang !== "tr") {
+      const val = `/tr/${shortLang}`;
+      document.cookie = `googtrans=${val}; path=/;`;
+      document.cookie = `googtrans=${val}; path=/; domain=${window.location.hostname};`;
+      document.cookie = `googtrans=${val}; path=/; domain=.${window.location.hostname};`;
+    }
+  })();
+
+  function applyLanguage(targetLang) {
+    if (targetLang === "tr") {
+      document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`;
+      document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${window.location.hostname};`;
+    } else {
+      const val = `/tr/${targetLang}`;
+      document.cookie = `googtrans=${val}; path=/;`;
+      document.cookie = `googtrans=${val}; path=/; domain=${window.location.hostname};`;
+      document.cookie = `googtrans=${val}; path=/; domain=.${window.location.hostname};`;
+    }
+    const combo = document.querySelector(".goog-te-combo");
+    if (combo) {
+      combo.value = targetLang === "tr" ? "" : targetLang;
+      combo.dispatchEvent(new Event("change"));
+    } else {
+      window.location.reload();
+    }
+  }
+
+  function syncLangSelectUI() {
+    const m = document.cookie.match(/googtrans=\/tr\/([a-zA-Z\-]+)/);
+    const active = m ? m[1] : "tr";
+    const sel = document.getElementById("customLangSelect");
+    if (sel) sel.value = active;
+  }
   const params = new URLSearchParams(window.location.search);
   let tableNo = parseInt(params.get("no") || params.get("masa") || "1", 10);
   if (isNaN(tableNo) || tableNo < 1) tableNo = 1;
@@ -1038,6 +1149,7 @@
   window.closeOverlayModal = closeOverlayModal;
 
   updateTableUI();
+  syncLangSelectUI();
   loadMenu();
   loadTableOrders();
   loadTableCalls();
