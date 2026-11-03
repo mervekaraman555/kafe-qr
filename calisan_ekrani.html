@@ -459,11 +459,13 @@
           notes: [],
           status: o.status,
           total: 0,
+          orderCount: 0,
           created_at: o.created_at,
           updated_at: o.updated_at
         };
       }
       const grp = byTableMap[tNo];
+      grp.orderCount = (grp.orderCount || 0) + 1;
       grp.total += (o.total || 0);
       if (o.note && !grp.notes.includes(o.note)) grp.notes.push(o.note);
       const rankMap = { bekliyor: 0, onaylandi: 0, hazirlaniyor: 1, hazir: 2, tamamlandi: 3 };
@@ -532,7 +534,10 @@
           <div class="order-card ${o.status}">
             <div>
               <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span class="table-tag">MASA ${o.table_no}</span>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                  <span class="table-tag">MASA ${o.table_no}</span>
+                  ${o.orderCount > 1 ? `<span style="font-size:0.75rem; background:rgba(245,158,11,0.22); color:#fbbf24; border:1px solid #f59e0b; padding:3px 8px; border-radius:8px; font-weight:800;">+${o.orderCount - 1} İlave Sipariş</span>` : ""}
+                </div>
                 <span style="font-size:0.78rem; color:var(--muted);">Saat: ${o.updated_at}</span>
               </div>
               <div style="font-size:0.82rem; color:var(--muted); margin-top:8px; font-weight:700;">${statusBadge}</div>
@@ -546,7 +551,7 @@
               </div>
               <div class="card-pay-section">
                 <div class="card-total-row">
-                  <span class="card-total-label">MASA HESAP TOPLAMI:</span>
+                  <span class="card-total-label">${o.orderCount > 1 ? "BİRLEŞİK HESAP TOPLAMI:" : "MASA HESAP TOPLAMI:"}</span>
                   <span class="card-total-val">${displayTotal} ₺</span>
                 </div>
                 <div class="card-actions-grid">

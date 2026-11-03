@@ -815,42 +815,19 @@ class MusteriHandler(BaseKafeHandler):
 
             now = datetime.now().strftime("%H:%M:%S")
             today_str = datetime.now().strftime("%Y-%m-%d")
+            merged_new = merge_items_list(items)
+            total = sum(float(i["price"]) * int(i["qty"]) for i in merged_new)
+
             conn = db_conn()
             cur = conn.cursor()
-            existing = cur.execute(
-                "SELECT * FROM orders WHERE table_no = ? AND status != 'odendi' ORDER BY id ASC LIMIT 1",
-                (table_no,),
-            ).fetchone()
-
-            if existing:
-                order_id = existing["id"]
-                combined_items = merge_items_list(json.loads(existing["items_json"]) + items)
-                total = sum(float(i["price"]) * int(i["qty"]) for i in combined_items)
-                existing_note = (existing["note"] or "").strip()
-                if note and note not in existing_note:
-                    combined_note = f"{existing_note} | {note}" if existing_note else note
-                else:
-                    combined_note = existing_note
-                cur.execute(
-                    """
-                    UPDATE orders
-                    SET items_json = ?, note = ?, total = ?, status = 'bekliyor', order_date = ?, updated_at = ?
-                    WHERE id = ?
-                    """,
-                    (json.dumps(combined_items, ensure_ascii=False), combined_note, total, today_str, now, order_id),
-                )
-            else:
-                merged_new = merge_items_list(items)
-                total = sum(float(i["price"]) * int(i["qty"]) for i in merged_new)
-                cur.execute(
-                    """
-                    INSERT INTO orders (table_no, items_json, note, total, status, order_date, created_at, updated_at)
-                    VALUES (?, ?, ?, ?, 'bekliyor', ?, ?, ?)
-                    """,
-                    (table_no, json.dumps(merged_new, ensure_ascii=False), note, total, today_str, now, now),
-                )
-                order_id = cur.lastrowid
-
+            cur.execute(
+                """
+                INSERT INTO orders (table_no, items_json, note, total, status, order_date, created_at, updated_at)
+                VALUES (?, ?, ?, ?, 'bekliyor', ?, ?, ?)
+                """,
+                (table_no, json.dumps(merged_new, ensure_ascii=False), note, total, today_str, now, now),
+            )
+            order_id = cur.lastrowid
             conn.commit()
             row = conn.execute("SELECT * FROM orders WHERE id = ?", (order_id,)).fetchone()
             conn.close()

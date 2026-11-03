@@ -355,7 +355,6 @@
 
   async function loadAdisyon() {
     updateClock();
-    document.getElementById("adisyonTableTitle").textContent = `MASA ${tableNo}`;
 
     const res = await fetch(`/api/orders?table_no=${tableNo}`);
     if (!res.ok) return;
@@ -364,6 +363,7 @@
     const bodyEl = document.getElementById("adisyonBody");
 
     if (activeOrders.length === 0) {
+      document.getElementById("adisyonTableTitle").textContent = `MASA ${tableNo}`;
       document.getElementById("adisyonNo").textContent = "#-";
       document.getElementById("adisyonStatus").textContent = "SİPARİŞ YOK";
       bodyEl.innerHTML = `
@@ -374,11 +374,25 @@
       return;
     }
 
+    const orderCount = activeOrders.length;
     const firstId = activeOrders[activeOrders.length - 1].id;
     const lastId = activeOrders[0].id;
-    document.getElementById("adisyonNo").textContent = firstId === lastId ? `#${firstId}` : `#${firstId}-${lastId}`;
+    const adisyonNoText = orderCount === 1 ? `#${firstId}` : `#${firstId}-${lastId} (${orderCount} Sipariş Birleşik)`;
+    document.getElementById("adisyonNo").textContent = adisyonNoText;
+
     const allDone = activeOrders.every(o => o.status === "tamamlandi");
     document.getElementById("adisyonStatus").textContent = allDone ? "SERVİS EDİLDİ" : "AÇIK / HAZIRLANIYOR";
+
+    if (orderCount > 1) {
+      document.getElementById("adisyonTableTitle").innerHTML = `
+        MASA ${tableNo} — BİRLEŞİK HESAP ADİSYONU
+        <div style="font-size:0.75rem; font-weight:700; color:#fbbf24; margin-top:3px; letter-spacing:0;">
+          (Ödemesi Tamamlanmamış ${orderCount} Sipariş Birleştirildi)
+        </div>
+      `;
+    } else {
+      document.getElementById("adisyonTableTitle").textContent = `MASA ${tableNo}`;
+    }
 
     // Ürünleri birleştir (Aynı üründen birden fazla siparişte varsa toplam adedini göster)
     const grouped = {};
@@ -407,12 +421,18 @@
     const kdvHaric = (grandTotal / 1.10).toFixed(2);
     const kdvTutar = (grandTotal - grandTotal / 1.10).toFixed(2);
 
-    const ordersLogHtml = activeOrders.slice().reverse().map(o => {
+    const ordersLogHtml = activeOrders.slice().reverse().map((o, idx) => {
+      const orderType = idx === 0 ? "1. Ana Sipariş" : `${idx + 1}. İlave Sipariş`;
       const st = o.status === "tamamlandi" ? "✅ Servis Edildi" : (o.status === "hazirlaniyor" ? "👨‍🍳 Hazırlanıyor" : "⏳ Bekliyor");
+      const itemsDetail = o.items.map(it => `${it.qty}x ${it.name}`).join(", ");
       return `
-        <div class="r-order-item">
-          <span>Sipariş #${o.id} (${o.created_at}) — ${st}</span>
-          <b>${o.total} ₺</b>
+        <div class="r-order-item" style="padding:6px 0; border-bottom:1px dashed #cbd5e1;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span><b>${orderType} (#${o.id})</b> <span style="color:#64748b; font-size:0.75rem;">Saat: ${o.created_at}</span></span>
+            <span style="font-weight:900; color:#1e293b;">${o.total} ₺</span>
+          </div>
+          <div style="font-size:0.76rem; color:#475569; margin-top:2px;">${itemsDetail} <span style="font-weight:700; color:#b45309;">(${st})</span></div>
+          ${o.note ? `<div style="font-size:0.72rem; color:#92400e; font-style:italic;">Not: ${o.note}</div>` : ""}
         </div>
       `;
     }).join("");
@@ -433,7 +453,7 @@
       </table>
 
       <div class="r-orders-log">
-        <div class="r-orders-log-title">📋 Sipariş Geçmişi (${activeOrders.length} Sipariş)</div>
+        <div class="r-orders-log-title">📋 Birleştirilen Sipariş Detayları (${orderCount} Sipariş)</div>
         ${ordersLogHtml}
       </div>
 
