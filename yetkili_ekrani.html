@@ -340,8 +340,8 @@
   </div>
   <div class="nav-btns">
     <a href="/personel" class="staff-btn">👨‍🍳 Çalışan Sipariş Ekranı</a>
-    <a href="/adisyon?no=1" target="_blank">🧾 Masa Adisyonları</a>
-    <a href="/qr" target="_blank">🔳 Masa QR Kodları</a>
+    <a href="/adisyon?no=1">🧾 Masa Adisyonları</a>
+    <a href="/qr">🔳 Masa QR Kodları</a>
     <button class="logout-btn" onclick="logout()">🚪 Çıkış Yap</button>
   </div>
 </header>
@@ -1042,7 +1042,7 @@
               <div style="text-align:right; flex-shrink:0;">
                 <div style="font-size:1.25rem; font-weight:900; color:#4ade80; margin-bottom:6px;">${t.total} ₺</div>
                 <div style="display:flex; gap:6px;">
-                  <a href="/adisyon?no=${t.table_no}" target="_blank" style="background:#f59e0b; color:#090d16; text-decoration:none; padding:6px 10px; border-radius:7px; font-size:0.78rem; font-weight:800;">🧾 Adisyon</a>
+                  <a href="/adisyon?no=${t.table_no}" style="background:#f59e0b; color:#090d16; text-decoration:none; padding:6px 10px; border-radius:7px; font-size:0.78rem; font-weight:800;">🧾 Adisyon</a>
                   <button onclick="closeTableBill(${t.table_no})" style="background:#ef4444; color:#fff; border:none; padding:6px 10px; border-radius:7px; font-size:0.78rem; font-weight:800; cursor:pointer;">💳 Hesabı Kapat</button>
                 </div>
               </div>

@@ -7,67 +7,133 @@
 <style>
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 24px; }
   .toolbar {
-    max-width: 1080px; margin: 0 auto 24px; background: #fff; padding: 18px 22px;
-    border-radius: 14px; border: 1px solid #e2e8f0; display: flex; flex-wrap: wrap;
+    max-width: 1120px; margin: 0 auto 20px; background: #fff; padding: 18px 22px;
+    border-radius: 16px; border: 1px solid #e2e8f0; display: flex; flex-wrap: wrap;
     justify-content: space-between; align-items: center; gap: 14px;
     box-shadow: 0 4px 14px rgba(0,0,0,0.04);
   }
-  .toolbar h1 { font-size: 1.2rem; margin: 0 0 4px; }
-  .toolbar p { font-size: 0.85rem; color: #475569; margin: 0; }
-  .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-  input { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; }
-  button, .nav-link {
-    background: #b45309; color: #fff; border: none; padding: 9px 16px;
-    border-radius: 8px; font-weight: 700; cursor: pointer; text-decoration: none; font-size: 0.88rem;
+  .toolbar h1 { font-size: 1.22rem; margin: 0 0 4px; }
+  .toolbar p { font-size: 0.84rem; color: #475569; margin: 0; }
+  .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; width: 100%; padding-top: 12px; border-top: 1px solid #f1f5f9; }
+  .control-box {
+    display: flex; align-items: center; gap: 8px; background: #f8fafc;
+    border: 1px solid #e2e8f0; padding: 8px 12px; border-radius: 10px;
   }
+  .control-box.extra-box {
+    background: #ecfdf5; border-color: #6ee7b7;
+  }
+  input { padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.88rem; font-weight: 700; }
+  button, .nav-link {
+    background: #b45309; color: #fff; border: none; padding: 9px 14px;
+    border-radius: 8px; font-weight: 700; cursor: pointer; text-decoration: none; font-size: 0.85rem;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  button.add-btn { background: #059669; }
+  button.add-btn:hover { background: #047857; }
+  button.lock-btn { background: #475569; }
   button.print-btn { background: #0f172a; }
+  button.print-extra-btn { background: #0284c7; }
   .nav-link.staff { background: #1e293b; }
+
+  .info-banner {
+    max-width: 1120px; margin: 0 auto 20px; background: #fffbeb; border: 1px solid #fde68a;
+    color: #92400e; padding: 12px 18px; border-radius: 12px; font-size: 0.85rem;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+  }
+
   .qr-grid {
-    max-width: 1080px; margin: 0 auto;
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px;
+    max-width: 1120px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(225px, 1fr)); gap: 18px;
   }
   .qr-card {
     background: #fff; border: 2px solid #1e293b; border-radius: 18px; padding: 18px;
     text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,0.04); page-break-inside: avoid;
+    position: relative; transition: transform 0.15s;
   }
+  .qr-card.extra-table {
+    border-color: #059669;
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.12);
+  }
+  .badge-status {
+    display: inline-block; font-size: 0.7rem; font-weight: 800; padding: 3px 9px;
+    border-radius: 999px; margin-bottom: 6px;
+  }
+  .badge-fixed { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
+  .badge-extra { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+
   .qr-card h2 { font-size: 1.35rem; margin: 0 0 4px; color: #b45309; }
-  .qr-card .sub { font-size: 0.78rem; color: #64748b; margin-bottom: 10px; }
+  .qr-card.extra-table h2 { color: #059669; }
+  .qr-card .sub { font-size: 0.76rem; color: #64748b; margin-bottom: 10px; }
   .qr-box {
     width: 170px; height: 170px; margin: 0 auto 10px;
     display: flex; align-items: center; justify-content: center;
     background: #f8fafc; border-radius: 10px;
   }
   .qr-box img { width: 170px; height: 170px; border-radius: 8px; }
-  .qr-url { font-size: 0.72rem; color: #475569; word-break: break-all; margin-bottom: 8px; }
+  .qr-url { font-size: 0.7rem; color: #475569; word-break: break-all; margin-bottom: 10px; }
+  .card-actions { display: flex; flex-direction: column; gap: 6px; align-items: center; }
   .test-link {
-    display: inline-block; font-size: 0.8rem; font-weight: 700; color: #15803d;
+    display: inline-block; font-size: 0.78rem; font-weight: 700; color: #15803d;
     text-decoration: none; border: 1px solid #86efac; background: #dcfce7;
-    padding: 5px 10px; border-radius: 999px;
+    padding: 5px 10px; border-radius: 999px; width: 100%; box-sizing: border-box;
   }
+  .single-print-btn {
+    background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1;
+    padding: 5px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;
+    width: 100%; justify-content: center;
+  }
+  .single-print-btn:hover { background: #e2e8f0; }
+
   @media print {
-    .toolbar, .test-link { display: none !important; }
+    .toolbar, .info-banner, .card-actions, .badge-status { display: none !important; }
     body { background: #fff; padding: 0; }
+    body.print-only-extra .qr-card.fixed-table { display: none !important; }
+    body.print-single-table .qr-card:not(.print-target) { display: none !important; }
   }
 </style>
 </head>
 <body>
 
 <div class="toolbar">
-  <div>
-    <h1>🔳 Masa Sipariş Kare Kodları (QR)</h1>
-    <p>Her masanın kendi QR kodu vardır. Müşteri okuttuğunda yalnızca o masanın sipariş ekranı açılır.</p>
+  <div style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap:wrap; gap:10px;">
+    <div>
+      <h1>🔳 Masa Sipariş Kare Kodları (QR)</h1>
+      <p>İlave masa açtığınızda mevcut masaların QR kodları <b>kesinlikle değişmez (sabit kalır)</b>, yalnızca yeni masalar sona eklenir.</p>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+      <button class="print-btn" onclick="printAllTables()">🖨️ Tüm Masaları Yazdır</button>
+      <button class="print-extra-btn" id="printExtraBtn" onclick="printExtraTables()" style="display:none;">🖨️ Sadece İlave Masaları Yazdır</button>
+      <a class="nav-link staff" href="/personel">👨‍🍳 Çalışan Ekranı</a>
+      <a class="nav-link" href="/yetkili" title="Kapat (✕)" style="background:#fee2e2; color:#991b1b; border:1.5px solid #fca5a5; border-radius:50%; width:36px; height:36px; padding:0; justify-content:center; font-size:1rem;">✕</a>
+    </div>
   </div>
+
   <div class="controls">
-    <label style="font-size:0.85rem;">Masa Sayısı:
-      <input type="number" id="tableCount" value="12" min="1" max="100" style="width:70px;">
-    </label>
-    <label style="font-size:0.85rem;">Müşteri QR Adresi:
-      <input type="text" id="baseUrl" style="width:230px;">
-    </label>
-    <button onclick="renderQRs()">Güncelle</button>
-    <button class="print-btn" onclick="window.print()">🖨️ Yazdır / PDF Kaydet</button>
-    <a class="nav-link staff" href="/personel">👨‍🍳 Çalışan Ekranı</a>
+    <div class="control-box extra-box">
+      <strong style="font-size:0.84rem; color:#065f46;">➕ İlave Masa Aç:</strong>
+      <input type="number" id="addTableInput" value="1" min="1" max="50" style="width:58px;" title="Kaç adet ilave masa eklenecek?">
+      <button class="add-btn" onclick="addExtraTables()">➕ İlave Masa Ekle (Diğerleri Sabit Kalır)</button>
+    </div>
+
+    <div class="control-box">
+      <label style="font-size:0.83rem; font-weight:600;">Toplam Masa:
+        <input type="number" id="tableCount" value="12" min="1" max="200" style="width:64px;">
+      </label>
+      <button onclick="applyTotalTableCount()">Uygula</button>
+      <button class="lock-btn" id="lockAllBtn" onclick="markAllAsFixed()" title="Mevcut tüm masaları sabitlenmiş olarak işaretle" style="display:none;">🔒 İlaveleri Sabitle</button>
+    </div>
+
+    <div class="control-box" style="margin-left:auto;">
+      <label style="font-size:0.82rem; color:#475569;">QR Adresi:
+        <input type="text" id="baseUrl" style="width:210px; font-weight:500;">
+      </label>
+      <button onclick="updateBaseUrlOnly()" style="background:#334155;">Adresi Kaydet</button>
+    </div>
   </div>
+</div>
+
+<div class="info-banner" id="statusBanner">
+  <span id="statusText">🔒 <b>Masa 1 – 12</b> sabitlenmiş durumda. Yeni masa eklediğinizde önceki masaların QR kodları değişmez.</span>
 </div>
 
 <div class="qr-grid" id="qrGrid"></div>
@@ -75,33 +141,199 @@
 <script>
   const defaultHost = "__LAN_ORIGIN__";
   const isCloudHost = window.location.protocol === "https:" || (!window.location.hostname.startsWith("192.168.") && !window.location.hostname.startsWith("10.") && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1");
-  const initialUrl = isCloudHost ? window.location.origin : (defaultHost.startsWith("http") ? defaultHost : window.location.origin);
-  document.getElementById("baseUrl").value = initialUrl;
+  const fallbackUrl = isCloudHost ? window.location.origin : (defaultHost.startsWith("http") ? defaultHost : window.location.origin);
 
-  function renderQRs() {
-    const count = parseInt(document.getElementById("tableCount").value || "12", 10);
-    const base = document.getElementById("baseUrl").value.replace(/\/+$/, "");
-    const grid = document.getElementById("qrGrid");
-    const cards = [];
-    for (let i = 1; i <= count; i++) {
-      const targetUrl = `${base}/?no=${i}`;
-      const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=${encodeURIComponent(targetUrl)}`;
-      cards.push(`
-        <div class="qr-card">
-          <h2>☕ MASA ${i}</h2>
-          <div class="sub">Menüyü görmek ve sipariş vermek için kameranızla okutun</div>
-          <div class="qr-box">
-            <img src="${qrApi}" alt="Masa ${i} QR">
-          </div>
-          <div class="qr-url">${targetUrl}</div>
-          <a class="test-link" href="${targetUrl}" target="_blank">Masa ${i} Müşteri Ekranını Aç →</a>
-        </div>
-      `);
-    }
-    grid.innerHTML = cards.join("");
+  let currentTotalCount = 12;
+  let fixedTableCount = 12;
+  let currentBaseUrl = fallbackUrl;
+
+  function createCardElement(tableNo, base, isExtra) {
+    const targetUrl = `${base}/?no=${tableNo}`;
+    const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=${encodeURIComponent(targetUrl)}`;
+    const card = document.createElement("div");
+    card.className = `qr-card ${isExtra ? "extra-table" : "fixed-table"}`;
+    card.id = `qr-card-${tableNo}`;
+    card.dataset.tableNo = String(tableNo);
+    card.dataset.targetUrl = targetUrl;
+    card.innerHTML = `
+      <div class="badge-status ${isExtra ? "badge-extra" : "badge-fixed"}" id="badge-${tableNo}">
+        ${isExtra ? "✨ Yeni İlave Masa" : "🔒 Sabit Masa (Değişmez)"}
+      </div>
+      <h2>☕ MASA ${tableNo}</h2>
+      <div class="sub">Menüyü görmek ve sipariş vermek için kameranızla okutun</div>
+      <div class="qr-box">
+        <img src="${qrApi}" alt="Masa ${tableNo} QR" loading="lazy">
+      </div>
+      <div class="qr-url">${targetUrl}</div>
+      <div class="card-actions">
+        <a class="test-link" href="${targetUrl}" target="_blank">Masa ${tableNo} Müşteri Ekranını Aç →</a>
+        <button type="button" class="single-print-btn" onclick="printSingleTable(${tableNo})">🖨️ Sadece Masa ${tableNo} Yazdır</button>
+      </div>
+    `;
+    return card;
   }
 
-  renderQRs();
+  /**
+   * Mevcut masa kartlarına DOKUNMADAN yalnızca yeni eklenen masaları sona ilave eder.
+   */
+  function syncQRCards(forceRebuildUrl = false) {
+    const grid = document.getElementById("qrGrid");
+    const base = currentBaseUrl.replace(/\/+$/, "");
+
+    if (forceRebuildUrl) {
+      grid.innerHTML = "";
+    }
+
+    // Eğer masa sayısı azaltıldıysa yalnızca sondaki fazla masaları kaldır, öncekilere dokunma
+    const existingCards = Array.from(grid.querySelectorAll(".qr-card"));
+    for (const card of existingCards) {
+      const tNo = parseInt(card.dataset.tableNo, 10);
+      if (tNo > currentTotalCount) {
+        card.remove();
+      } else {
+        // Sabit / İlave rozet durumunu güncelle (QR resmine ve URL'sine hiç dokunmadan)
+        const isExtra = tNo > fixedTableCount;
+        card.className = `qr-card ${isExtra ? "extra-table" : "fixed-table"}`;
+        const badge = document.getElementById(`badge-${tNo}`);
+        if (badge) {
+          badge.className = `badge-status ${isExtra ? "badge-extra" : "badge-fixed"}`;
+          badge.textContent = isExtra ? "✨ Yeni İlave Masa" : "🔒 Sabit Masa (Değişmez)";
+        }
+      }
+    }
+
+    // Sadece henüz ekranda olmayan YENİ masaları sona ekle (Mevcut masalar sabit kalır!)
+    for (let i = 1; i <= currentTotalCount; i++) {
+      if (!document.getElementById(`qr-card-${i}`)) {
+        const isExtra = i > fixedTableCount;
+        grid.appendChild(createCardElement(i, base, isExtra));
+      }
+    }
+
+    document.getElementById("tableCount").value = currentTotalCount;
+    updateToolbarState();
+  }
+
+  function updateToolbarState() {
+    const extraCount = Math.max(0, currentTotalCount - fixedTableCount);
+    const printExtraBtn = document.getElementById("printExtraBtn");
+    const lockAllBtn = document.getElementById("lockAllBtn");
+    const statusText = document.getElementById("statusText");
+
+    if (extraCount > 0) {
+      printExtraBtn.style.display = "inline-flex";
+      printExtraBtn.textContent = `🖨️ Sadece İlave Masaları Yazdır (Masa ${fixedTableCount + 1} – ${currentTotalCount})`;
+      lockAllBtn.style.display = "inline-flex";
+      statusText.innerHTML = `🔒 <b>Masa 1 – ${fixedTableCount}</b> sabit korundu (değişmedi). ✨ <b>Masa ${fixedTableCount + 1} – ${currentTotalCount}</b> (${extraCount} adet) ilave masa olarak eklendi.`;
+    } else {
+      printExtraBtn.style.display = "none";
+      lockAllBtn.style.display = "none";
+      statusText.innerHTML = `🔒 <b>Masa 1 – ${currentTotalCount}</b> sabitlenmiş durumda. İlave masa açtığınızda mevcut masaların QR kodları sabit kalır.`;
+    }
+  }
+
+  async function saveSettingsToServer() {
+    localStorage.setItem("kafe_table_count", String(currentTotalCount));
+    localStorage.setItem("kafe_fixed_table_count", String(fixedTableCount));
+    localStorage.setItem("kafe_qr_base_url", currentBaseUrl);
+    try {
+      await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          table_count: currentTotalCount,
+          fixed_table_count: fixedTableCount,
+          qr_base_url: currentBaseUrl
+        })
+      });
+    } catch (e) {}
+  }
+
+  async function addExtraTables() {
+    const addCount = parseInt(document.getElementById("addTableInput").value || "1", 10);
+    if (isNaN(addCount) || addCount < 1) return;
+    currentTotalCount = Math.min(200, currentTotalCount + addCount);
+    syncQRCards(false);
+    await saveSettingsToServer();
+    const firstNew = document.getElementById(`qr-card-${currentTotalCount}`);
+    if (firstNew) firstNew.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  async function applyTotalTableCount() {
+    const newCount = parseInt(document.getElementById("tableCount").value || "12", 10);
+    if (isNaN(newCount) || newCount < 1) return;
+    currentTotalCount = Math.min(200, newCount);
+    if (currentTotalCount < fixedTableCount) {
+      fixedTableCount = currentTotalCount;
+    }
+    syncQRCards(false);
+    await saveSettingsToServer();
+  }
+
+  async function markAllAsFixed() {
+    fixedTableCount = currentTotalCount;
+    syncQRCards(false);
+    await saveSettingsToServer();
+  }
+
+  async function updateBaseUrlOnly() {
+    const val = document.getElementById("baseUrl").value.trim().replace(/\/+$/, "");
+    if (!val) return;
+    currentBaseUrl = val;
+    syncQRCards(true);
+    await saveSettingsToServer();
+  }
+
+  function printAllTables() {
+    document.body.classList.remove("print-only-extra", "print-single-table");
+    window.print();
+  }
+
+  function printExtraTables() {
+    document.body.classList.remove("print-single-table");
+    document.body.classList.add("print-only-extra");
+    window.print();
+    setTimeout(() => document.body.classList.remove("print-only-extra"), 500);
+  }
+
+  function printSingleTable(tableNo) {
+    document.body.classList.remove("print-only-extra");
+    document.body.classList.add("print-single-table");
+    document.querySelectorAll(".qr-card").forEach(c => c.classList.remove("print-target"));
+    const target = document.getElementById(`qr-card-${tableNo}`);
+    if (target) target.classList.add("print-target");
+    window.print();
+    setTimeout(() => {
+      document.body.classList.remove("print-single-table");
+      if (target) target.classList.remove("print-target");
+    }, 500);
+  }
+
+  async function initPage() {
+    const savedTotal = parseInt(localStorage.getItem("kafe_table_count") || "0", 10);
+    const savedFixed = parseInt(localStorage.getItem("kafe_fixed_table_count") || "0", 10);
+    const savedUrl = localStorage.getItem("kafe_qr_base_url") || "";
+
+    if (savedTotal > 0) currentTotalCount = savedTotal;
+    if (savedFixed > 0) fixedTableCount = savedFixed;
+    if (savedUrl) currentBaseUrl = savedUrl;
+
+    try {
+      const res = await fetch("/api/settings");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.table_count) currentTotalCount = data.table_count;
+        if (data.fixed_table_count) fixedTableCount = data.fixed_table_count;
+        if (data.qr_base_url) currentBaseUrl = data.qr_base_url;
+      }
+    } catch (e) {}
+
+    document.getElementById("baseUrl").value = currentBaseUrl;
+    document.getElementById("tableCount").value = currentTotalCount;
+    syncQRCards(false);
+  }
+
+  initPage();
 </script>
 </body>
 </html>

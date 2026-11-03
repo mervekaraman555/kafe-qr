@@ -246,6 +246,17 @@ def init_db():
         )
         """
     )
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )
+        """
+    )
+    cur.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('table_count', '12')")
+    cur.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('fixed_table_count', '12')")
+    cur.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('qr_base_url', '')")
     count = cur.execute("SELECT COUNT(*) FROM menu").fetchone()[0]
     if count == 0:
         cur.executemany(
@@ -548,7 +559,13 @@ class BaseKafeHandler(BaseHTTPRequestHandler):
             if os.path.isfile(icon_path):
                 with open(icon_path, "rb") as f:
                     icon_b64 = base64.b64encode(f.read()).decode("ascii")
-            target_url = f"http://{get_lan_ip()}:{STAFF_PORT}/giris"
+            req_host = self.headers.get("Host", "").strip()
+            req_proto = self.headers.get("X-Forwarded-Proto", "http").strip() or "http"
+            if req_host and not req_host.startswith("localhost") and not req_host.startswith("127.0.0.1") and not req_host.startswith("192.168.") and not req_host.startswith("10."):
+                scheme = "https" if ("pythonanywhere" in req_host or "onrender" in req_host or req_proto == "https") else req_proto
+                target_url = f"{scheme}://{req_host}/giris"
+            else:
+                target_url = f"http://{get_lan_ip()}:{STAFF_PORT}/giris"
             mc = f"""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -624,11 +641,11 @@ class MusteriHandler(BaseKafeHandler):
         path = parsed.path
         qs = parse_qs(parsed.query)
 
-        if path in ("/", "/masa"):
+        if path == "/masa" or (path == "/" and "no" in qs):
             with open(MUSTERI_HTML_PATH, "r", encoding="utf-8") as f:
                 return self._send_html(f.read())
 
-        if path in ("/giris", "/login", "/giris_ekrani.html"):
+        if path in ("/", "/giris", "/login", "/giris_ekrani.html"):
             with open(GIRIS_HTML_PATH, "r", encoding="utf-8") as f:
                 return self._send_html(f.read())
 
@@ -645,6 +662,19 @@ class MusteriHandler(BaseKafeHandler):
             if os.path.exists(reklam_path):
                 with open(reklam_path, "r", encoding="utf-8") as f:
                     return self._send_html(f.read())
+
+        if path in ("/Kafe_QR_Siparis_Tanitim_Videosu.mp4", "/tanitim.mp4"):
+            mp4_path = os.path.join(BASE_DIR, "Kafe_QR_Siparis_Tanitim_Videosu.mp4")
+            if os.path.isfile(mp4_path):
+                with open(mp4_path, "rb") as f:
+                    raw = f.read()
+                self.send_response(200)
+                self.send_header("Content-Type", "video/mp4")
+                self.send_header("Content-Disposition", 'attachment; filename="Kafe_QR_Siparis_Tanitim_Videosu.mp4"')
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+                return
 
         if path.startswith("/audio/"):
             fname = os.path.basename(path)
@@ -716,6 +746,9 @@ class MusteriHandler(BaseKafeHandler):
             conn.close()
             return self._send_json({"calls": [serialize_call(r) for r in rows]})
 
+        if path == "/api/settings":
+            return PersonelHandler.do_GET(self)
+
         return self._send_json({"error": "Sayfa bulunamadı"}, status=404)
 
     def do_POST(self):
@@ -725,7 +758,7 @@ class MusteriHandler(BaseKafeHandler):
 
         if path == "/api/login":
             return PersonelHandler.do_POST(self)
-        if path in ("/api/logout", "/api/menu", "/api/users") or path.startswith("/api/menu/") or path.startswith("/api/users/") or (path.startswith("/api/orders/") and path.endswith("/status")):
+        if path in ("/api/logout", "/api/menu", "/api/users", "/api/settings") or path.startswith("/api/menu/") or path.startswith("/api/users/") or (path.startswith("/api/orders/") and path.endswith("/status")):
             return PersonelHandler.do_POST(self)
 
         if path == "/api/orders":
@@ -862,6 +895,28 @@ class MusteriHandler(BaseKafeHandler):
             conn.close()
             return self._send_json({"ok": True})
 
+        if path == "/api/settings":
+            conn = db_conn()
+            if "table_count" in payload:
+                tc = max(1, min(200, int(payload["table_count"])))
+                conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('table_count', ?)", (str(tc),))
+            if "fixed_table_count" in payload:
+                fc = max(1, min(200, int(payload["fixed_table_count"])))
+                conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('fixed_table_count', ?)", (str(fc),))
+            if "qr_base_url" in payload:
+                bu = str(payload["qr_base_url"]).strip()
+                conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('qr_base_url', ?)", (bu,))
+            conn.commit()
+            rows = conn.execute("SELECT key, value FROM settings").fetchall()
+            conn.close()
+            cfg = {r["key"]: r["value"] for r in rows}
+            return self._send_json({
+                "ok": True,
+                "table_count": int(cfg.get("table_count", "12") or 12),
+                "fixed_table_count": int(cfg.get("fixed_table_count", "12") or 12),
+                "qr_base_url": cfg.get("qr_base_url", ""),
+            })
+
         return self._send_json({"error": "Bulunamadı"}, status=404)
 
 
@@ -905,6 +960,19 @@ class PersonelHandler(BaseKafeHandler):
             if os.path.exists(reklam_path):
                 with open(reklam_path, "r", encoding="utf-8") as f:
                     return self._send_html(f.read())
+
+        if path in ("/Kafe_QR_Siparis_Tanitim_Videosu.mp4", "/tanitim.mp4"):
+            mp4_path = os.path.join(BASE_DIR, "Kafe_QR_Siparis_Tanitim_Videosu.mp4")
+            if os.path.isfile(mp4_path):
+                with open(mp4_path, "rb") as f:
+                    raw = f.read()
+                self.send_response(200)
+                self.send_header("Content-Type", "video/mp4")
+                self.send_header("Content-Disposition", 'attachment; filename="Kafe_QR_Siparis_Tanitim_Videosu.mp4"')
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+                return
 
         if path.startswith("/audio/"):
             fname = os.path.basename(path)
@@ -956,6 +1024,19 @@ class PersonelHandler(BaseKafeHandler):
             ).fetchall()
             conn.close()
             return self._send_json({"calls": [serialize_call(r) for r in rows]})
+
+        if path == "/api/settings":
+            conn = db_conn()
+            rows = conn.execute("SELECT key, value FROM settings").fetchall()
+            conn.close()
+            cfg = {r["key"]: r["value"] for r in rows}
+            table_count = int(cfg.get("table_count", "12") or 12)
+            fixed_count = int(cfg.get("fixed_table_count", str(table_count)) or table_count)
+            return self._send_json({
+                "table_count": table_count,
+                "fixed_table_count": fixed_count,
+                "qr_base_url": cfg.get("qr_base_url", ""),
+            })
 
         return self._send_json({"error": "Bulunamadı"}, status=404)
 
@@ -1148,7 +1229,85 @@ class PersonelHandler(BaseKafeHandler):
             conn.close()
             return self._send_json({"ok": True})
 
+        if path == "/api/settings":
+            conn = db_conn()
+            if "table_count" in payload:
+                tc = max(1, min(200, int(payload["table_count"])))
+                conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('table_count', ?)", (str(tc),))
+            if "fixed_table_count" in payload:
+                fc = max(1, min(200, int(payload["fixed_table_count"])))
+                conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('fixed_table_count', ?)", (str(fc),))
+            if "qr_base_url" in payload:
+                bu = str(payload["qr_base_url"]).strip()
+                conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('qr_base_url', ?)", (bu,))
+            conn.commit()
+            rows = conn.execute("SELECT key, value FROM settings").fetchall()
+            conn.close()
+            cfg = {r["key"]: r["value"] for r in rows}
+            return self._send_json({
+                "ok": True,
+                "table_count": int(cfg.get("table_count", "12") or 12),
+                "fixed_table_count": int(cfg.get("fixed_table_count", "12") or 12),
+                "qr_base_url": cfg.get("qr_base_url", ""),
+            })
+
         return self._send_json({"error": "Bulunamadı"}, status=404)
+
+
+class _WSGIAdapter(MusteriHandler):
+    def __init__(self, environ):
+        import io
+        path_info = environ.get("PATH_INFO", "/") or "/"
+        query_string = environ.get("QUERY_STRING", "")
+        self.path = f"{path_info}?{query_string}" if query_string else path_info
+        self.headers = {
+            "Host": environ.get("HTTP_HOST", ""),
+            "X-Forwarded-Proto": environ.get("HTTP_X_FORWARDED_PROTO", environ.get("wsgi.url_scheme", "https")),
+            "Cookie": environ.get("HTTP_COOKIE", ""),
+            "Content-Length": environ.get("CONTENT_LENGTH") or "0",
+            "Content-Type": environ.get("CONTENT_TYPE", ""),
+        }
+        self.rfile = environ.get("wsgi.input") or io.BytesIO(b"")
+        self.wfile = io.BytesIO()
+        self._status_code = 200
+        self._resp_headers = []
+
+    def send_response(self, code, message=None):
+        self._status_code = int(code)
+
+    def send_header(self, keyword, value):
+        self._resp_headers.append((str(keyword), str(value)))
+
+    def end_headers(self):
+        pass
+
+
+_WSGI_DB_INITIALIZED = False
+
+
+def application(environ, start_response):
+    global _WSGI_DB_INITIALIZED
+    if not _WSGI_DB_INITIALIZED:
+        init_db()
+        _WSGI_DB_INITIALIZED = True
+    adapter = _WSGIAdapter(environ)
+    method = (environ.get("REQUEST_METHOD") or "GET").upper()
+    if method == "POST":
+        adapter.do_POST()
+    else:
+        adapter.do_GET()
+    status_map = {
+        200: "200 OK",
+        201: "201 Created",
+        400: "400 Bad Request",
+        401: "401 Unauthorized",
+        403: "403 Forbidden",
+        404: "404 Not Found",
+        500: "500 Internal Server Error",
+    }
+    status_str = status_map.get(adapter._status_code, f"{adapter._status_code} OK")
+    start_response(status_str, adapter._resp_headers)
+    return [adapter.wfile.getvalue()]
 
 
 def main():

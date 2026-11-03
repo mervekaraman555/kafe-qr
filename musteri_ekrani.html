@@ -174,12 +174,83 @@
   .item-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
   .item-top { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; }
   .item-emoji {
-    font-size: 1.8rem; background: #f6efe6; width: 56px; height: 56px;
+    font-size: 1.8rem; background: #f6efe6; width: 62px; height: 62px;
     border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    cursor: zoom-in; position: relative; transition: transform 0.15s;
   }
+  .item-emoji:hover { transform: scale(1.06); }
+  .item-img-wrap {
+    width: 62px; height: 62px; border-radius: 12px; position: relative;
+    flex-shrink: 0; cursor: zoom-in; overflow: hidden; border: 1px solid var(--border);
+    background: #f6efe6; transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .item-img-wrap:hover { transform: scale(1.06); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
   .item-img {
-    width: 56px; height: 56px; border-radius: 12px; object-fit: cover;
-    border: 1px solid var(--border); flex-shrink: 0; background: #f6efe6;
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .zoom-hint {
+    position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.65);
+    color: #fff; font-size: 0.62rem; width: 18px; height: 18px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; pointer-events: none;
+  }
+
+  /* Tam Ekran Ürün Görseli (Lightbox Modal) */
+  .lightbox-overlay {
+    position: fixed; inset: 0; background: rgba(15, 12, 10, 0.92);
+    backdrop-filter: blur(6px); z-index: 9999; display: none;
+    align-items: center; justify-content: center; padding: 18px;
+    animation: fadeInModal 0.18s ease-out;
+  }
+  .lightbox-overlay.open { display: flex; }
+  @keyframes fadeInModal {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .lightbox-content {
+    position: relative; width: 100%; max-width: 540px; max-height: 92vh;
+    background: #1f1a17; color: #fff; border-radius: 22px; overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.75); border: 1px solid rgba(255,255,255,0.14);
+    display: flex; flex-direction: column;
+  }
+  .lightbox-close {
+    position: absolute; top: 14px; right: 14px; z-index: 10;
+    background: rgba(0,0,0,0.68); color: #fff; border: 1.5px solid rgba(255,255,255,0.3);
+    width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; font-weight: 800;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .lightbox-media {
+    width: 100%; height: 56vh; max-height: 460px; min-height: 260px;
+    background: #120f0d; display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .lightbox-media img {
+    width: 100%; height: 100%; object-fit: contain; background: #0d0b09;
+  }
+  .lightbox-media .big-emoji {
+    font-size: 6.5rem; filter: drop-shadow(0 10px 24px rgba(0,0,0,0.4));
+  }
+  .lightbox-info {
+    padding: 18px 20px; background: #1f1a17;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .lightbox-cat {
+    font-size: 0.75rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.6px;
+  }
+  .lightbox-title { font-size: 1.3rem; font-weight: 800; color: #fff; }
+  .lightbox-desc { font-size: 0.9rem; color: #d6c7b8; line-height: 1.45; }
+  .lightbox-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.12); margin-top: 4px;
+  }
+  .lightbox-price { font-size: 1.45rem; font-weight: 900; color: #fbbf24; }
+  .lightbox-qty-ctrl { display: flex; align-items: center; gap: 10px; }
+  .lightbox-btn-qty {
+    width: 38px; height: 38px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.1); color: #fff; font-weight: 800; font-size: 1.15rem; cursor: pointer;
+  }
+  .lightbox-btn-add {
+    background: #22c55e; color: #052e16; border: none; padding: 10px 18px;
+    border-radius: 12px; font-weight: 800; font-size: 0.92rem; cursor: pointer;
   }
   .item-name { font-weight: 700; font-size: 0.96rem; margin-bottom: 3px; }
   .item-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.3; }
@@ -272,6 +343,23 @@
 
   <!-- Menü Ürünleri -->
   <div class="menu-grid" id="menuGrid"></div>
+</div>
+
+<!-- Tam Ekran Ürün Görseli (Lightbox Modal) -->
+<div class="lightbox-overlay" id="productLightbox" onclick="handleLightboxBackdrop(event)">
+  <div class="lightbox-content">
+    <button type="button" class="lightbox-close" onclick="closeProductModal()" aria-label="Kapat">✕</button>
+    <div class="lightbox-media" id="lightboxMedia"></div>
+    <div class="lightbox-info">
+      <div class="lightbox-cat" id="lightboxCat"></div>
+      <div class="lightbox-title" id="lightboxTitle"></div>
+      <div class="lightbox-desc" id="lightboxDesc"></div>
+      <div class="lightbox-footer">
+        <span class="lightbox-price" id="lightboxPrice">0 ₺</span>
+        <div class="lightbox-qty-ctrl" id="lightboxQtyCtrl"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Alt Sepet Barı -->
@@ -400,20 +488,28 @@
     renderMenu();
   }
 
+  let currentModalItemId = null;
+
   function renderMenu() {
     const items = activeCategory === "Tümü" ? menu : menu.filter(i => i.category === activeCategory);
     const grid = document.getElementById("menuGrid");
     grid.innerHTML = items.map(item => {
       const q = cart[item.id] || 0;
       const visualHtml = item.image_url
-        ? `<img src="${item.image_url}" class="item-img" alt="${item.name}">`
-        : `<div class="item-emoji">${item.emoji}</div>`;
+        ? `<div class="item-img-wrap" onclick="openProductModal(${item.id})" title="Tam ekran görmek için dokunun">
+             <img src="${item.image_url}" class="item-img" alt="${item.name}">
+             <span class="zoom-hint">🔍</span>
+           </div>`
+        : `<div class="item-emoji" onclick="openProductModal(${item.id})" title="Tam ekran görmek için dokunun">
+             ${item.emoji}
+             <span class="zoom-hint">🔍</span>
+           </div>`;
       return `
         <div class="item-card">
           <div class="item-top">
             ${visualHtml}
             <div>
-              <div class="item-name">${item.name}</div>
+              <div class="item-name" style="cursor:pointer;" onclick="openProductModal(${item.id})">${item.name}</div>
               <div class="item-desc">${item.description}</div>
             </div>
           </div>
@@ -429,11 +525,67 @@
     }).join("");
   }
 
+  function openProductModal(itemId) {
+    const item = menu.find(x => x.id === Number(itemId));
+    if (!item) return;
+    currentModalItemId = item.id;
+    const mediaEl = document.getElementById("lightboxMedia");
+    if (item.image_url) {
+      mediaEl.innerHTML = `<img src="${item.image_url}" alt="${item.name}">`;
+    } else {
+      mediaEl.innerHTML = `<div class="big-emoji">${item.emoji}</div>`;
+    }
+    document.getElementById("lightboxCat").textContent = item.category || "";
+    document.getElementById("lightboxTitle").textContent = item.name;
+    document.getElementById("lightboxDesc").textContent = item.description || "";
+    document.getElementById("lightboxPrice").textContent = `${item.price} ₺`;
+    updateLightboxQtyUI();
+    document.getElementById("productLightbox").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function updateLightboxQtyUI() {
+    if (currentModalItemId === null) return;
+    const q = cart[currentModalItemId] || 0;
+    const ctrl = document.getElementById("lightboxQtyCtrl");
+    if (!ctrl) return;
+    if (q > 0) {
+      ctrl.innerHTML = `
+        <button type="button" class="lightbox-btn-qty" onclick="changeQty(${currentModalItemId}, -1)">−</button>
+        <span style="font-size:1.15rem; font-weight:800; min-width:24px; text-align:center;">${q}</span>
+        <button type="button" class="lightbox-btn-qty" style="background:#f59e0b; color:#1f1a17; border-color:#f59e0b;" onclick="changeQty(${currentModalItemId}, 1)">+</button>
+      `;
+    } else {
+      ctrl.innerHTML = `
+        <button type="button" class="lightbox-btn-add" onclick="changeQty(${currentModalItemId}, 1)">+ Sepete Ekle</button>
+      `;
+    }
+  }
+
+  function closeProductModal() {
+    currentModalItemId = null;
+    document.getElementById("productLightbox").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  function handleLightboxBackdrop(e) {
+    if (e.target.id === "productLightbox") {
+      closeProductModal();
+    }
+  }
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeProductModal();
+  });
+
   function changeQty(id, delta) {
     cart[id] = (cart[id] || 0) + delta;
     if (cart[id] <= 0) delete cart[id];
     renderMenu();
     renderCartBar();
+    if (currentModalItemId === id) {
+      updateLightboxQtyUI();
+    }
   }
 
   function renderCartBar() {
@@ -577,7 +729,7 @@
 
     const adisyonBtnHTML = `
       <div style="margin-top: 10px; text-align: right;">
-        <a href="/adisyon?no=${tableNo}&musteri=1" target="_blank" style="display:inline-flex; align-items:center; gap:6px; background:#1f1a17; color:#fff; text-decoration:none; padding:9px 14px; border-radius:10px; font-size:0.84rem; font-weight:700;">
+        <a href="/adisyon?no=${tableNo}&musteri=1" style="display:inline-flex; align-items:center; gap:6px; background:#1f1a17; color:#fff; text-decoration:none; padding:9px 14px; border-radius:10px; font-size:0.84rem; font-weight:700;">
           🧾 Hesap Adisyonu Fişini Görüntüle (${totalAll} ₺)
         </a>
       </div>

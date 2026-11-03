@@ -30,7 +30,7 @@
             <key>Precomposed</key>
             <true/>
             <key>URL</key>
-            <string>http://192.168.1.7:8091/giris</string>
+            <string>https://faruk8503.pythonanywhere.com/giris</string>
         </dict>
     </array>
     <key>PayloadDescription</key>

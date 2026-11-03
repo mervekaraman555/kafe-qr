@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kafe QR Sipariş Sistemi — Tanıtım Reklam Videosu</title>
+<title>Kafe QR Sipariş Sistemi — Sesli Tanıtım Videosu (Son Sürüm)</title>
 <style>
   :root {
     --bg: #0b0908;
@@ -22,7 +22,7 @@
   }
 
   .top-bar {
-    width: 100%; max-width: 1120px; display: flex; justify-content: space-between;
+    width: 100%; max-width: 1140px; display: flex; justify-content: space-between;
     align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
   }
   .top-bar h1 { font-size: 1.15rem; font-weight: 800; color: #fde68a; display: flex; align-items: center; gap: 8px; }
@@ -38,14 +38,13 @@
 
   /* 16:9 Sinematik Video Sahnesi */
   .stage {
-    width: 100%; max-width: 1120px; aspect-ratio: 16 / 9;
+    width: 100%; max-width: 1140px; aspect-ratio: 16 / 9;
     background: linear-gradient(135deg, #1b130f 0%, #0f172a 100%);
     border-radius: 24px; border: 2px solid rgba(245,158,11,0.35);
     box-shadow: 0 28px 80px rgba(0,0,0,0.75), 0 0 50px rgba(245,158,11,0.12);
     position: relative; overflow: hidden;
   }
 
-  /* Üst Sahne Rozeti ve Süre Çubuğu */
   .progress-wrap {
     position: absolute; top: 0; left: 0; right: 0; height: 6px;
     background: rgba(255,255,255,0.12); z-index: 50;
@@ -57,16 +56,16 @@
 
   .hud-top {
     position: absolute; top: 18px; left: 24px; right: 24px; z-index: 40;
-    display: flex; justify-content: space-between; align-items: center;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
   }
   .brand-pill {
     background: rgba(15,23,42,0.75); backdrop-filter: blur(8px);
     border: 1px solid rgba(255,255,255,0.15); padding: 7px 14px; border-radius: 999px;
-    font-weight: 800; font-size: 0.88rem; display: flex; align-items: center; gap: 8px;
+    font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;
   }
-  .scene-steps { display: flex; gap: 6px; }
+  .scene-steps { display: flex; gap: 6px; flex-wrap: wrap; }
   .step-dot {
-    padding: 5px 11px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;
+    padding: 5px 10px; border-radius: 999px; font-size: 0.73rem; font-weight: 700;
     background: rgba(255,255,255,0.08); color: #cbd5e1; cursor: pointer;
     border: 1px solid transparent; transition: all 0.25s;
   }
@@ -74,122 +73,81 @@
     background: var(--gold); color: #1c130e; border-color: #fde68a; transform: scale(1.05);
   }
 
-  /* Sahneler */
   .scene {
-    position: absolute; inset: 0; padding: 70px 48px 92px;
-    display: grid; grid-template-columns: 1.05fr 1fr; gap: 36px; align-items: center;
+    position: absolute; inset: 0; padding: 68px 44px 90px;
+    display: grid; grid-template-columns: 1.05fr 1fr; gap: 32px; align-items: center;
     opacity: 0; pointer-events: none; transform: translateY(18px) scale(0.985);
-    transition: opacity 0.55s ease, transform 0.55s ease;
+    transition: opacity 0.5s ease, transform 0.5s ease;
   }
   .scene.active {
     opacity: 1; pointer-events: auto; transform: translateY(0) scale(1);
   }
 
   .copy-side h2 {
-    font-size: clamp(1.6rem, 2.7vw, 2.55rem); line-height: 1.15; font-weight: 900;
+    font-size: clamp(1.5rem, 2.5vw, 2.35rem); line-height: 1.15; font-weight: 900;
     margin-bottom: 14px; letter-spacing: -0.02em;
   }
   .copy-side h2 span { color: var(--gold); }
   .copy-side p {
-    font-size: clamp(0.95rem, 1.3vw, 1.15rem); color: #cbd5e1; line-height: 1.55;
-    margin-bottom: 18px;
+    font-size: clamp(0.92rem, 1.25vw, 1.1rem); color: #cbd5e1; line-height: 1.55;
+    margin-bottom: 16px;
   }
   .tag-badge {
     display: inline-flex; align-items: center; gap: 6px;
     background: rgba(245,158,11,0.16); color: #fcd34d; border: 1px solid rgba(245,158,11,0.4);
-    padding: 6px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 800;
-    margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 6px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 800;
+    margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em;
   }
 
   .visual-side {
-    display: flex; align-items: center; justify-content: center; position: relative;
+    display: flex; align-items: center; justify-content: center; gap: 14px; position: relative;
   }
 
-  /* Sahne 1: Masa Üstü QR Standı + Telefon Kamera */
   .qr-stand {
-    background: #fff; color: var(--ink); width: 230px; padding: 20px;
-    border-radius: 22px; text-align: center; box-shadow: 0 24px 50px rgba(0,0,0,0.5);
-    border: 3px solid var(--gold); position: relative; animation: float 3s ease-in-out infinite;
+    background: #fff; color: var(--ink); width: 205px; padding: 16px;
+    border-radius: 20px; text-align: center; box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+    border: 3px solid var(--gold); position: relative;
   }
-  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-  .qr-stand h3 { color: #b45309; font-size: 1.3rem; margin-bottom: 4px; }
-  .qr-stand p { font-size: 0.72rem; color: #64748b; margin-bottom: 10px; }
+  .qr-stand.extra { border-color: #059669; }
+  .qr-stand h3 { color: #b45309; font-size: 1.2rem; margin-bottom: 4px; }
+  .qr-stand.extra h3 { color: #059669; }
+  .qr-stand p { font-size: 0.7rem; color: #64748b; margin-bottom: 8px; }
   .qr-fake {
-    width: 150px; height: 150px; margin: 0 auto 10px; border-radius: 12px;
+    width: 130px; height: 130px; margin: 0 auto 8px; border-radius: 10px;
     background:
-      linear-gradient(90deg, #111 25%, transparent 25%) 0 0 / 24px 24px,
-      linear-gradient(#111 25%, #f8fafc 25%) 0 0 / 24px 24px;
-    border: 6px solid #111; position: relative; overflow: hidden;
+      linear-gradient(90deg, #111 25%, transparent 25%) 0 0 / 22px 22px,
+      linear-gradient(#111 25%, #f8fafc 25%) 0 0 / 22px 22px;
+    border: 5px solid #111; position: relative; overflow: hidden;
   }
   .scan-laser {
     position: absolute; left: 0; right: 0; height: 4px;
     background: #22c55e; box-shadow: 0 0 14px #22c55e;
     animation: scan 1.6s ease-in-out infinite;
   }
-  @keyframes scan { 0%, 100% { top: 8px; } 50% { top: 132px; } }
+  @keyframes scan { 0%, 100% { top: 8px; } 50% { top: 112px; } }
 
-  /* Sahne 2 & 5: Telefon Mockup */
   .phone-mock {
-    width: 295px; background: var(--cream); color: var(--ink);
-    border-radius: 30px; border: 7px solid #1e293b; overflow: hidden;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    width: 320px; background: #1f1a17; color: #fff;
+    border-radius: 26px; border: 5px solid #f59e0b; overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.65);
   }
   .phone-hdr {
-    background: #29201b; color: #fff; padding: 12px 14px;
-    display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem;
+    background: #29201b; color: #fff; padding: 11px 14px;
+    display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;
   }
-  .phone-hdr .m-badge {
-    background: var(--gold); color: #1c130e; font-weight: 800; padding: 3px 9px; border-radius: 999px;
-  }
-  .phone-body { padding: 12px; }
-  .mini-item {
-    background: #fff; border: 1px solid #e7e0d6; border-radius: 12px; padding: 9px 11px;
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
-    font-size: 0.82rem;
-  }
-  .mini-qty {
-    background: #b45309; color: #fff; padding: 3px 9px; border-radius: 8px; font-weight: 800;
-  }
-  .mini-note {
-    background: #fef3c7; border: 1px solid #fcd34d; color: #78350f;
-    padding: 7px 10px; border-radius: 9px; font-size: 0.76rem; margin-bottom: 8px;
-  }
-  .mini-send {
-    background: #15803d; color: #fff; text-align: center; padding: 10px;
-    border-radius: 10px; font-weight: 800; font-size: 0.85rem;
-    animation: pulseBtn 1.3s infinite;
-  }
-  @keyframes pulseBtn { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+  .phone-body { padding: 14px; }
 
-  /* Sahne 3 & 4: Çalışan Ekranı Kartı */
   .staff-mock {
-    width: 390px; background: #0f172a; border: 2px solid var(--gold);
+    width: 400px; background: #0f172a; border: 2px solid var(--gold);
     border-radius: 18px; padding: 16px; color: #f8fafc;
     box-shadow: 0 20px 55px rgba(0,0,0,0.65);
   }
-  .staff-top {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
-  }
-  .masa-pill {
-    background: var(--gold); color: #020617; font-weight: 900; font-size: 1.05rem;
-    padding: 4px 12px; border-radius: 8px;
-  }
-  .staff-items {
-    border-top: 1px dashed #334155; border-bottom: 1px dashed #334155;
-    padding: 10px 0; margin: 10px 0; font-size: 0.88rem; line-height: 1.65;
-  }
-  .staff-btn-row { display: flex; gap: 8px; margin-top: 10px; }
-  .staff-btn {
-    flex: 1; padding: 10px; border-radius: 9px; font-weight: 800; font-size: 0.82rem;
-    text-align: center;
-  }
 
-  /* Alt Altyazı (Voiceover) Bandı */
   .subtitle-bar {
-    position: absolute; bottom: 18px; left: 32px; right: 32px; z-index: 45;
-    background: rgba(2,6,23,0.86); backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.16); border-radius: 14px;
-    padding: 12px 20px; text-align: center; font-size: clamp(0.9rem, 1.35vw, 1.12rem);
+    position: absolute; bottom: 16px; left: 28px; right: 28px; z-index: 45;
+    background: rgba(2,6,23,0.9); backdrop-filter: blur(10px);
+    border: 1px solid rgba(245,158,11,0.45); border-radius: 14px;
+    padding: 12px 18px; text-align: center; font-size: clamp(0.86rem, 1.25vw, 1.05rem);
     font-weight: 600; color: #fef3c7;
   }
 </style>
@@ -197,12 +155,13 @@
 <body>
 
 <div class="top-bar">
-  <h1>🎬 Kafe QR Sipariş & Canlı Hesap — Reklam Videosu</h1>
+  <h1>🎬 Kafe QR Sipariş & Yönetim Sistemi — Sesli Tanıtım Videosu (Son Sürüm)</h1>
   <div class="controls">
     <button class="btn primary" id="startBtn" onclick="startWithSound()">▶️ Sesli Oynat (Baştan)</button>
     <button class="btn" id="pauseBtn" onclick="togglePause()">⏸️ Duraklat</button>
     <button class="btn" id="voiceBtn" onclick="toggleVoice()">🔊 Ses: Açık</button>
-    <a class="btn green" href="http://localhost:8090/qr" target="_blank">🔳 Canlı Sistemi Aç</a>
+    <a class="btn green" href="Kafe_QR_Siparis_Tanitim_Videosu.mp4" download="Kafe_QR_Siparis_Tanitim_Videosu.mp4">⬇️ MP4 Video İndir</a>
+    <a class="btn" href="/giris">🔐 Giriş Ekranı</a>
   </div>
 </div>
 
@@ -214,135 +173,167 @@
     <div class="scene-steps" id="sceneDots"></div>
   </div>
 
-  <!-- SAHNE 1: QR Okutma -->
+  <!-- SAHNE 1: QR Okutma & Sabit Masa -->
   <div class="scene active" data-index="0">
     <div class="copy-side">
-      <div class="tag-badge">1. Adım · Sıfır Bekleme</div>
-      <h2>Garson Beklemeye Son.<br><span>Kare Kodu Okut, Menü Açulsın!</span></h2>
-      <p>Kafenizdeki her masaya özel üretilen kare kodu müşteri telefon kamerasıyla okutur; uygulama indirmeden doğrudan kendi masasının menüsüne girer.</p>
+      <div class="tag-badge">1. Adım · Akıllı QR & Sabit Masa Sistemi</div>
+      <h2>Garson Beklemeye Son,<br><span>İlave Masada Sabit QR Garantisi!</span></h2>
+      <p>Müşteri masadaki kare kodu okutarak uygulama indirmeden menüye bağlanır. İşletme yeni ilave masa açtığında mevcut masaların QR kodları kesinlikle değişmez, sabit kalır.</p>
     </div>
     <div class="visual-side">
       <div class="qr-stand">
-        <h3>☕ MASA 4</h3>
-        <p>Sipariş için kameranızla okutun</p>
+        <div style="font-size:0.68rem; font-weight:800; background:#f1f5f9; color:#334155; padding:3px 8px; border-radius:99px; margin-bottom:6px;">🔒 Sabit Masa (Değişmez)</div>
+        <h3>☕ MASA 1</h3>
         <div class="qr-fake"><div class="scan-laser"></div></div>
-        <div style="font-size:0.75rem; font-weight:800; color:#15803d;">📱 Masa 4 Otomatik Seçildi</div>
+        <div style="font-size:0.72rem; font-weight:800; color:#15803d;">✓ QR Kod Sabit Korunur</div>
+      </div>
+      <div class="qr-stand extra">
+        <div style="font-size:0.68rem; font-weight:800; background:#dcfce7; color:#15803d; padding:3px 8px; border-radius:99px; margin-bottom:6px;">✨ + Yeni İlave Masa</div>
+        <h3>☕ MASA 13</h3>
+        <div class="qr-fake"></div>
+        <div style="font-size:0.72rem; font-weight:800; color:#059669;">🖨️ Sadece İlaveyi Yazdır</div>
       </div>
     </div>
   </div>
 
-  <!-- SAHNE 2: Müşteri Sipariş Veriyor -->
+  <!-- SAHNE 2: Tam Ekran Ürün Görseli & Garson Zili -->
   <div class="scene" data-index="1">
     <div class="copy-side">
-      <div class="tag-badge">2. Adım · Kolay Sipariş</div>
-      <h2>Müşteri Seçimini Yapar,<br><span>Tek Tuşla Mutfağa Gönderir.</span></h2>
-      <p>Sıcak-soğuk içecekler ve tatlılar arasından adet seçer, özel notunu yazar ("yulaf sütlü olsun" gibi) ve anında siparişi onaylar.</p>
+      <div class="tag-badge">2. Adım · Tam Ekran Ürün Resmi & Garson Zili</div>
+      <h2>Ürüne Tıkla <span>Tam Ekran Gör,</span><br>Tek Tuşla Sipariş Ver & Zil Çal!</h2>
+      <p>Müşteri menüdeki ürün fotoğrafına dokunduğunda ürün tam ekran açılır. Detayları inceleyip sepete ekler, özel notunu yazar veya tek dokunuşla garson zilini çalar.</p>
     </div>
     <div class="visual-side">
       <div class="phone-mock">
         <div class="phone-hdr">
-          <span>☕ Artisan Kafe</span>
-          <span class="m-badge">📍 Masa 4</span>
+          <span>☕ Masa 4 Menü</span>
+          <span style="background:#ef4444; color:#fff; padding:4px 10px; border-radius:99px; font-weight:800; font-size:0.74rem;">🔔 Garson Zili</span>
         </div>
         <div class="phone-body">
-          <div class="mini-item">
-            <span>🥛 <b>Caffe Latte</b> (110 ₺)</span>
-            <span class="mini-qty">2 Adet</span>
+          <div style="background:#120f0d; border-radius:14px; padding:16px; text-align:center; border:1px solid #fbbf24; margin-bottom:10px;">
+            <div style="font-size:0.7rem; color:#fde68a; font-weight:700; margin-bottom:6px;">🔍 TAM EKRAN ÜRÜN GÖRÜNÜMÜ</div>
+            <div style="font-size:3.2rem; margin:6px 0;">☕🍰</div>
+            <div style="font-weight:800; font-size:1rem; margin-top:4px;">Caffe Latte & San Sebastian</div>
+            <div style="font-size:0.75rem; color:#d6c7b8; margin-top:3px;">Çift shot espresso & taze krema</div>
           </div>
-          <div class="mini-item">
-            <span>🍰 <b>San Sebastian</b> (165 ₺)</span>
-            <span class="mini-qty">1 Adet</span>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b style="font-size:1.25rem; color:#fbbf24;">275 ₺</b>
+            <span style="background:#22c55e; color:#052e16; padding:8px 14px; border-radius:10px; font-weight:800; font-size:0.82rem;">+ Sepete Ekle & Gönder</span>
           </div>
-          <div class="mini-note">📝 Not: Bir latte yulaf sütlü olsun</div>
-          <div class="mini-send">Siparişi Gönder (385 ₺) →</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SAHNE 3: Kafe Çalışanı Hangi Masa Olduğunu Görüyor -->
+  <!-- SAHNE 3: Çalışan Ekranı & Sesli Bildirim -->
   <div class="scene" data-index="2">
     <div class="copy-side">
-      <div class="tag-badge">3. Adım · Anında Bildirim</div>
-      <h2>Çalışanlar <span>Hangi Masanın</span><br>Ne İstediğini Anında Görür!</h2>
-      <p>Sipariş verildiği anda çalışan ekranında sesli bildirim çalar. Masa numarası, ürünler ve sipariş notu net olarak ekrana düşer.</p>
+      <div class="tag-badge">3. Adım · Anında Sesli Bildirim & Mutfak</div>
+      <h2>Çalışan Ekranında <span>Sesli Uyarı,</span><br>Hangi Masa Ne İstedi Anında Gör!</h2>
+      <p>Sipariş veya garson çağrısı geldiği anda çalışan ekranında sesli zil çalar. Masa numarası, ürünler ve müşteri notu saniyesinde ekrana düşer.</p>
     </div>
     <div class="visual-side">
       <div class="staff-mock">
-        <div class="staff-top">
-          <span class="masa-pill">🔔 MASA 4</span>
+        <div style="background:#7f1d1d; border:1.5px solid #ef4444; padding:8px 12px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; font-size:0.78rem;">
+          <span>🔔 <b>MASA 4:</b> Garson & Servis Çağrısı</span>
+          <span style="background:#22c55e; color:#052e16; padding:3px 8px; border-radius:6px; font-weight:800;">✓ İlgilenildi</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="background:#f59e0b; color:#020617; font-weight:900; padding:4px 10px; border-radius:8px;">MASA 4</span>
           <span style="font-size:0.78rem; color:#fcd34d;">⏳ Yeni Sipariş Geldi!</span>
         </div>
-        <div class="staff-items">
+        <div style="border-top:1px dashed #334155; border-bottom:1px dashed #334155; padding:8px 0; margin:8px 0; font-size:0.85rem; line-height:1.6;">
           <div><b>2x</b> Caffe Latte <span style="float:right;">220 ₺</span></div>
           <div><b>1x</b> San Sebastian Cheesecake <span style="float:right;">165 ₺</span></div>
         </div>
-        <div class="mini-note" style="background:rgba(245,158,11,0.15); color:#fde68a; border-color:#f59e0b;">
+        <div style="background:rgba(245,158,11,0.15); color:#fde68a; border:1px solid #f59e0b; padding:7px 10px; border-radius:8px; font-size:0.76rem; margin-bottom:10px;">
           📝 Müşteri Notu: Bir latte yulaf sütlü olsun
         </div>
-        <div class="staff-btn-row">
-          <div class="staff-btn" style="background:#38bdf8; color:#020617;">👨‍🍳 Hazırlanıyor İşaretle</div>
+        <div style="display:flex; gap:8px;">
+          <div style="flex:1; background:#38bdf8; color:#020617; text-align:center; padding:8px; border-radius:8px; font-weight:800; font-size:0.8rem;">👨‍🍳 Hazırlanıyor</div>
+          <div style="flex:1; background:#22c55e; color:#052e16; text-align:center; padding:8px; border-radius:8px; font-weight:800; font-size:0.8rem;">✅ Tamamla</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SAHNE 4: Sipariş Tamamlanıyor -->
+  <!-- SAHNE 4: Canlı Birleştirilmiş Hesap & Adisyon Fişi -->
   <div class="scene" data-index="3">
     <div class="copy-side">
-      <div class="tag-badge">4. Adım · Tek Tıkla Servis</div>
-      <h2>Sipariş Hazır Olduğunda<br><span>"Tamamla"</span> Tuşuna Basılır.</h2>
-      <p>Barista veya garson ürünleri masaya servis ettiğinde çalışan ekranından <b>Tamamla (Hesabı Göster)</b> butonuna dokunur.</p>
+      <div class="tag-badge">4. Adım · Canlı Hesap & Termal Adisyon Fişi</div>
+      <h2>Birleştirilmiş Canlı Hesap ve<br><span>Yazdırılabilir Termal Adisyon!</span></h2>
+      <p>Masadan verilen tüm ek siparişler tek adisyonda otomatik birleşir. Müşteri kendi telefonundan güncel hesabını canlı takip eder, kasadan tek tıkla adisyon fişi yazdırılır.</p>
     </div>
     <div class="visual-side">
-      <div class="staff-mock" style="border-color:#22c55e;">
-        <div class="staff-top">
-          <span class="masa-pill" style="background:#22c55e;">✅ MASA 4</span>
-          <span style="font-size:0.78rem; color:#4ade80;">Servis Tamamlandı</span>
+      <div style="width:340px; background:#fffdf9; color:#1e293b; border-radius:16px; padding:18px; box-shadow:0 20px 50px rgba(0,0,0,0.6); font-family:monospace;">
+        <div style="text-align:center; border-bottom:2px dashed #94a3b8; padding-bottom:8px; margin-bottom:10px;">
+          <div style="font-weight:900; font-size:1.05rem;">☕ ARTİSAN KAFE ADİSYON</div>
+          <div style="font-size:0.75rem; color:#64748b;">MASA 4 • BİRLEŞTİRİLMİŞ HESAP</div>
         </div>
-        <div class="staff-items">
-          <div><b>2x</b> Caffe Latte <span style="float:right;">220 ₺</span></div>
-          <div><b>1x</b> San Sebastian Cheesecake <span style="float:right;">165 ₺</span></div>
+        <div style="font-size:0.82rem; line-height:1.7; margin-bottom:10px;">
+          <div>2x Caffe Latte <b style="float:right;">220 ₺</b></div>
+          <div>1x San Sebastian <b style="float:right;">165 ₺</b></div>
+          <div>1x Taze Portakal Suyu <b style="float:right;">95 ₺</b></div>
         </div>
-        <div style="display:flex; justify-content:space-between; font-weight:800; margin-top:6px;">
-          <span>Masa Toplam Hesabı:</span>
-          <span style="color:#4ade80; font-size:1.15rem;">385 ₺</span>
+        <div style="background:#fef3c7; border:2px solid #f59e0b; padding:8px 10px; border-radius:8px; display:flex; justify-content:space-between; font-weight:900; font-size:1.05rem; color:#78350f; margin-bottom:10px;">
+          <span>GENEL TOPLAM</span>
+          <span>480 ₺</span>
         </div>
-        <div class="staff-btn-row">
-          <div class="staff-btn" style="background:#22c55e; color:#052e16;">✅ Tamamlandı · Hesap Müşteride Açık</div>
+        <div style="display:flex; gap:8px; font-family:sans-serif;">
+          <div style="flex:1; background:#0f172a; color:#fff; text-align:center; padding:8px; border-radius:8px; font-weight:800; font-size:0.76rem;">🖨️ Adisyon Yazdır</div>
+          <div style="flex:1; background:#15803d; color:#fff; text-align:center; padding:8px; border-radius:8px; font-weight:800; font-size:0.76rem;">💳 Hesabı Kapat</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SAHNE 5: Müşteri Ödeyeceği Hesabı Görüyor -->
+  <!-- SAHNE 5: Yetkili Yönetici Paneli & Ciro -->
   <div class="scene" data-index="4">
     <div class="copy-side">
-      <div class="tag-badge">5. Adım · Şeffaf Hesap</div>
-      <h2>Müşteri Kendi Ekranında<br><span>Ödeyeceği Hesabı</span> Anında Görür!</h2>
-      <p>Sipariş tamamlandığı anda müşterinin telefonunda yeşil onay kutusu açılır ve masanın toplam ödenecek tutarı kalem kalem gösterilir.</p>
+      <div class="tag-badge">5. Adım · Yönetici Paneli & Ciro Raporu</div>
+      <h2>Fotoğraflı Menü Yönetimi ve<br><span>Günlük / Geçmiş Ciro Takibi!</span></h2>
+      <p>Kafe yetkilisi özel şifreli panelinden yeni ürün fotoğrafı yükler, fiyatları günceller, personel hesaplarını yönetir ve günlük cirosunu tarih seçerek inceler.</p>
     </div>
     <div class="visual-side">
-      <div class="phone-mock">
-        <div class="phone-hdr">
-          <span>☕ Artisan Kafe</span>
-          <span class="m-badge">📍 Masa 4</span>
-        </div>
-        <div class="phone-body">
-          <div style="background:#dcfce7; border:2px solid #22c55e; color:#14532d; padding:12px; border-radius:12px; margin-bottom:10px;">
-            <div style="font-size:0.8rem; font-weight:800;">✅ TÜM SİPARİŞLERİNİZ TAMAMLANDI</div>
-            <div style="font-size:0.74rem; margin-top:2px;">Masada ödenecek toplam hesap tutarınız:</div>
-            <div style="font-size:1.65rem; font-weight:900; margin-top:4px;">385 ₺</div>
+      <div class="staff-mock">
+        <div style="font-weight:800; color:#fde68a; margin-bottom:10px; font-size:0.95rem;">👔 Yetkili / Yönetici Paneli</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+          <div style="background:#064e3b; border:1px solid #22c55e; padding:10px; border-radius:10px;">
+            <div style="font-size:0.7rem; color:#a7f3d0;">Tahsil Edilen Ciro</div>
+            <div style="font-size:1.25rem; font-weight:900; color:#4ade80;">18.450 ₺</div>
           </div>
-          <div class="mini-item">
-            <span>2x Caffe Latte</span>
-            <b>220 ₺</b>
-          </div>
-          <div class="mini-item">
-            <span>1x San Sebastian Cheesecake</span>
-            <b>165 ₺</b>
+          <div style="background:#442c0e; border:1px solid #f59e0b; padding:10px; border-radius:10px;">
+            <div style="font-size:0.7rem; color:#fde68a;">Açık Masalar</div>
+            <div style="font-size:1.25rem; font-weight:900; color:#fbbf24;">2.340 ₺</div>
           </div>
         </div>
+        <div style="background:#1e293b; padding:10px; border-radius:10px; font-size:0.8rem; margin-bottom:8px;">
+          <div style="font-weight:800; margin-bottom:6px;">📸 Fotoğraflı Menü & Fiyat Güncelleme</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:6px 8px; border-radius:6px;">
+            <span>☕ Iced Caramel Macchiato (135 ₺)</span>
+            <span style="background:#f59e0b; color:#0f172a; padding:2px 7px; border-radius:5px; font-weight:800; font-size:0.7rem;">📷 Resim Yükle</span>
+          </div>
+        </div>
+        <div style="font-size:0.75rem; color:#7dd3fc;">📅 Tarih Seçerek Geçmiş Gün Sonu Raporları</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAHNE 6: 5 İşletim Sistemi Kurulum Merkezi -->
+  <div class="scene" data-index="5">
+    <div class="copy-side">
+      <div class="tag-badge">6. Adım · 5 İşletim Sistemine Tek Tıkla Kurulum</div>
+      <h2>Windows, Mac, Android,<br><span>HarmonyOS ve iOS Kurulumu!</span></h2>
+      <p>Mağaza komisyonu olmadan kasa bilgisayarınıza, Mac cihazınıza, Android, Huawei HarmonyOS ve iPhone-iPad telefon ve tabletlere tek tıkla uygulama olarak kurulur.</p>
+    </div>
+    <div class="visual-side">
+      <div class="staff-mock" style="display:flex; flex-direction:column; gap:7px;">
+        <div style="font-weight:800; color:#fde68a; font-size:0.9rem; margin-bottom:2px;">📲 Çoklu İşletim Sistemi Kurulum Merkezi</div>
+        <div style="background:#1e293b; border-left:4px solid #3b82f6; padding:7px 10px; border-radius:8px; font-size:0.8rem;">🪟 <b>Windows 10/11</b> — Kasa & POS (.bat Yükleyici)</div>
+        <div style="background:#1e293b; border-left:4px solid #a855f7; padding:7px 10px; border-radius:8px; font-size:0.8rem;">🍎 <b>Apple macOS</b> — Masaüstü .app Uygulaması</div>
+        <div style="background:#1e293b; border-left:4px solid #22c55e; padding:7px 10px; border-radius:8px; font-size:0.8rem;">🤖 <b>Android</b> — Telefon & Garson Tableti</div>
+        <div style="background:#1e293b; border-left:4px solid #ef4444; padding:7px 10px; border-radius:8px; font-size:0.8rem;">🔴 <b>Huawei HarmonyOS</b> — Telefon & MatePad</div>
+        <div style="background:#1e293b; border-left:4px solid #38bdf8; padding:7px 10px; border-radius:8px; font-size:0.8rem;">📱 <b>Apple iOS / iPadOS</b> — iPhone & iPad Profil</div>
       </div>
     </div>
   </div>
@@ -351,33 +342,38 @@
 </div>
 
 <script>
-  const PAUSE_BETWEEN_SCENES_MS = 1800; // Sahneler arası 1.8 saniye net boşluk
+  const PAUSE_BETWEEN_SCENES_MS = 1500;
 
   const SCENES = [
     {
-      title: "1. QR Okut",
+      title: "1. QR & Sabit Masa",
       audio: "audio/sahne1.mp3",
-      text: "Kafenizde garson beklemeye son! Müşteriniz masadaki kare kodu okutur ve anında kendi masasının menüsüne bağlanır."
+      text: "Kafenizde garson beklemeye son! Müşteriniz masadaki kare kodu okutarak anında menüye bağlanır. Üstelik işletmeniz yeni ilave masa açtığında mevcut masaların kare kodları sabit kalır, sadece yeni masalar eklenir."
     },
     {
-      title: "2. Sipariş Ver",
+      title: "2. Tam Ekran Menü",
       audio: "audio/sahne2.mp3",
-      text: "Menüden dilediği ürünleri seçer, sipariş notunu ekler ve tek dokunuşla siparişini mutfağa gönderir."
+      text: "Müşteriniz menüdeki ürünlerin resmine tıkladığında ürünü tam ekran yüksek kalitede inceler, sepetine ekler ve tek tuşla mutfağa gönderir. İhtiyaç halinde ekrandaki garson ziliyle anında garson çağırabilir."
     },
     {
       title: "3. Çalışan Ekranı",
       audio: "audio/sahne3.mp3",
-      text: "Kafe çalışanları, sesli bildirimle hangi masanın ne sipariş ettiğini ve özel notunu saniyesinde ekranda görür."
+      text: "Sipariş verildiği veya garson zili çalındığı anda çalışan ekranında sesli uyarı duyulur. Personel hangi masanın ne istediğini ve özel sipariş notunu saniyesinde görerek hazırlığa başlar."
     },
     {
-      title: "4. Siparişi Tamamla",
+      title: "4. Canlı Adisyon",
       audio: "audio/sahne4.mp3",
-      text: "Ürünler hazırlandığında çalışan tek tuşla siparişi tamamlandı olarak işaretler."
+      text: "Masadan verilen tüm siparişler tek adisyonda otomatik birleştirilir. Müşteriniz kendi telefonundan güncel hesabını şeffafça takip ederken, kasadan tek tıkla adisyon fişi yazdırılır."
     },
     {
-      title: "5. Canlı Hesap",
+      title: "5. Yetkili Paneli",
       audio: "audio/sahne5.mp3",
-      text: "Ve sipariş tamamlandığı anda müşteriniz, kendi telefonunda ödeyeceği toplam hesap tutarını şeffafça görür!"
+      text: "Yetkili yönetici paneli sayesinde menüye fotoğraflı yeni ürünler ekleyebilir, fiyatları anında güncelleyebilir ve kafenizin günlük cirosunu geçmiş tarihlerle birlikte detaylıca takip edebilirsiniz."
+    },
+    {
+      title: "6. Tüm Cihazlar",
+      audio: "audio/sahne6.mp3",
+      text: "Gelişmiş kurulum merkezi ile Windows, Mac, Android, Huawei HarmonyOS ve iOS cihazların tamamına tek tıkla kurulur. Kafenizi modern teknolojiye taşımak için hemen kullanmaya başlayın!"
     }
   ];
 
@@ -406,15 +402,14 @@
   function scheduleNextScene() {
     clearTimeout(gapTimer);
     if (isPaused) return;
-    // Ses bittikten sonra tam 1.8 saniye sessizlik bırak, sonra diğer sahneye geç
     const sub = document.getElementById("subtitleBar");
-    sub.innerHTML = `🎙️ ${SCENES[current].text} <span style="color:#94a3b8; font-size:0.8rem; margin-left:8px;">(1.8 sn nefes arası...)</span>`;
+    sub.innerHTML = `🎙️ ${SCENES[current].text}`;
     gapTimer = setTimeout(() => {
       if (isPaused) return;
       if (current < SCENES.length - 1) {
         showScene(current + 1);
       } else {
-        sub.innerHTML = `✅ Reklam videosu tamamlandı — Tekrar izlemek için <b>"▶️ Sesli Oynat (Baştan)"</b> tuşuna basın.`;
+        sub.innerHTML = `✅ Tanıtım videosu tamamlandı — Tekrar izlemek için <b>"▶️ Sesli Oynat (Baştan)"</b> tuşuna basın.`;
       }
     }, PAUSE_BETWEEN_SCENES_MS);
   }
@@ -424,7 +419,6 @@
     if (isPaused) return;
 
     if (!voiceEnabled) {
-      // Ses kapalıysa okuma süresi (~7 sn) + 1.8 sn boşluk
       gapTimer = setTimeout(() => {
         if (!isPaused && current < SCENES.length - 1) showScene(current + 1);
       }, 7000 + PAUSE_BETWEEN_SCENES_MS);
@@ -432,17 +426,12 @@
     }
 
     currentAudio = new Audio(sc.audio);
-    currentAudio.onended = () => {
-      scheduleNextScene();
-    };
-    currentAudio.onerror = () => {
-      scheduleNextScene();
-    };
+    currentAudio.onended = () => scheduleNextScene();
+    currentAudio.onerror = () => scheduleNextScene();
 
     const playPromise = currentAudio.play();
     if (playPromise !== undefined) {
       playPromise.catch(() => {
-        // Tarayıcı otomatik sesi engellediyse kullanıcıya bilgi ver
         document.getElementById("subtitleBar").innerHTML =
           `🔊 Sesi başlatmak için üstteki <b>"▶️ Sesli Oynat (Baştan)"</b> butonuna bir kez tıklayın.`;
       });
@@ -506,4 +495,3 @@
 </script>
 </body>
 </html>
-

@@ -120,7 +120,7 @@
       <h1>📲 Kafe QR Sipariş — İşletim Sistemi Kurulum Yükleyicileri</h1>
       <p>Windows, macOS, Android, HarmonyOS ve iOS cihazlar için ayrı ayrı yapılandırılmış kurulum paketleri.</p>
     </div>
-    <a class="back-btn" id="backGirisBtn" href="/giris">🔐 Giriş Ekranına Dön</a>
+    <a class="back-btn" id="backGirisBtn" href="/giris" title="Kapat (✕)" style="border-radius:50%; width:42px; height:42px; padding:0; display:inline-flex; align-items:center; justify-content:center; font-size:1.15rem; background:#fee2e2; color:#991b1b; border:1.5px solid #fca5a5;">✕</a>
   </div>
 
   <div class="os-filter">
@@ -304,7 +304,8 @@
 
   const lanBase = "__LAN_STAFF_ORIGIN__";
   const isFile = window.location.protocol === "file:";
-  const base = (!isFile && lanBase.startsWith("http")) ? lanBase : (isFile ? "http://localhost:8091" : window.location.origin);
+  const isCloud = window.location.protocol === "https:" || (!window.location.hostname.startsWith("192.168.") && !window.location.hostname.startsWith("10.") && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1");
+  const base = isCloud ? window.location.origin : ((!isFile && lanBase.startsWith("http")) ? lanBase : (isFile ? "http://localhost:8091" : window.location.origin));
 
   document.getElementById("backGirisBtn").href = `${base}/giris`;
   document.getElementById("dlWinBtn").href = isFile ? "Kurulum_Paketleri/1_Windows_Kurulum/Windows_Kurulum_Yukleyici.bat" : `${base}/kurulum/windows.bat`;
