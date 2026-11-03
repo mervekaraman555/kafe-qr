@@ -307,8 +307,8 @@
   }
 
   if (isCustomerView) {
-    document.getElementById("tableSelect").style.display = "none";
-    document.getElementById("tableSelectLabel").style.display = "none";
+    const tb = document.getElementById("toolbar");
+    if (tb) tb.style.display = "none";
   } else {
     const localCount = parseInt(localStorage.getItem("kafe_table_count") || "20", 10);
     populateTableSelect(localCount);

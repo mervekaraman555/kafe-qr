@@ -591,6 +591,25 @@
   </div>
 </div>
 
+<!-- Masa Hesabı Kapatıldığında Açılan Tam Ekran Çıkış Ekranı -->
+<div id="tableClosedScreen" style="display:none; position:fixed; inset:0; z-index:999999; background:linear-gradient(145deg, #18120f 0%, #0a0807 100%); color:#fff; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:24px;">
+  <div style="max-width:440px; width:100%; background:rgba(255,255,255,0.04); border:1.5px solid rgba(34,197,94,0.35); border-radius:24px; padding:40px 24px; box-shadow:0 24px 60px rgba(0,0,0,0.7); backdrop-filter:blur(14px); animation:fadeInUp 0.35s ease;">
+    <div style="font-size:4.5rem; margin-bottom:12px; filter:drop-shadow(0 8px 24px rgba(34,197,94,0.4));">✨💳</div>
+    <div style="display:inline-block; background:rgba(34,197,94,0.18); border:1px solid #22c55e; color:#4ade80; font-size:0.84rem; font-weight:800; padding:6px 14px; border-radius:999px; margin-bottom:16px;">
+      ✓ HESAP ÖDENDİ (MASA <span id="closedTableNo">1</span>)
+    </div>
+    <h2 style="font-size:1.85rem; font-weight:900; color:#fff; margin-bottom:12px; line-height:1.25;">
+      Masanızın Hesabı Kapatıldı
+    </h2>
+    <p style="font-size:0.95rem; color:#d6c7b8; line-height:1.55; margin-bottom:10px;">
+      Ödemeniz başarıyla tahsil edilmiş ve masanız kapatılmıştır.
+    </p>
+    <div style="margin-top:14px; padding:14px; background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.25); border-radius:14px; font-size:1.02rem; font-weight:800; color:#fbbf24;">
+      Afiyet olsun, iyi günler dileriz! Bizi tercih ettiğiniz için teşekkür ederiz.
+    </div>
+  </div>
+</div>
+
 <!-- Alt Sepet Barı -->
 <div class="cart-bar">
   <div class="cart-inner">
@@ -912,6 +931,7 @@
     });
 
     if (res.ok) {
+      hadActiveOrders = true;
       cart = {};
       document.getElementById("orderNote").value = "";
       renderMenu();
@@ -941,6 +961,24 @@
     if (cartBar) cartBar.style.display = "block";
     renderCartBar();
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  let hadActiveOrders = false;
+
+  function showTableClosedScreen() {
+    try {
+      closeOverlayModal();
+      closeProductModal();
+    } catch (e) {}
+    const succ = document.getElementById("orderSuccessScreen");
+    if (succ) succ.style.display = "none";
+    const cartBar = document.querySelector(".cart-bar");
+    if (cartBar) cartBar.style.display = "none";
+
+    document.getElementById("closedTableNo").textContent = tableNo;
+    const closedScreen = document.getElementById("tableClosedScreen");
+    if (closedScreen) closedScreen.style.display = "flex";
+    document.body.style.overflow = "hidden";
   }
 
   let lastCustomerOrderStage = null;
@@ -1021,24 +1059,15 @@
     const box = document.getElementById("billContent");
 
     if (activeOrders.length === 0) {
-      const wasPaid = lastCustomerOrderStage !== null;
-      lastCustomerOrderStage = null;
-      if (wasPaid) {
-        box.innerHTML = `
-          <div style="background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border:1.5px solid #86efac; border-radius:14px; padding:16px; text-align:center; color:#166534; box-shadow:0 4px 14px rgba(34,197,94,0.12);">
-            <div style="font-size:1.8rem; margin-bottom:4px;">✨</div>
-            <div style="font-weight:900; font-size:1.02rem; color:#14532d;">Masanızın Hesabı Kapatıldı</div>
-            <div style="font-size:0.84rem; margin-top:4px; color:#166534;">Ödemeniz başarıyla alındı. Bizi tercih ettiğiniz için teşekkür ederiz!</div>
-            <div style="margin-top:10px; padding-top:10px; border-top:1px dashed #bbf7d0; font-size:0.8rem; font-weight:700; color:#15803d;">
-              ☕ Yeni bir sipariş vermek için aşağıdaki menüden seçim yapabilirsiniz.
-            </div>
-          </div>
-        `;
-      } else {
-        box.innerHTML = `<p style="font-size:0.86rem; color:var(--muted);">Henüz aktif siparişiniz bulunmuyor. Aşağıdaki menüden ürün seçip yeni sipariş oluşturabilirsiniz.</p>`;
+      if (hadActiveOrders) {
+        showTableClosedScreen();
+        return;
       }
+      box.innerHTML = `<p style="font-size:0.86rem; color:var(--muted);">Henüz aktif siparişiniz bulunmuyor. Aşağıdaki menüden ürün seçip yeni sipariş oluşturabilirsiniz.</p>`;
       return;
     }
+
+    hadActiveOrders = true;
 
     // Masadaki tüm açık siparişleri tek listede birleştir
     const combinedMap = {};
