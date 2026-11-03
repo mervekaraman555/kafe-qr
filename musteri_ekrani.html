@@ -862,8 +862,22 @@
     const box = document.getElementById("billContent");
 
     if (activeOrders.length === 0) {
+      const wasPaid = lastCustomerOrderStage !== null;
       lastCustomerOrderStage = null;
-      box.innerHTML = `<p style="font-size:0.86rem; color:var(--muted);">Henüz aktif siparişiniz bulunmuyor. Aşağıdaki menüden ürün seçip sipariş oluşturabilirsiniz.</p>`;
+      if (wasPaid) {
+        box.innerHTML = `
+          <div style="background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border:1.5px solid #86efac; border-radius:14px; padding:16px; text-align:center; color:#166534; box-shadow:0 4px 14px rgba(34,197,94,0.12);">
+            <div style="font-size:1.8rem; margin-bottom:4px;">✨</div>
+            <div style="font-weight:900; font-size:1.02rem; color:#14532d;">Masanızın Hesabı Kapatıldı</div>
+            <div style="font-size:0.84rem; margin-top:4px; color:#166534;">Ödemeniz başarıyla alındı. Bizi tercih ettiğiniz için teşekkür ederiz!</div>
+            <div style="margin-top:10px; padding-top:10px; border-top:1px dashed #bbf7d0; font-size:0.8rem; font-weight:700; color:#15803d;">
+              ☕ Yeni bir sipariş vermek için aşağıdaki menüden seçim yapabilirsiniz.
+            </div>
+          </div>
+        `;
+      } else {
+        box.innerHTML = `<p style="font-size:0.86rem; color:var(--muted);">Henüz aktif siparişiniz bulunmuyor. Aşağıdaki menüden ürün seçip yeni sipariş oluşturabilirsiniz.</p>`;
+      }
       return;
     }
 

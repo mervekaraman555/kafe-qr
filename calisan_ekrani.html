@@ -210,6 +210,99 @@
   }
   .btn-prep { background: var(--blue); color: #020617; }
   .btn-done { background: var(--green); color: #020617; }
+
+  /* Kart altı Adisyon ve Ödeme / Masayı Kapat Alanı */
+  .card-pay-section {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #334155;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .card-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #090d16;
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid #1e293b;
+  }
+  .card-total-label {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+  .card-total-val {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #4ade80;
+  }
+  .card-actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .btn-adisyon {
+    background: #f59e0b;
+    color: #020617;
+    border: none;
+    padding: 10px 8px;
+    border-radius: 9px;
+    font-weight: 800;
+    font-size: 0.82rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+  }
+  .btn-adisyon:hover {
+    background: #fbbf24;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+  }
+  .btn-pay-close {
+    background: #22c55e;
+    color: #020617;
+    border: none;
+    padding: 10px 8px;
+    border-radius: 9px;
+    font-weight: 800;
+    font-size: 0.82rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+  }
+  .btn-pay-close:hover {
+    background: #4ade80;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35);
+  }
+  .toast-notification {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    background: #15803d;
+    color: #fff;
+    padding: 14px 22px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.92rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 100000;
+    animation: toastIn 0.25s ease;
+  }
+  @keyframes toastIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
 </style>
 </head>
 <body>
@@ -219,7 +312,8 @@
     <h1>👨‍🍳 Personel Masa Sipariş Ekranı <span class="live-pill">● CANLI</span> <span id="staffUserBadge" style="font-size:0.8rem; color:#94a3b8; font-weight:600;"></span></h1>
   </div>
   <div class="nav-btns">
-    <a href="/yetkili" id="yetkiliLink" style="display:none; background:#f59e0b; color:#020617; border-color:#f59e0b;">👔 Yetkili Paneli</a>
+    <a href="/adisyon?no=1" onclick="openAdisyonModal(1); return false;" style="background:#f59e0b; color:#020617; border-color:#f59e0b;">🧾 Masa Adisyonları</a>
+    <a href="/yetkili" id="yetkiliLink" style="display:none; background:#38bdf8; color:#020617; border-color:#38bdf8;">👔 Yetkili Paneli</a>
     <a href="/giris" onclick="logoutStaff(event)" style="background:rgba(239,68,68,0.18); border-color:#ef4444; color:#fca5a5;">🚪 Çıkış Yap</a>
   </div>
 </header>
@@ -241,6 +335,13 @@
       <span id="activeCount" style="font-size:0.88rem; color:var(--muted);">0 aktif masa siparişi</span>
     </div>
     <div class="orders-grid" id="ordersGrid"></div>
+  </div>
+</div>
+
+<!-- Adisyon Overlay Modal (Pencereli Görünüm) -->
+<div id="overlayModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.78); z-index:99999; justify-content:center; align-items:center; padding:16px; backdrop-filter:blur(4px);">
+  <div style="position:relative; width:100%; max-width:520px; height:90vh; background:transparent; border-radius:16px; overflow:hidden; box-shadow:0 24px 48px rgba(0,0,0,0.6);">
+    <iframe id="overlayIframe" src="about:blank" style="width:100%; height:100%; border:none; background:#fff; border-radius:16px;"></iframe>
   </div>
 </div>
 
@@ -357,11 +458,13 @@
           itemsMap: {},
           notes: [],
           status: o.status,
+          total: 0,
           created_at: o.created_at,
           updated_at: o.updated_at
         };
       }
       const grp = byTableMap[tNo];
+      grp.total += (o.total || 0);
       if (o.note && !grp.notes.includes(o.note)) grp.notes.push(o.note);
       const rankMap = { bekliyor: 0, onaylandi: 0, hazirlaniyor: 1, hazir: 2, tamamlandi: 3 };
       const rNew = rankMap[o.status] !== undefined ? rankMap[o.status] : 0;
@@ -370,7 +473,7 @@
       for (const it of o.items) {
         const ikey = `${it.name}_${it.price}`;
         if (!grp.itemsMap[ikey]) {
-          grp.itemsMap[ikey] = { name: it.name, qty: 0 };
+          grp.itemsMap[ikey] = { name: it.name, price: it.price, qty: 0 };
         }
         grp.itemsMap[ikey].qty += it.qty;
       }
@@ -397,6 +500,7 @@
         const itemsHtml = itemsList.map(i => `
           <div>
             <span><span class="qty-badge">${i.qty}x</span> <b>${i.name}</b></span>
+            ${i.price ? `<span style="font-size:0.82rem; color:#94a3b8;">${i.price * i.qty} ₺</span>` : ""}
           </div>
         `).join("");
         const curIdx = rankMap[o.status] !== undefined ? rankMap[o.status] : 0;
@@ -405,6 +509,9 @@
         if (curIdx === 2) statusBadge = "🍽️ 3/4 — Sipariş Hazır (Garson Bekliyor)";
         if (curIdx === 3) statusBadge = "✅ 4/4 — Masaya Teslim Edildi";
         const noteText = o.notes.join(" | ");
+
+        const calcTotal = Object.values(o.itemsMap).reduce((s, i) => s + ((i.price || 0) * i.qty), 0);
+        const displayTotal = o.total > 0 ? o.total : calcTotal;
 
         const stepperBtns = stages.map(s => {
           let cls = "staff-step-btn";
@@ -437,10 +544,77 @@
               <div class="staff-stepper">
                 ${stepperBtns}
               </div>
+              <div class="card-pay-section">
+                <div class="card-total-row">
+                  <span class="card-total-label">MASA HESAP TOPLAMI:</span>
+                  <span class="card-total-val">${displayTotal} ₺</span>
+                </div>
+                <div class="card-actions-grid">
+                  <button type="button" class="btn-adisyon" onclick="openAdisyonModal(${o.table_no})">
+                    🧾 Adisyon Fişi Oluştur
+                  </button>
+                  <button type="button" class="btn-pay-close" onclick="payAndCloseTable(${o.table_no}, ${displayTotal})">
+                    💳 Ödeme Al & Masayı Kapat
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         `;
       }).join("");
+    }
+  }
+
+  function openAdisyonModal(tableNo) {
+    const modal = document.getElementById("overlayModal");
+    const frame = document.getElementById("overlayIframe");
+    frame.src = `/adisyon?no=${tableNo}`;
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeOverlayModal() {
+    const modal = document.getElementById("overlayModal");
+    const frame = document.getElementById("overlayIframe");
+    modal.style.display = "none";
+    frame.src = "about:blank";
+    document.body.style.overflow = "";
+    loadAllOrders();
+  }
+  window.closeOverlayModal = closeOverlayModal;
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeOverlayModal();
+  });
+
+  function showToast(msg) {
+    const existing = document.querySelector(".toast-notification");
+    if (existing) existing.remove();
+    const t = document.createElement("div");
+    t.className = "toast-notification";
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => {
+      t.style.opacity = "0";
+      t.style.transition = "opacity 0.3s";
+      setTimeout(() => t.remove(), 300);
+    }, 3200);
+  }
+
+  async function payAndCloseTable(tableNo, total) {
+    const onay = confirm(`Masa ${tableNo} için ${total} ₺ tutarındaki hesap tahsil edildi mi?\n\nMasa kapatılacak ve sıradaki yeni müşteriler için hazır hale gelecektir.\nİşlemi onaylıyor musunuz?`);
+    if (!onay) return;
+    try {
+      const res = await fetch(`/api/tables/${tableNo}/pay`, { method: "POST" });
+      if (res.ok) {
+        showToast(`✅ Masa ${tableNo} hesabı kapatıldı. Masa yeni siparişlere hazır!`);
+        await loadAllOrders();
+        await loadAllCalls();
+      } else {
+        alert("Ödeme işlemi tamamlanamadı.");
+      }
+    } catch (e) {
+      alert("Sunucuya bağlanılamadı.");
     }
   }
 

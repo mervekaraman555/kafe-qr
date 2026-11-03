@@ -323,8 +323,22 @@
   }
 
   async function closeTableBill() {
-    await fetch(`/api/tables/${tableNo}/pay`, { method: "POST" });
-    await loadAdisyon();
+    const onay = confirm(`Masa ${tableNo} için hesap tahsil edildi mi?\n\nMasa kapatılacak ve sıradaki yeni müşteriler için boşaltılacaktır. Onaylıyor musunuz?`);
+    if (!onay) return;
+    try {
+      const res = await fetch(`/api/tables/${tableNo}/pay`, { method: "POST" });
+      if (res.ok) {
+        if (window.parent && window.parent !== window && typeof window.parent.closeOverlayModal === "function") {
+          window.parent.closeOverlayModal();
+          return;
+        }
+        await loadAdisyon();
+      } else {
+        alert("Hesap kapatma işlemi sırasında bir hata oluştu.");
+      }
+    } catch (e) {
+      alert("Sunucuya ulaşılamadı.");
+    }
   }
 
   function changeTable(val) {
