@@ -104,7 +104,7 @@
       <button class="print-btn" onclick="printAllTables()">🖨️ Tüm Masaları Yazdır</button>
       <button class="print-extra-btn" id="printExtraBtn" onclick="printExtraTables()" style="display:none;">🖨️ Sadece İlave Masaları Yazdır</button>
       <a class="nav-link staff" href="/personel">👨‍🍳 Çalışan Ekranı</a>
-      <a class="nav-link" href="/yetkili" title="Kapat (✕)" style="background:#fee2e2; color:#991b1b; border:1.5px solid #fca5a5; border-radius:50%; width:36px; height:36px; padding:0; justify-content:center; font-size:1rem;">✕</a>
+      <a class="nav-link" href="/yetkili" onclick="if(window.parent&&window.parent!==window&&typeof window.parent.closeOverlayModal==='function'){event.preventDefault();window.parent.closeOverlayModal();}" title="Kapat (✕)" style="background:#fee2e2; color:#991b1b; border:1.5px solid #fca5a5; border-radius:50%; width:36px; height:36px; padding:0; justify-content:center; font-size:1rem;">✕</a>
     </div>
   </div>
 
