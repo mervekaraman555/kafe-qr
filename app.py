@@ -629,17 +629,33 @@ class BaseKafeHandler(BaseHTTPRequestHandler):
             return True
 
         if path == "/guncelle":
-            import subprocess, glob
+            import subprocess, glob, urllib.request
             logs = []
-            try:
-                out = subprocess.check_output(
-                    ["git", "-C", BASE_DIR, "pull", "--rebase", "origin", "main"],
-                    stderr=subprocess.STDOUT,
-                    timeout=20,
-                ).decode("utf-8", errors="ignore")
-                logs.append(out.strip())
-            except Exception as e:
-                logs.append(f"Git pull bilgi: {e}")
+            raw_base = "https://raw.githubusercontent.com/mervekaraman555/kafe-qr/main"
+            update_files = [
+                "app.py", "giris_ekrani.html", "musteri_ekrani.html", "calisan_ekrani.html",
+                "yetkili_ekrani.html", "adisyon.html", "qr_kodlar.html", "kurulum_ekrani.html",
+                "reklam_videosu.html", "manifest.json", "sw.js"
+            ]
+            downloaded = 0
+            for fn in update_files:
+                try:
+                    urllib.request.urlretrieve(f"{raw_base}/{fn}", os.path.join(BASE_DIR, fn))
+                    downloaded += 1
+                except Exception:
+                    pass
+            if downloaded > 0:
+                logs.append(f"{downloaded} dosya GitHub üzerinden güncellendi.")
+            else:
+                try:
+                    out = subprocess.check_output(
+                        ["git", "-C", BASE_DIR, "pull", "--rebase", "origin", "main"],
+                        stderr=subprocess.STDOUT,
+                        timeout=20,
+                    ).decode("utf-8", errors="ignore")
+                    logs.append(out.strip())
+                except Exception as e:
+                    logs.append(f"Git bilgi: {e}")
             for wsgi_file in glob.glob("/var/www/*_wsgi.py"):
                 try:
                     os.utime(wsgi_file, None)

@@ -25,15 +25,8 @@ FILES = [
 ]
 
 home_dir = os.path.expanduser("~")
-try:
-    project_dir = os.path.dirname(os.path.abspath(__file__))
-except NameError:
-    project_dir = os.path.join(home_dir, "kafe_1") if os.path.isdir(os.path.join(home_dir, "kafe_1")) else os.path.join(home_dir, "kafe-qr")
-target_dirs = {project_dir}
-for dname in ("kafe_1", "kafe-qr"):
-    cand = os.path.join(home_dir, dname)
-    if os.path.isdir(cand):
-        target_dirs.add(cand)
+project_dir = os.path.join(home_dir, "kafe_1")
+target_dirs = {home_dir, project_dir, os.path.join(home_dir, "kafe-qr")}
 
 for tdir in sorted(target_dirs):
     os.makedirs(tdir, exist_ok=True)
