@@ -40,8 +40,9 @@ ADISYON_HTML_PATH = os.path.join(BASE_DIR, "adisyon.html")
 SESSIONS = {}  # {token: {"id": ..., "username": ..., "name": ..., "role": ...}}
 
 DEFAULT_USERS = [
-    ("Kafe Personeli", "personel", "1234", "personel"),
+    ("Kafe Yöneticisi", "yonetici", "1234", "yonetici"),
     ("Kafe Yetkilisi", "yetkili", "0000", "yetkili"),
+    ("Kafe Personeli", "personel", "1234", "personel"),
 ]
 
 DEFAULT_MENU = [
@@ -319,6 +320,23 @@ def init_db():
     cur.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('table_count', '12')")
     cur.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('fixed_table_count', '12')")
     cur.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('qr_base_url', '')")
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS categories (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL UNIQUE
+        )
+        """
+    )
+    for c_name in ["Sıcak İçecekler", "Soğuk İçecekler", "Tatlılar", "Yiyecekler"]:
+        cur.execute("INSERT OR IGNORE INTO categories (name) VALUES (?)", (c_name,))
+    try:
+        menu_cats = cur.execute("SELECT DISTINCT category FROM menu WHERE category IS NOT NULL AND category != ''").fetchall()
+        for mc in menu_cats:
+            cur.execute("INSERT OR IGNORE INTO categories (name) VALUES (?)", (mc[0],))
+    except Exception:
+        pass
+
     count = cur.execute("SELECT COUNT(*) FROM menu").fetchone()[0]
     if count == 0:
         cur.executemany(
@@ -379,6 +397,16 @@ def init_db():
             "INSERT INTO users (name, username, password, role) VALUES (?, ?, ?, ?)",
             DEFAULT_USERS,
         )
+    else:
+        # Yönetici hesabı yoksa mutlaka ekle, varsa rolünü 'yonetici' yap
+        yon_row = cur.execute("SELECT id FROM users WHERE username = 'yonetici'").fetchone()
+        if not yon_row:
+            cur.execute(
+                "INSERT INTO users (name, username, password, role) VALUES (?, ?, ?, ?)",
+                ("Kafe Yöneticisi", "yonetici", "1234", "yonetici"),
+            )
+        else:
+            cur.execute("UPDATE users SET role = 'yonetici' WHERE username = 'yonetici'")
     conn.commit()
     consolidate_table_orders(conn)
     conn.close()
@@ -877,6 +905,12 @@ class MusteriHandler(BaseKafeHandler):
             with open(QR_HTML_PATH, "r", encoding="utf-8") as f:
                 return self._send_html(f.read().replace("__LAN_ORIGIN__", lan_origin))
 
+        if path == "/api/categories":
+            conn = db_conn()
+            rows = conn.execute("SELECT id, name FROM categories ORDER BY id ASC").fetchall()
+            conn.close()
+            return self._send_json({"categories": [dict(r) for r in rows]})
+
         if path == "/api/me":
             user = self._get_session_user()
             return self._send_json({"user": user})
@@ -933,7 +967,7 @@ class MusteriHandler(BaseKafeHandler):
 
         if path == "/api/login":
             return PersonelHandler.do_POST(self)
-        if path in ("/api/logout", "/api/menu", "/api/users", "/api/settings") or path.startswith("/api/menu/") or path.startswith("/api/users/") or (path.startswith("/api/orders/") and path.endswith("/status")):
+        if path in ("/api/logout", "/api/menu", "/api/users", "/api/settings", "/api/categories") or path.startswith("/api/menu/") or path.startswith("/api/users/") or path.startswith("/api/categories/") or (path.startswith("/api/orders/") and path.endswith("/status")):
             return PersonelHandler.do_POST(self)
 
         if path == "/api/orders":
@@ -1141,6 +1175,12 @@ class PersonelHandler(BaseKafeHandler):
                 self.wfile.write(raw)
                 return
 
+        if path == "/api/categories":
+            conn = db_conn()
+            rows = conn.execute("SELECT id, name FROM categories ORDER BY id ASC").fetchall()
+            conn.close()
+            return self._send_json({"categories": [dict(r) for r in rows]})
+
         if path == "/api/me":
             user = self._get_session_user()
             return self._send_json({"user": user})
@@ -1214,12 +1254,12 @@ class PersonelHandler(BaseKafeHandler):
                 return self._send_json({"ok": False, "error": "Kullanıcı adı veya şifre hatalı!"}, status=401)
 
             user_dict = dict(row)
-            if role == "yetkili" and user_dict["role"] != "yetkili":
+            if role == "yetkili" and user_dict["role"] not in ("yetkili", "yonetici"):
                 return self._send_json({"ok": False, "error": "Bu hesabın Yetkili / Yönetici giriş yetkisi yok!"}, status=403)
 
             token = secrets.token_hex(16)
             SESSIONS[token] = user_dict
-            redirect_url = "/yetkili" if role == "yetkili" and user_dict["role"] == "yetkili" else "/personel"
+            redirect_url = "/yetkili" if user_dict["role"] in ("yetkili", "yonetici") else "/personel"
             cookie_hdr = f"kafe_session={token}; Path=/; HttpOnly; SameSite=Lax"
             return self._send_json({"ok": True, "user": user_dict, "redirect": redirect_url}, cookie_header=cookie_hdr)
 
@@ -1233,7 +1273,39 @@ class PersonelHandler(BaseKafeHandler):
             cookie_hdr = "kafe_session=; Path=/; Max-Age=0"
             return self._send_json({"ok": True}, cookie_header=cookie_hdr)
 
+        if path == "/api/categories":
+            user = self._get_session_user()
+            if not user or user.get("role") != "yonetici":
+                return self._send_json({"error": "Kategori oluşturma yetkisi yalnızca Yönetici (Tam Yetkili) hesabına aittir."}, status=403)
+            name = str(payload.get("name", "")).strip()
+            if not name:
+                return self._send_json({"error": "Kategori adı belirtilmedi"}, status=400)
+            conn = db_conn()
+            try:
+                conn.execute("INSERT INTO categories (name) VALUES (?)", (name,))
+                conn.commit()
+            except sqlite3.IntegrityError:
+                conn.close()
+                return self._send_json({"error": "Bu kategori zaten mevcut"}, status=400)
+            conn.close()
+            return self._send_json({"ok": True, "name": name}, status=201)
+
+        if path.startswith("/api/categories/") and path.endswith("/delete"):
+            user = self._get_session_user()
+            if not user or user.get("role") != "yonetici":
+                return self._send_json({"error": "Kategori silme yetkisi yalnızca Yönetici hesabına aittir."}, status=403)
+            parts = path.strip("/").split("/")
+            cat_id = int(parts[2])
+            conn = db_conn()
+            conn.execute("DELETE FROM categories WHERE id = ?", (cat_id,))
+            conn.commit()
+            conn.close()
+            return self._send_json({"ok": True})
+
         if path == "/api/menu":
+            user = self._get_session_user()
+            if not user or user.get("role") != "yonetici":
+                return self._send_json({"error": "Yeni ürün ekleme yetkisi yalnızca Yönetici (Tam Yetkili) hesabına aittir. Yetkili hesabı yeni ürün ekleyemez."}, status=403)
             name = str(payload.get("name", "")).strip()
             category = str(payload.get("category", "Sıcak İçecekler")).strip()
             price = float(payload.get("price", 0))
@@ -1286,6 +1358,9 @@ class PersonelHandler(BaseKafeHandler):
             return self._send_json({"ok": True, "image_url": image_url})
 
         if path.startswith("/api/menu/") and path.endswith("/delete"):
+            user = self._get_session_user()
+            if not user or user.get("role") != "yonetici":
+                return self._send_json({"error": "Ürün silme yetkisi yalnızca Yönetici hesabına aittir."}, status=403)
             parts = path.strip("/").split("/")
             item_id = int(parts[2])
             conn = db_conn()
@@ -1295,10 +1370,15 @@ class PersonelHandler(BaseKafeHandler):
             return self._send_json({"ok": True})
 
         if path == "/api/users":
+            user = self._get_session_user()
+            if not user or user.get("role") != "yonetici":
+                return self._send_json({"error": "Yeni kullanıcı hesabı ekleme yetkisi yalnızca Yönetici hesabına aittir."}, status=403)
             name = str(payload.get("name", "")).strip()
             username = str(payload.get("username", "")).strip()
             password = str(payload.get("password", "")).strip()
             role = str(payload.get("role", "personel")).strip()
+            if role not in ("yonetici", "yetkili", "personel"):
+                role = "personel"
             if not name or not username or not password:
                 return self._send_json({"error": "Tüm alanları doldurun"}, status=400)
             conn = db_conn()
@@ -1315,10 +1395,13 @@ class PersonelHandler(BaseKafeHandler):
             return self._send_json({"ok": True}, status=201)
 
         if path.startswith("/api/users/") and path.endswith("/delete"):
+            user = self._get_session_user()
+            if not user or user.get("role") != "yonetici":
+                return self._send_json({"error": "Kullanıcı silme yetkisi yalnızca Yönetici hesabına aittir."}, status=403)
             parts = path.strip("/").split("/")
             user_id = int(parts[2])
             conn = db_conn()
-            conn.execute("DELETE FROM users WHERE id = ? AND username != 'yetkili'", (user_id,))
+            conn.execute("DELETE FROM users WHERE id = ? AND username NOT IN ('yetkili', 'yonetici')", (user_id,))
             conn.commit()
             conn.close()
             return self._send_json({"ok": True})

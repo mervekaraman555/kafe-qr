@@ -1398,8 +1398,12 @@
         return;
       }
       document.getElementById("staffUserBadge").textContent = `· 👤 ${data.user.name}`;
-      if (data.user.role === "yetkili") {
-        document.getElementById("yetkiliLink").style.display = "inline-block";
+      if (data.user.role === "yetkili" || data.user.role === "yonetici") {
+        const yl = document.getElementById("yetkiliLink");
+        yl.style.display = "inline-block";
+        if (data.user.role === "yonetici") {
+          yl.textContent = "👑 Yönetici Paneli";
+        }
       }
     } catch (e) {}
   }

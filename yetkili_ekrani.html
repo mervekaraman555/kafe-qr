@@ -360,6 +360,27 @@
   <iframe id="overlayIframe" src="about:blank" style="width:100%; height:100%; border:none; flex:1; background:#f8fafc;"></iframe>
 </div>
 
+<!-- Kategori Yönetimi Modalı (Yönetici) -->
+<div id="categoryModal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(9,13,22,0.88); backdrop-filter:blur(5px); justify-content:center; align-items:center; padding:16px;">
+  <div style="background:#0f172a; border:1px solid #334155; border-radius:18px; width:100%; max-width:480px; padding:22px; box-shadow:0 25px 60px rgba(0,0,0,0.7);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #1e293b; padding-bottom:12px;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:1.3rem;">📁</span>
+        <h3 style="margin:0; font-size:1.1rem; color:#f8fafc; font-weight:800;">Ürün Kategori Yönetimi</h3>
+      </div>
+      <button type="button" onclick="closeCategoryModal()" style="background:none; border:none; color:#94a3b8; font-size:1.2rem; cursor:pointer; font-weight:800;">✕</button>
+    </div>
+    <form onsubmit="handleCreateCategory(event)" style="display:flex; gap:8px; margin-bottom:16px;">
+      <input type="text" id="newCategoryInput" placeholder="Yeni kategori adı (ör: Kahvaltılıklar)..." required style="flex:1; padding:9px 12px; border-radius:9px; border:1px solid #334155; background:#020617; color:#fff; font-size:0.85rem;">
+      <button type="submit" style="background:#f59e0b; color:#090d16; border:none; padding:9px 16px; border-radius:9px; font-weight:900; font-size:0.85rem; cursor:pointer; white-space:nowrap;">
+        + Kategori Ekle
+      </button>
+    </form>
+    <div style="font-size:0.78rem; color:#94a3b8; font-weight:700; margin-bottom:8px; text-transform:uppercase;">Mevcut Kategoriler:</div>
+    <div id="categoryChipsList" style="display:flex; flex-wrap:wrap; gap:8px; max-height:220px; overflow-y:auto; padding:4px 0;"></div>
+  </div>
+</div>
+
 <div class="container">
   <!-- 1. BÖLÜM: BUGÜNKÜ GÜNLÜK CİRO İSTATİSTİKLERİ -->
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -519,18 +540,25 @@
     <div>
       <div class="section-box">
         <div class="section-title">
-          <span>📋 Menü & Ürün Fiyat Yönetimi</span>
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <span>📋 Menü & Ürün Fiyat Yönetimi</span>
+            <button type="button" id="btnCategoryManage" onclick="openCategoryModal()" style="display:none; background:linear-gradient(135deg, #f59e0b, #d97706); color:#090d16; border:none; padding:5px 12px; border-radius:8px; font-weight:900; font-size:0.78rem; cursor:pointer; align-items:center; gap:5px; box-shadow:0 2px 8px rgba(245,158,11,0.3);">
+              📁 Kategori Yönetimi (+ Yeni Kategori)
+            </button>
+          </div>
           <span style="font-size:0.78rem; color:var(--muted);" id="menuCount">0 ürün</span>
         </div>
-        <form onsubmit="addMenuItem(event)" style="margin-bottom:16px;">
+
+        <!-- Yetkili için ürün ekleme kilitli uyarısı -->
+        <div id="productAddLockedNotice" style="display:none; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; padding:12px 16px; border-radius:12px; font-size:0.85rem; font-weight:700; align-items:center; gap:8px; margin-bottom:16px;">
+          <span style="font-size:1.15rem;">🔒</span>
+          <span><b>Ürün Ekleme Kilitli:</b> Yeni ürün ve kategori ekleme yetkisi yalnızca <b>Yönetici (Tam Yetkili)</b> hesabına aittir. Yetkili hesabı ürün ekleyemez.</span>
+        </div>
+
+        <form id="addProductForm" onsubmit="addMenuItem(event)" style="margin-bottom:16px;">
           <div class="form-row">
             <input type="text" id="mName" placeholder="Ürün Adı (ör: Mocha)" required>
-            <select id="mCategory">
-              <option value="Sıcak İçecekler">Sıcak İçecekler</option>
-              <option value="Soğuk İçecekler">Soğuk İçecekler</option>
-              <option value="Tatlılar">Tatlılar</option>
-              <option value="Yiyecekler">Yiyecekler</option>
-            </select>
+            <select id="mCategory"></select>
             <input type="number" id="mPrice" placeholder="Fiyat (₺)" required min="1" step="0.5">
             <input type="number" id="mCalories" placeholder="Kalori (kcal)" min="0" style="max-width:115px;">
             <input type="text" id="mEmoji" placeholder="Emoji (☕)" value="☕" style="max-width:80px;">
@@ -571,26 +599,33 @@
     <div>
       <div class="section-box">
         <div class="section-title">
-          <span>👥 Yetkili & Çalışan Personel Hesapları</span>
+          <span>👥 Yönetici, Yetkili & Çalışan Personel Hesapları</span>
         </div>
-        <form onsubmit="addUser(event)" style="margin-bottom:14px;">
-          <div class="form-row">
-            <input type="text" id="uName" placeholder="Ad Soyad (ör: Ahmet)" required>
-            <input type="text" id="uUsername" placeholder="Kullanıcı Adı" required>
-            <input type="text" id="uPassword" placeholder="Şifre / PIN" required>
-            <select id="uRole">
-              <option value="personel">👨‍🍳 Çalışan Personel</option>
-              <option value="yetkili">👔 Yetkili / Yönetici</option>
-            </select>
-          </div>
-          <button type="submit" class="btn-add" style="width:100%;">+ Personel / Yetkili Ekle</button>
-        </form>
+        <div id="userAddLockedNotice" style="display:none; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; padding:10px 14px; border-radius:10px; font-size:0.82rem; font-weight:700; align-items:center; gap:6px; margin-bottom:12px;">
+          <span>🔒</span>
+          <span>Yeni kullanıcı hesabı açma yetkisi yalnızca <b>Yönetici</b> hesabına aittir.</span>
+        </div>
+        <div id="addUserBox">
+          <form onsubmit="addUser(event)" style="margin-bottom:14px;">
+            <div class="form-row">
+              <input type="text" id="uName" placeholder="Ad Soyad (ör: Ahmet)" required>
+              <input type="text" id="uUsername" placeholder="Kullanıcı Adı" required>
+              <input type="text" id="uPassword" placeholder="Şifre / PIN" required>
+              <select id="uRole">
+                <option value="yonetici">👑 Yönetici (Tam Yetkili)</option>
+                <option value="yetkili">👔 Yetkili (Ürün Ekleme Kapalı)</option>
+                <option value="personel" selected>👨‍🍳 Çalışan Personel</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-add" style="width:100%;">+ Yeni Hesap Ekle</button>
+          </form>
+        </div>
         <table>
           <thead>
             <tr>
               <th>Ad Soyad</th>
               <th>Kullanıcı Adı</th>
-              <th>Rol</th>
+              <th>Rol / Yetki</th>
               <th>İşlem</th>
             </tr>
           </thead>
@@ -621,6 +656,9 @@
 </div>
 
 <script>
+  let currentUserRole = "yetkili";
+  let currentUserName = "";
+
   async function checkAuth() {
     const res = await fetch("/api/me");
     const data = await res.json();
@@ -628,11 +666,43 @@
       window.location.href = "/giris";
       return;
     }
-    if (data.user.role !== "yetkili") {
+    if (data.user.role !== "yetkili" && data.user.role !== "yonetici") {
       window.location.href = "/personel";
       return;
     }
-    document.getElementById("userBadge").textContent = `${data.user.name} (YETKİLİ)`;
+    currentUserRole = data.user.role;
+    currentUserName = data.user.name;
+
+    const badge = document.getElementById("userBadge");
+    if (currentUserRole === "yonetici") {
+      badge.textContent = `${data.user.name} (👑 YÖNETİCİ - TAM YETKİ)`;
+      badge.style.background = "linear-gradient(135deg, #f59e0b, #d97706)";
+      badge.style.color = "#020617";
+      badge.style.fontWeight = "900";
+    } else {
+      badge.textContent = `${data.user.name} (👔 YETKİLİ)`;
+      badge.style.background = "#0284c7";
+      badge.style.color = "#fff";
+    }
+
+    applyRolePermissions(currentUserRole);
+    loadCategories();
+  }
+
+  function applyRolePermissions(role) {
+    const isYonetici = role === "yonetici";
+    const addForm = document.getElementById("addProductForm");
+    const lockNotice = document.getElementById("productAddLockedNotice");
+    if (addForm) addForm.style.display = isYonetici ? "block" : "none";
+    if (lockNotice) lockNotice.style.display = isYonetici ? "none" : "flex";
+
+    const btnCat = document.getElementById("btnCategoryManage");
+    if (btnCat) btnCat.style.display = isYonetici ? "inline-flex" : "none";
+
+    const addUserBox = document.getElementById("addUserBox");
+    const userLockNotice = document.getElementById("userAddLockedNotice");
+    if (addUserBox) addUserBox.style.display = isYonetici ? "block" : "none";
+    if (userLockNotice) userLockNotice.style.display = isYonetici ? "none" : "flex";
   }
 
   async function logout() {
@@ -719,10 +789,90 @@
     loadMenu();
   }
 
+  let cafeCategories = [];
+
+  async function loadCategories() {
+    try {
+      const res = await fetch("/api/categories");
+      if (res.ok) {
+        const data = await res.json();
+        cafeCategories = data.categories || [];
+      }
+    } catch(e) {}
+
+    const sel = document.getElementById("mCategory");
+    if (sel && cafeCategories.length > 0) {
+      const curVal = sel.value;
+      sel.innerHTML = cafeCategories.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
+      if (curVal && cafeCategories.some(c => c.name === curVal)) {
+        sel.value = curVal;
+      }
+    }
+
+    renderCategoryChips();
+  }
+
+  function renderCategoryChips() {
+    const list = document.getElementById("categoryChipsList");
+    if (!list) return;
+    const defaultProtected = new Set(["Sıcak İçecekler", "Soğuk İçecekler", "Tatlılar", "Yiyecekler"]);
+    list.innerHTML = cafeCategories.map(c => `
+      <div style="background:#1e293b; border:1px solid #334155; padding:6px 12px; border-radius:999px; font-size:0.8rem; font-weight:700; color:#f8fafc; display:flex; align-items:center; gap:8px;">
+        <span>📁 ${c.name}</span>
+        ${!defaultProtected.has(c.name) ? `<button type="button" onclick="deleteCategory(${c.id})" style="background:none; border:none; color:#f87171; cursor:pointer; font-weight:900; font-size:0.85rem;" title="Kategoriyi Sil">✕</button>` : ''}
+      </div>
+    `).join("");
+  }
+
+  function openCategoryModal() {
+    loadCategories();
+    document.getElementById("categoryModal").style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeCategoryModal() {
+    document.getElementById("categoryModal").style.display = "none";
+    document.body.style.overflow = "";
+  }
+
+  async function handleCreateCategory(e) {
+    e.preventDefault();
+    const input = document.getElementById("newCategoryInput");
+    const name = input.value.trim();
+    if (!name) return;
+
+    const res = await fetch("/api/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name })
+    });
+    if (res.ok) {
+      input.value = "";
+      await loadCategories();
+      alert(`✅ "${name}" kategorisi başarıyla eklendi!`);
+    } else {
+      const err = await res.json();
+      alert(err.error || "Kategori eklenemedi");
+    }
+  }
+
+  async function deleteCategory(id) {
+    if (!confirm("Bu kategoriyi silmek istediğinize emin misiniz?")) return;
+    const res = await fetch(`/api/categories/${id}/delete`, { method: "POST" });
+    if (res.ok) {
+      await loadCategories();
+    } else {
+      const err = await res.json();
+      alert(err.error || "Kategori silinemedi");
+    }
+  }
+
   async function loadMenu() {
     const res = await fetch("/api/menu");
     const data = await res.json();
     document.getElementById("menuCount").textContent = `${data.items.length} ürün`;
+    const isYonetici = currentUserRole === "yonetici";
+
     document.getElementById("menuTableBody").innerHTML = data.items.map(i => {
       const thumbHtml = i.image_url
         ? `<img src="${i.image_url}" class="menu-thumb" alt="${i.name}">`
@@ -732,6 +882,25 @@
         ? `<div style="display:flex; flex-wrap:wrap; gap:3px; margin-top:4px;">${ingChips.slice(0, 3).map(c => `<span style="font-size:0.68rem; background:#1e293b; color:#94a3b8; padding:1px 6px; border-radius:4px;">${c.split(':')[0]}</span>`).join("")}${ingChips.length > 3 ? `<span style="font-size:0.68rem; color:var(--amber);">+${ingChips.length - 3}</span>` : ""}</div>`
         : "";
 
+      const calBadge = isYonetici
+        ? `<span style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); font-size:0.7rem; font-weight:800; padding:1px 6px; border-radius:999px; margin-left:6px; cursor:pointer;" onclick="editItemCalories(${i.id}, ${i.calories || 0})" title="Kaloriyi güncellemek için tıklayın">🔥 ${i.calories || 0} kcal</span>`
+        : `<span style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); font-size:0.7rem; font-weight:800; padding:1px 6px; border-radius:999px; margin-left:6px;">🔥 ${i.calories || 0} kcal</span>`;
+
+      const actionButtons = isYonetici ? `
+        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+          <button type="button" class="btn-img-sm" style="background:rgba(245,158,11,0.15); color:#fbbf24; border-color:#f59e0b;" onclick="editItemIngredients(${i.id}, '${(i.ingredients || "").replace(/'/g, "\\'")}')">
+            ✨ Katmanlar
+          </button>
+          <button type="button" class="btn-img-sm" onclick="triggerRowImageUpload(${i.id})">
+            📷 ${i.image_url ? "Resim" : "+ Resim"}
+          </button>
+          ${i.image_url ? `<button type="button" class="btn-sm" title="Resmi Kaldır" onclick="removeRowImage(${i.id})">🖼️✕</button>` : ""}
+          <button type="button" class="btn-sm" onclick="deleteMenuItem(${i.id})">Sil</button>
+        </div>
+      ` : `
+        <span style="font-size:0.74rem; color:var(--muted); font-weight:600;">🔒 Sadece Yönetici Düzenleyebilir</span>
+      `;
+
       return `
         <tr>
           <td>
@@ -739,7 +908,7 @@
               ${thumbHtml}
               <div>
                 <b>${i.emoji} ${i.name}</b>
-                <span style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); font-size:0.7rem; font-weight:800; padding:1px 6px; border-radius:999px; margin-left:6px; cursor:pointer;" onclick="editItemCalories(${i.id}, ${i.calories || 0})" title="Kaloriyi güncellemek için tıklayın">🔥 ${i.calories || 0} kcal</span>
+                ${calBadge}
                 <div style="font-size:0.74rem;color:var(--muted);">${i.description || ""}</div>
                 ${ingHtml}
               </div>
@@ -747,24 +916,17 @@
           </td>
           <td>${i.category}</td>
           <td><b>${i.price} ₺</b></td>
-          <td>
-            <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-              <button type="button" class="btn-img-sm" style="background:rgba(245,158,11,0.15); color:#fbbf24; border-color:#f59e0b;" onclick="editItemIngredients(${i.id}, '${(i.ingredients || "").replace(/'/g, "\\'")}')">
-                ✨ Katmanlar
-              </button>
-              <button type="button" class="btn-img-sm" onclick="triggerRowImageUpload(${i.id})">
-                📷 ${i.image_url ? "Resim" : "+ Resim"}
-              </button>
-              ${i.image_url ? `<button type="button" class="btn-sm" title="Resmi Kaldır" onclick="removeRowImage(${i.id})">🖼️✕</button>` : ""}
-              <button type="button" class="btn-sm" onclick="deleteMenuItem(${i.id})">Sil</button>
-            </div>
-          </td>
+          <td>${actionButtons}</td>
         </tr>
       `;
     }).join("");
   }
 
   async function editItemIngredients(id, currentIngs) {
+    if (currentUserRole !== "yonetici") {
+      alert("Bu işlem yalnızca Yönetici (Tam Yetkili) hesabına aittir.");
+      return;
+    }
     const newVal = prompt("Ürün İçerik ve Katmanları (| ile ayırarak yazın):\nÖrnek: POTATO SLICES: Patates Dilimleri | JUICY BEEF PATTY: Dana Köfte | MELTED CHEESE: Cheddar Peyniri", currentIngs || "");
     if (newVal === null) return;
     await fetch(`/api/menu/${id}/ingredients`, {
@@ -776,6 +938,10 @@
   }
 
   async function editItemCalories(id, currentCal) {
+    if (currentUserRole !== "yonetici") {
+      alert("Bu işlem yalnızca Yönetici (Tam Yetkili) hesabına aittir.");
+      return;
+    }
     const newVal = prompt("Ürün Kalorisi (kcal):\nÖrnek: 450", currentCal || 0);
     if (newVal === null) return;
     const cal = parseInt(newVal.trim(), 10) || 0;
@@ -789,6 +955,10 @@
 
   async function addMenuItem(e) {
     e.preventDefault();
+    if (currentUserRole !== "yonetici") {
+      alert("Yeni ürün ekleme yetkisi yalnızca Yönetici (Tam Yetkili) hesabına aittir.");
+      return;
+    }
     const payload = {
       name: document.getElementById("mName").value.trim(),
       category: document.getElementById("mCategory").value,
@@ -812,10 +982,18 @@
       if (document.getElementById("mIngredients")) document.getElementById("mIngredients").value = "";
       clearNewItemImage();
       loadMenu();
+    } else {
+      const err = await res.json();
+      alert(err.error || "Ürün eklenemedi");
     }
   }
 
   async function deleteMenuItem(id) {
+    if (currentUserRole !== "yonetici") {
+      alert("Ürün silme yetkisi yalnızca Yönetici (Tam Yetkili) hesabına aittir.");
+      return;
+    }
+    if (!confirm("Bu ürünü menüden silmek istediğinize emin misiniz?")) return;
     await fetch(`/api/menu/${id}/delete`, { method: "POST" });
     loadMenu();
   }
@@ -824,14 +1002,27 @@
     const res = await fetch("/api/users");
     if (!res.ok) return;
     const data = await res.json();
-    document.getElementById("usersTableBody").innerHTML = data.users.map(u => `
-      <tr>
-        <td><b>${u.name}</b></td>
-        <td><code>${u.username}</code></td>
-        <td>${u.role === "yetkili" ? "👔 Yetkili" : "👨‍🍳 Çalışan"}</td>
-        <td>${u.username === "yetkili" ? "<span style='color:var(--muted);font-size:0.75rem;'>Ana Hesap</span>" : `<button class="btn-sm" onclick="deleteUser(${u.id})">Sil</button>`}</td>
-      </tr>
-    `).join("");
+    document.getElementById("usersTableBody").innerHTML = data.users.map(u => {
+      const roleBadge = u.role === "yonetici"
+        ? `<span style="background:linear-gradient(135deg, #f59e0b, #d97706); color:#020617; font-size:0.72rem; font-weight:900; padding:2px 8px; border-radius:6px;">👑 Yönetici (Tam Yetki)</span>`
+        : (u.role === "yetkili"
+          ? `<span style="background:#0284c7; color:#fff; font-size:0.72rem; font-weight:800; padding:2px 8px; border-radius:6px;">👔 Yetkili</span>`
+          : `<span style="background:#1e293b; color:#94a3b8; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:6px;">👨‍🍳 Personel</span>`);
+
+      const canDelete = currentUserRole === "yonetici" && u.username !== "yonetici" && u.username !== "yetkili";
+      const actionHtml = canDelete
+        ? `<button class="btn-sm" onclick="deleteUser(${u.id})">Sil</button>`
+        : `<span style='color:var(--muted);font-size:0.72rem;'>${u.username === "yonetici" ? "Ana Yönetici" : (u.username === "yetkili" ? "Ana Yetkili" : "—")}</span>`;
+
+      return `
+        <tr>
+          <td><b>${u.name}</b></td>
+          <td><code>${u.username}</code></td>
+          <td>${roleBadge}</td>
+          <td>${actionHtml}</td>
+        </tr>
+      `;
+    }).join("");
   }
 
   async function addUser(e) {

@@ -1835,7 +1835,7 @@
     fetch("/api/me")
       .then(r => r.json())
       .then(d => {
-        if (d && d.user && (d.user.role === "yetkili" || d.user.role === "calisan")) {
+        if (d && d.user && (d.user.role === "yetkili" || d.user.role === "calisan" || d.user.role === "yonetici" || d.user.role === "personel")) {
           showBanner();
         }
       })
