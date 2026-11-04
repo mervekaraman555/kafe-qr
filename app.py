@@ -712,7 +712,8 @@ class BaseKafeHandler(BaseHTTPRequestHandler):
                 "uploads/urun_artisan_burger.jpg",
                 "uploads/urun_matcha_latte.jpg",
                 "uploads/urun_limonlu_cheesecake.jpg",
-                "uploads/urun_oreolu_pasta.jpg"
+                "uploads/urun_oreolu_pasta.jpg",
+                "kafe.db"
             ]
             downloaded = 0
             for fn in update_files:
