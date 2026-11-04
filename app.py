@@ -1575,10 +1575,18 @@ def application(environ, start_response):
         _WSGI_DB_INITIALIZED = True
     adapter = _WSGIAdapter(environ)
     method = (environ.get("REQUEST_METHOD") or "GET").upper()
-    if method == "POST":
-        adapter.do_POST()
-    else:
-        adapter.do_GET()
+    try:
+        if method == "POST":
+            adapter.do_POST()
+        else:
+            adapter.do_GET()
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        adapter.send_response(500)
+        adapter.send_header("Content-Type", "text/plain; charset=utf-8")
+        adapter.end_headers()
+        adapter.wfile.write(f"SUNUCU HATASI: {e}\n\n{tb}".encode("utf-8"))
     status_map = {
         200: "200 OK",
         201: "201 Created",
