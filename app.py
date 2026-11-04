@@ -948,14 +948,15 @@ class MusteriHandler(BaseKafeHandler):
             merged_new = merge_items_list(items)
             total = sum(float(i["price"]) * int(i["qty"]) for i in merged_new)
 
+            status = str(payload.get("status", "bekliyor")).strip() or "bekliyor"
             conn = db_conn()
             cur = conn.cursor()
             cur.execute(
                 """
                 INSERT INTO orders (table_no, items_json, note, total, status, order_date, created_at, updated_at)
-                VALUES (?, ?, ?, ?, 'bekliyor', ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                (table_no, json.dumps(merged_new, ensure_ascii=False), note, total, today_str, now, now),
+                (table_no, json.dumps(merged_new, ensure_ascii=False), note, total, status, today_str, now, now),
             )
             order_id = cur.lastrowid
             conn.commit()
