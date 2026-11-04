@@ -768,8 +768,9 @@ class BaseKafeHandler(BaseHTTPRequestHandler):
             return True
 
         if path == "/guncelle":
-            import subprocess, glob, urllib.request
+            import subprocess, glob, urllib.request, time
             logs = []
+            ts = int(time.time())
             raw_base = "https://raw.githubusercontent.com/mervekaraman555/kafe-qr/main"
             update_files = [
                 "app.py", "giris_ekrani.html", "musteri_ekrani.html", "calisan_ekrani.html",
@@ -782,34 +783,27 @@ class BaseKafeHandler(BaseHTTPRequestHandler):
                 "kafe.db"
             ]
             downloaded = 0
-            # Varsa eski luma dosyasını temizle
+            # Önce git pull dene
             try:
-                for lf in ["luma_video_olusturucu.py", "Luma_AI_Dream_Machine.webloc"]:
-                    p = os.path.join(BASE_DIR, lf)
-                    if os.path.isfile(p):
-                        os.remove(p)
-            except Exception:
-                pass
+                out = subprocess.check_output(
+                    ["git", "-C", BASE_DIR, "pull", "origin", "main"],
+                    stderr=subprocess.STDOUT,
+                    timeout=20,
+                ).decode("utf-8", errors="ignore")
+                logs.append(f"Git: {out.strip()[:100]}")
+            except Exception as ge:
+                logs.append(f"Git not: {ge}")
+
             for fn in update_files:
                 try:
                     target_path = os.path.join(BASE_DIR, fn)
                     os.makedirs(os.path.dirname(target_path), exist_ok=True)
-                    urllib.request.urlretrieve(f"{raw_base}/{fn}", target_path)
+                    urllib.request.urlretrieve(f"{raw_base}/{fn}?v={ts}", target_path)
                     downloaded += 1
                 except Exception as e:
                     logs.append(f"Hata {fn}: {e}")
             if downloaded > 0:
                 logs.append(f"{downloaded} dosya GitHub üzerinden güncellendi.")
-            else:
-                try:
-                    out = subprocess.check_output(
-                        ["git", "-C", BASE_DIR, "pull", "--rebase", "origin", "main"],
-                        stderr=subprocess.STDOUT,
-                        timeout=20,
-                    ).decode("utf-8", errors="ignore")
-                    logs.append(out.strip())
-                except Exception as e:
-                    logs.append(f"Git bilgi: {e}")
             for wsgi_file in glob.glob("/var/www/*_wsgi.py"):
                 try:
                     os.utime(wsgi_file, None)
