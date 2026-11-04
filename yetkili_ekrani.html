@@ -352,31 +352,75 @@
 </div>
 
 <div class="container">
-  <!-- Ciro & Masa İstatistikleri -->
+  <!-- 1. BÖLÜM: BUGÜNKÜ GÜNLÜK CİRO İSTATİSTİKLERİ -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+    <div style="font-weight:800; font-size:0.95rem; color:#cbd5e1; display:flex; align-items:center; gap:8px;">
+      <span style="background:#0284c7; color:#fff; font-size:0.7rem; padding:3px 8px; border-radius:6px; font-weight:800;">GÜNLÜK</span>
+      <span id="dailyTitleLabel">📌 Bugünün Günlük Ciro İstatistikleri</span>
+    </div>
+  </div>
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-label">💰 Tahsil Edilen Ciro (Kapanan Hesaplar)</div>
+      <div class="stat-label" id="lblPaidTotal">💰 Bugün Tahsil Edilen Ciro</div>
       <div class="stat-val green" id="statPaidTotal">0 ₺</div>
+      <div style="font-size:0.74rem; color:var(--muted); margin-top:5px;" id="statPaidAllTime">Genel Toplam: 0 ₺</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">⏳ Açık Masalardaki Bekleyen Tutar</div>
+      <div class="stat-label" id="lblOpenTotal">⏳ Bugün Açık Kalan Tutar</div>
       <div class="stat-val amber" id="statOpenTotal">0 ₺</div>
+      <div style="font-size:0.74rem; color:var(--muted); margin-top:5px;" id="statOpenAllTime">Genel Toplam: 0 ₺</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">🧾 Toplam Genel Ciro (Açık + Kapanan)</div>
+      <div class="stat-label" id="lblAllTotal">🧾 Bugün Toplam Günün Cirosu</div>
       <div class="stat-val blue" id="statAllTotal">0 ₺</div>
+      <div style="font-size:0.74rem; color:var(--muted); margin-top:5px;" id="statAllTimeTotal">Genel Toplam: 0 ₺</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">📍 Aktif Açık Masa / Kapanan Adisyon</div>
+      <div class="stat-label" id="lblCounts">📍 Bugün Aktif / Kapanan Adisyon</div>
       <div class="stat-val" id="statCounts">0 Açık · 0 Ödendi</div>
+      <div style="font-size:0.74rem; color:var(--muted); margin-top:5px;" id="statCountsAllTime">Genel: 0 Açık · 0 Ödendi</div>
+    </div>
+  </div>
+
+  <!-- 2. BÖLÜM: AY SONU YAPILAN CİRO TOPLAMI (AYRI BLOK) -->
+  <div style="background:linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); border:1px solid #3b82f6; border-radius:16px; padding:18px 20px; margin-bottom:24px; box-shadow:0 8px 24px rgba(0,0,0,0.35);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+      <div style="font-weight:900; font-size:1.05rem; color:#38bdf8; display:flex; align-items:center; gap:8px;">
+        <span style="background:rgba(56,189,248,0.2); color:#38bdf8; border:1px solid #38bdf8; font-size:0.72rem; padding:3px 9px; border-radius:6px; font-weight:900;">AY SONU RAPORU</span>
+        <span id="monthlyTitleLabel">🗓️ Ay Sonu Yapılan Ciro Toplamı</span>
+      </div>
+      <div style="font-size:0.82rem; color:#cbd5e1; font-weight:700;" id="monthlyDateRangeText">Ay Sonu Kapanış Değerleri</div>
+    </div>
+    
+    <div class="stats-grid" style="margin-bottom:0;">
+      <div class="stat-card" style="background:#090d16; border-color:#334155;">
+        <div class="stat-label">🏦 Ay Sonu Tahsil Edilen (Ödenen)</div>
+        <div class="stat-val green" id="statMonthPaidTotal">0 ₺</div>
+        <div style="font-size:0.72rem; color:var(--muted); margin-top:5px;" id="statMonthPaidSub">Ödenmiş hesaplar</div>
+      </div>
+      <div class="stat-card" style="background:#090d16; border-color:#334155;">
+        <div class="stat-label">⏳ Ay İçi Bekleyen Açık Tutar</div>
+        <div class="stat-val amber" id="statMonthOpenTotal">0 ₺</div>
+        <div style="font-size:0.72rem; color:var(--muted); margin-top:5px;" id="statMonthOpenSub">Kapanmamış açık masalar</div>
+      </div>
+      <div class="stat-card" style="background:#090d16; border:2px solid #38bdf8; box-shadow:0 0 16px rgba(56,189,248,0.15);">
+        <div class="stat-label" style="color:#38bdf8; font-weight:900;">🏆 AY SONU GENEL TOPLAM CİRO</div>
+        <div class="stat-val blue" id="statMonthAllTotal">0 ₺</div>
+        <div style="font-size:0.74rem; color:#cbd5e1; margin-top:5px;" id="statMonthKdvSub">KDV Hariç: 0 ₺ · %10 KDV: 0 ₺</div>
+      </div>
+      <div class="stat-card" style="background:#090d16; border-color:#334155;">
+        <div class="stat-label">🧾 Ay Boyunca Toplam Adisyon</div>
+        <div class="stat-val" id="statMonthCounts" style="color:#f8fafc;">0 Adet</div>
+        <div style="font-size:0.72rem; color:var(--muted); margin-top:5px;" id="statMonthCountsSub">0 Ödenen · 0 Açık</div>
+      </div>
     </div>
   </div>
 
   <!-- Günlük Takvim & Gün Bazlı Ciro Hesaplamaları -->
   <div class="section-box" style="margin-bottom:22px;">
     <div class="section-title">
-      <span>📅 Günlük Takvim & Gün Bazlı Ciro Hesaplamaları</span>
-      <span style="font-size:0.82rem; color:#38bdf8; font-weight:800;" id="calMonthSummary">Bu Ay Toplam: 0 ₺</span>
+      <span>📅 Günlük Takvim & Gün Bazlı Ciro Takibi</span>
+      <span style="font-size:0.84rem; color:#4ade80; font-weight:800; background:rgba(34,197,94,0.12); padding:5px 12px; border-radius:8px; border:1px solid rgba(34,197,94,0.3);" id="calMonthSummary">Bugün Günlük Toplam: 0 ₺</span>
     </div>
 
     <div class="calendar-layout">
@@ -872,8 +916,44 @@
         monthAll += info.total;
       }
     }
-    document.getElementById("calMonthSummary").textContent =
-      `${TR_MONTHS[calViewMonth]} ${calViewYear} Tahsilat: ${monthPaid} ₺ · Genel: ${monthAll} ₺`;
+
+    const DAYS_TR = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+    const todayDayName = DAYS_TR[new Date().getDay()];
+    const todayInfo = byDate[todayStr] || { paid: 0, open: 0, total: 0, count: 0 };
+    document.getElementById("calMonthSummary").innerHTML =
+      `Bugün (<b>${todayDayName}</b>) Günlük: <b style="color:#38bdf8; font-size:0.95rem;">${todayInfo.total} ₺</b> · <span style="color:#fbbf24; font-weight:800;">${TR_MONTHS[calViewMonth]} ${calViewYear} Ay Sonu Toplam Ciro: <b style="color:#fff;">${monthAll} ₺</b></span> <span style="font-size:0.75rem; color:#cbd5e1; font-weight:600;">(Tahsil: ${monthPaid} ₺ · Açık: ${monthAll - monthPaid} ₺)</span>`;
+
+    // 2. BÖLÜM: Üstteki "Ay Sonu Yapılan Ciro Toplamı" panelini de görüntülenen aya göre güncelle
+    const viewMonthName = TR_MONTHS[calViewMonth];
+    const lastDayOfViewMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+    const viewMonthOrders = orders.filter(o => (o.order_date || todayStr).startsWith(monthPrefix));
+    const viewMonthPaidOrders = viewMonthOrders.filter(o => o.status === "odendi");
+    const viewMonthOpenOrders = viewMonthOrders.filter(o => o.status !== "odendi");
+    const vNet = (monthAll / 1.10).toFixed(2);
+    const vKdv = (monthAll - monthAll / 1.10).toFixed(2);
+
+    const elMonthTitle = document.getElementById("monthlyTitleLabel");
+    if (elMonthTitle) elMonthTitle.textContent = `🗓️ ${viewMonthName} ${calViewYear} — Ay Sonu Yapılan Ciro Toplamı`;
+    const elMonthRange = document.getElementById("monthlyDateRangeText");
+    if (elMonthRange) elMonthRange.textContent = `Dönem: 1 - ${lastDayOfViewMonth} ${viewMonthName} ${calViewYear}`;
+
+    const elStatMonthPaid = document.getElementById("statMonthPaidTotal");
+    if (elStatMonthPaid) elStatMonthPaid.textContent = `${monthPaid} ₺`;
+    const elStatMonthOpen = document.getElementById("statMonthOpenTotal");
+    if (elStatMonthOpen) elStatMonthOpen.textContent = `${monthAll - monthPaid} ₺`;
+    const elStatMonthAll = document.getElementById("statMonthAllTotal");
+    if (elStatMonthAll) elStatMonthAll.textContent = `${monthAll} ₺`;
+    const elStatMonthCounts = document.getElementById("statMonthCounts");
+    if (elStatMonthCounts) elStatMonthCounts.textContent = `${viewMonthOrders.length} Adisyon`;
+
+    const elStatMonthPaidSub = document.getElementById("statMonthPaidSub");
+    if (elStatMonthPaidSub) elStatMonthPaidSub.textContent = `${viewMonthPaidOrders.length} hesap ödendi`;
+    const elStatMonthOpenSub = document.getElementById("statMonthOpenSub");
+    if (elStatMonthOpenSub) elStatMonthOpenSub.textContent = `${viewMonthOpenOrders.length} masa açık bekliyor`;
+    const elStatMonthKdvSub = document.getElementById("statMonthKdvSub");
+    if (elStatMonthKdvSub) elStatMonthKdvSub.textContent = `KDV Hariç Net: ${vNet} ₺ · %10 KDV: ${vKdv} ₺`;
+    const elStatMonthCountsSub = document.getElementById("statMonthCountsSub");
+    if (elStatMonthCountsSub) elStatMonthCountsSub.textContent = `${viewMonthPaidOrders.length} Ödenen · ${viewMonthOpenOrders.length} Açık`;
 
     // Takvim ızgarasını oluştur (Pazartesi=0 ... Pazar=6)
     const firstDay = new Date(calViewYear, calViewMonth, 1);
@@ -903,7 +983,8 @@
       if (info) {
         bodyHtml = `
           <div>
-            <div class="cal-day-revenue">${info.paid} ₺</div>
+            <div class="cal-day-revenue" style="color:#38bdf8;" title="Günün Toplam Tutarı">${info.total} ₺</div>
+            <div style="font-size:0.67rem; color:#4ade80; font-weight:700;">${info.paid} ₺ ödendi</div>
             ${info.open > 0 ? `<div class="cal-day-open">+${info.open} ₺ açık</div>` : ""}
             <div class="cal-day-count">${info.count} adisyon</div>
           </div>
@@ -925,7 +1006,9 @@
 
     // Seçili gün detaylarını hesapla ve doldur
     const selInfo = byDate[selectedDateStr] || { paid: 0, open: 0, total: 0, count: 0, orders: [] };
-    document.getElementById("selectedDateLabel").textContent = formatTrDateFull(selectedDateStr);
+    const isSelToday = selectedDateStr === todayStr;
+    document.getElementById("selectedDateLabel").innerHTML =
+      `${formatTrDateFull(selectedDateStr)} ${isSelToday ? `<span style="background:var(--amber); color:#090d16; font-size:0.72rem; padding:2px 7px; border-radius:5px; font-weight:900; margin-left:6px;">BUGÜN</span>` : ""}`;
     document.getElementById("selectedDayCountBadge").textContent = `${selInfo.count} Adisyon`;
     document.getElementById("dayPaidTotal").textContent = `${selInfo.paid} ₺`;
     document.getElementById("dayOpenTotal").textContent = `${selInfo.open} ₺`;
@@ -1000,18 +1083,94 @@
     const orders = data.orders;
     cachedAllOrders = orders;
 
+    const todayStr = getLocalTodayStr();
+    const DAYS_TR = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+    const todayDayName = DAYS_TR[new Date().getDay()];
+
     renderDailyCalendar(orders);
 
-    const paidOrders = orders.filter(o => o.status === "odendi");
-    const openOrders = orders.filter(o => o.status !== "odendi");
+    // Bugünün siparişleri (Günlük Toplam)
+    const todayOrders = orders.filter(o => (o.order_date || todayStr) === todayStr);
+    const todayPaidOrders = todayOrders.filter(o => o.status === "odendi");
+    const todayOpenOrders = todayOrders.filter(o => o.status !== "odendi");
 
-    const paidTotal = paidOrders.reduce((s, o) => s + o.total, 0);
-    const openTotal = openOrders.reduce((s, o) => s + o.total, 0);
+    const todayPaidTotal = todayPaidOrders.reduce((s, o) => s + o.total, 0);
+    const todayOpenTotal = todayOpenOrders.reduce((s, o) => s + o.total, 0);
+    const todayTotal = todayPaidTotal + todayOpenTotal;
 
-    document.getElementById("statPaidTotal").textContent = `${paidTotal} ₺`;
-    document.getElementById("statOpenTotal").textContent = `${openTotal} ₺`;
-    document.getElementById("statAllTotal").textContent = `${paidTotal + openTotal} ₺`;
-    document.getElementById("statCounts").textContent = `${openOrders.length} Açık · ${paidOrders.length} Ödendi`;
+    // Tüm zamanlar genel toplam
+    const allPaidOrders = orders.filter(o => o.status === "odendi");
+    const allOpenOrders = orders.filter(o => o.status !== "odendi");
+    const allPaidTotal = allPaidOrders.reduce((s, o) => s + o.total, 0);
+    const allOpenTotal = allOpenOrders.reduce((s, o) => s + o.total, 0);
+    const allTotal = allPaidTotal + allOpenTotal;
+
+    // Kart başlıkları: Bugün hangi gün ise o günün adı ile
+    const lblPaid = document.getElementById("lblPaidTotal");
+    if (lblPaid) lblPaid.textContent = `💰 Bugün (${todayDayName}) Tahsil Edilen`;
+    const lblOpen = document.getElementById("lblOpenTotal");
+    if (lblOpen) lblOpen.textContent = `⏳ Bugün (${todayDayName}) Açık Kalan`;
+    const lblAll = document.getElementById("lblAllTotal");
+    if (lblAll) lblAll.textContent = `🧾 Bugün (${todayDayName}) Toplam Günün Cirosu`;
+    const lblCounts = document.getElementById("lblCounts");
+    if (lblCounts) lblCounts.textContent = `📍 Bugün (${todayDayName}) Adisyonları`;
+
+    // Günlük değerler
+    document.getElementById("statPaidTotal").textContent = `${todayPaidTotal} ₺`;
+    document.getElementById("statOpenTotal").textContent = `${todayOpenTotal} ₺`;
+    document.getElementById("statAllTotal").textContent = `${todayTotal} ₺`;
+    document.getElementById("statCounts").textContent = `${todayOpenOrders.length} Açık · ${todayPaidOrders.length} Ödendi`;
+
+    // Alt bilgi (Genel Toplam)
+    const elPaidAll = document.getElementById("statPaidAllTime");
+    if (elPaidAll) elPaidAll.textContent = `Genel Toplam: ${allPaidTotal} ₺`;
+    const elOpenAll = document.getElementById("statOpenAllTime");
+    if (elOpenAll) elOpenAll.textContent = `Genel Açık: ${allOpenTotal} ₺`;
+    const elAllTime = document.getElementById("statAllTimeTotal");
+    if (elAllTime) elAllTime.textContent = `Genel Toplam: ${allTotal} ₺`;
+    const elCountsAll = document.getElementById("statCountsAllTime");
+    if (elCountsAll) elCountsAll.textContent = `Genel: ${allOpenOrders.length} Açık · ${allPaidOrders.length} Ödendi`;
+
+    // 2. BÖLÜM: AY SONU YAPILAN CİRO TOPLAMLARI (AYRI HESAPLAMA)
+    const curYear = new Date().getFullYear();
+    const curMonthIdx = new Date().getMonth();
+    const curMonthPrefix = `${curYear}-${String(curMonthIdx + 1).padStart(2, "0")}-`;
+    const curMonthName = TR_MONTHS[curMonthIdx];
+    const lastDayOfMonth = new Date(curYear, curMonthIdx + 1, 0).getDate();
+
+    const monthOrders = orders.filter(o => (o.order_date || todayStr).startsWith(curMonthPrefix));
+    const monthPaidOrders = monthOrders.filter(o => o.status === "odendi");
+    const monthOpenOrders = monthOrders.filter(o => o.status !== "odendi");
+
+    const monthPaidTotal = monthPaidOrders.reduce((s, o) => s + o.total, 0);
+    const monthOpenTotal = monthOpenOrders.reduce((s, o) => s + o.total, 0);
+    const monthTotal = monthPaidTotal + monthOpenTotal;
+
+    const monthNetTutar = (monthTotal / 1.10).toFixed(2);
+    const monthKdvTutar = (monthTotal - monthTotal / 1.10).toFixed(2);
+
+    const elMonthTitle = document.getElementById("monthlyTitleLabel");
+    if (elMonthTitle) elMonthTitle.textContent = `🗓️ ${curMonthName} ${curYear} — Ay Sonu Yapılan Ciro Toplamı`;
+    const elMonthRange = document.getElementById("monthlyDateRangeText");
+    if (elMonthRange) elMonthRange.textContent = `Dönem: 1 - ${lastDayOfMonth} ${curMonthName} ${curYear}`;
+
+    const elStatMonthPaid = document.getElementById("statMonthPaidTotal");
+    if (elStatMonthPaid) elStatMonthPaid.textContent = `${monthPaidTotal} ₺`;
+    const elStatMonthOpen = document.getElementById("statMonthOpenTotal");
+    if (elStatMonthOpen) elStatMonthOpen.textContent = `${monthOpenTotal} ₺`;
+    const elStatMonthAll = document.getElementById("statMonthAllTotal");
+    if (elStatMonthAll) elStatMonthAll.textContent = `${monthTotal} ₺`;
+    const elStatMonthCounts = document.getElementById("statMonthCounts");
+    if (elStatMonthCounts) elStatMonthCounts.textContent = `${monthOrders.length} Adisyon`;
+
+    const elStatMonthPaidSub = document.getElementById("statMonthPaidSub");
+    if (elStatMonthPaidSub) elStatMonthPaidSub.textContent = `${monthPaidOrders.length} hesap ödendi`;
+    const elStatMonthOpenSub = document.getElementById("statMonthOpenSub");
+    if (elStatMonthOpenSub) elStatMonthOpenSub.textContent = `${monthOpenOrders.length} masa açık bekliyor`;
+    const elStatMonthKdvSub = document.getElementById("statMonthKdvSub");
+    if (elStatMonthKdvSub) elStatMonthKdvSub.textContent = `KDV Hariç Net: ${monthNetTutar} ₺ · %10 KDV: ${monthKdvTutar} ₺`;
+    const elStatMonthCountsSub = document.getElementById("statMonthCountsSub");
+    if (elStatMonthCountsSub) elStatMonthCountsSub.textContent = `${monthPaidOrders.length} Ödenen · ${monthOpenOrders.length} Açık`;
 
     // Açık masaları birleştirerek listele
     const byTable = {};
