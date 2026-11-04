@@ -523,6 +523,7 @@
               <option value="Yiyecekler">Yiyecekler</option>
             </select>
             <input type="number" id="mPrice" placeholder="Fiyat (₺)" required min="1" step="0.5">
+            <input type="number" id="mCalories" placeholder="Kalori (kcal)" min="0" style="max-width:115px;">
             <input type="text" id="mEmoji" placeholder="Emoji (☕)" value="☕" style="max-width:80px;">
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
@@ -729,6 +730,7 @@
               ${thumbHtml}
               <div>
                 <b>${i.emoji} ${i.name}</b>
+                <span style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); font-size:0.7rem; font-weight:800; padding:1px 6px; border-radius:999px; margin-left:6px; cursor:pointer;" onclick="editItemCalories(${i.id}, ${i.calories || 0})" title="Kaloriyi güncellemek için tıklayın">🔥 ${i.calories || 0} kcal</span>
                 <div style="font-size:0.74rem;color:var(--muted);">${i.description || ""}</div>
                 ${ingHtml}
               </div>
@@ -764,12 +766,25 @@
     loadMenu();
   }
 
+  async function editItemCalories(id, currentCal) {
+    const newVal = prompt("Ürün Kalorisi (kcal):\nÖrnek: 450", currentCal || 0);
+    if (newVal === null) return;
+    const cal = parseInt(newVal.trim(), 10) || 0;
+    await fetch(`/api/menu/${id}/calories`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ calories: cal })
+    });
+    loadMenu();
+  }
+
   async function addMenuItem(e) {
     e.preventDefault();
     const payload = {
       name: document.getElementById("mName").value.trim(),
       category: document.getElementById("mCategory").value,
       price: parseFloat(document.getElementById("mPrice").value),
+      calories: parseInt(document.getElementById("mCalories").value || 0, 10),
       emoji: document.getElementById("mEmoji").value.trim() || "☕",
       description: document.getElementById("mDesc").value.trim(),
       ingredients: (document.getElementById("mIngredients") ? document.getElementById("mIngredients").value.trim() : ""),
@@ -783,6 +798,7 @@
     if (res.ok) {
       document.getElementById("mName").value = "";
       document.getElementById("mPrice").value = "";
+      document.getElementById("mCalories").value = "";
       document.getElementById("mDesc").value = "";
       if (document.getElementById("mIngredients")) document.getElementById("mIngredients").value = "";
       clearNewItemImage();

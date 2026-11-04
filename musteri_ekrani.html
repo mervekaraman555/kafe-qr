@@ -329,6 +329,33 @@
     color: #fff; font-size: 0.62rem; width: 18px; height: 18px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center; pointer-events: none;
   }
+  .calorie-badge {
+    position: absolute; top: 3px; left: 3px;
+    background: rgba(15, 12, 10, 0.84);
+    backdrop-filter: blur(4px);
+    color: #fbbf24;
+    font-size: 0.58rem;
+    font-weight: 800;
+    padding: 1.5px 5.5px;
+    border-radius: 999px;
+    border: 1px solid rgba(245, 158, 11, 0.45);
+    letter-spacing: 0.2px;
+    display: flex; align-items: center; gap: 2px;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .lightbox-calorie-pill {
+    background: rgba(245, 158, 11, 0.18);
+    border: 1px solid rgba(245, 158, 11, 0.5);
+    color: #fbbf24;
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
 
   /* Tam Ekran Ürün Görseli (Lightbox Modal) */
   .lightbox-overlay {
@@ -662,7 +689,10 @@
       <div class="lightbox-desc" id="lightboxDesc"></div>
       <div id="lightboxIngredientsArea" style="margin-top:6px;"></div>
       <div class="lightbox-footer">
-        <span class="lightbox-price" id="lightboxPrice">0 ₺</span>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="lightbox-price" id="lightboxPrice">0 ₺</span>
+          <span id="lightboxCaloriePill" class="lightbox-calorie-pill">🔥 0 kcal</span>
+        </div>
         <div class="lightbox-qty-ctrl" id="lightboxQtyCtrl"></div>
       </div>
     </div>
@@ -674,7 +704,10 @@
   <div class="exploded-modal-box">
     <div class="exploded-header">
       <div class="exploded-title-area">
-        <h3 id="explodedHeaderTitle">🍔 Ürün İçerik & Malzeme Katmanları</h3>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <h3 id="explodedHeaderTitle">🍔 Ürün İçerik & Malzeme Katmanları</h3>
+          <span id="explodedCalorieBadge" class="lightbox-calorie-pill" style="font-size:0.72rem;">🔥 0 kcal</span>
+        </div>
         <p id="explodedHeaderSub">İstemediğiniz malzemeye dokunarak siparişten çıkarabilirsiniz</p>
       </div>
       <button type="button" class="lightbox-close" style="position:static;" onclick="closeExplodedModal()">✕</button>
@@ -798,10 +831,216 @@
     if (combo) {
       combo.value = targetLang === "tr" ? "" : targetLang;
       combo.dispatchEvent(new Event("change"));
-    } else {
-      window.location.reload();
+    }
+    syncLangSelectUI();
+    renderMenu();
+    if (currentModalItemId) {
+      openProductModal(currentModalItemId);
+    }
+    if (explodedCurrentItemId) {
+      const item = menu.find(x => x.id === explodedCurrentItemId);
+      if (item) {
+        renderExplodedLayers(item);
+        const i18n = I18N_EXPLODED[targetLang] || I18N_EXPLODED.tr;
+        const headEl = document.getElementById("explodedHeaderTitle");
+        if (headEl) headEl.innerHTML = `${item.emoji} ${item.name} — ${i18n.modalTitle}`;
+        const subEl = document.getElementById("explodedHeaderSub");
+        if (subEl) subEl.textContent = `${item.category} · ${i18n.modalSub}`;
+      }
     }
   }
+
+  function getActiveLang() {
+    const sel = document.getElementById("customLangSelect");
+    if (sel && sel.value) return sel.value;
+    const m = document.cookie.match(/googtrans=\/tr\/([a-zA-Z\-]+)/);
+    return m ? m[1] : "tr";
+  }
+
+  const I18N_EXPLODED = {
+    tr: {
+      badgeBtn: "✨ Malzeme Katmanları",
+      modalTitle: "Malzeme Katmanları",
+      modalSub: "İstemediğiniz malzemeye dokunarak çıkarabilirsiniz",
+      excludedPill: "(İSTEMİYORUM ✕)",
+      excludedNotePrefix: "Çıkarılanlar:",
+      excludedNoteSuffix: "olmadan hazırlanacak",
+      allFreshNote: "Tüm malzemeler eksiksiz ve taze hazırlanır",
+      addToCart: "🛒 Sepete Ekle",
+      layersCount: "İçerik Malzemeleri",
+      layersSuffix: "Katman",
+      seeLayersInModal: "🔍 Malzeme Katmanlarını Gör (Exploded View)",
+      without: "istemiyorum"
+    },
+    en: {
+      badgeBtn: "✨ Ingredient Layers",
+      modalTitle: "Ingredient Layers (Exploded View)",
+      modalSub: "Tap any ingredient to exclude it from your order",
+      excludedPill: "(EXCLUDE ✕)",
+      excludedNotePrefix: "Excluded:",
+      excludedNoteSuffix: "will be prepared without these",
+      allFreshNote: "All ingredients included, prepared fresh",
+      addToCart: "🛒 Add to Cart",
+      layersCount: "Ingredients",
+      layersSuffix: "Layers",
+      seeLayersInModal: "🔍 View Ingredient Layers (Exploded View)",
+      without: "no"
+    },
+    de: {
+      badgeBtn: "✨ Zutaten-Schichten",
+      modalTitle: "Zutaten-Schichten (Exploded View)",
+      modalSub: "Tippen Sie auf Zutaten, die Sie abwählen möchten",
+      excludedPill: "(OHNE ✕)",
+      excludedNotePrefix: "Ausgeschlossen:",
+      excludedNoteSuffix: "wird ohne diese zubereitet",
+      allFreshNote: "Alle Zutaten enthalten, frisch zubereitet",
+      addToCart: "🛒 In den Warenkorb",
+      layersCount: "Zutaten",
+      layersSuffix: "Schichten",
+      seeLayersInModal: "🔍 Zutaten-Schichten ansehen",
+      without: "ohne"
+    },
+    ru: {
+      badgeBtn: "✨ Слои ингредиентов",
+      modalTitle: "Слои ингредиентов (Взрыв-схема)",
+      modalSub: "Нажмите на ингредиент, чтобы исключить его из заказа",
+      excludedPill: "(БЕЗ ЭТОГО ✕)",
+      excludedNotePrefix: "Исключено:",
+      excludedNoteSuffix: "будет приготовлено без этого",
+      allFreshNote: "Все ингредиенты включены, свежее приготовление",
+      addToCart: "🛒 В корзину",
+      layersCount: "Ингредиенты",
+      layersSuffix: "Слоев",
+      seeLayersInModal: "🔍 Посмотреть слои ингредиентов",
+      without: "без"
+    },
+    ar: {
+      badgeBtn: "✨ طبقات المكونات",
+      modalTitle: "طبقات المكونات (عرض تفصيلي)",
+      modalSub: "انقر على أي مكون لإزالته من الطلب",
+      excludedPill: "(بدون ✕)",
+      excludedNotePrefix: "المستبعد:",
+      excludedNoteSuffix: "سيتم تحضيره بدونها",
+      allFreshNote: "جميع المكونات متضمنة وطازجة",
+      addToCart: "🛒 أضف إلى السلة",
+      layersCount: "المكونات",
+      layersSuffix: "طبقات",
+      seeLayersInModal: "🔍 عرض تفاصيل الطبقات والمكونات",
+      without: "بدون"
+    },
+    fr: {
+      badgeBtn: "✨ Couches d'ingrédients",
+      modalTitle: "Couches d'ingrédients (Vue éclatée)",
+      modalSub: "Appuyez sur un ingrédient pour le retirer",
+      excludedPill: "(SANS ✕)",
+      excludedNotePrefix: "Exclus :",
+      excludedNoteSuffix: "sera préparé sans ces ingrédients",
+      allFreshNote: "Tous les ingrédients inclus, préparé frais",
+      addToCart: "🛒 Ajouter au panier",
+      layersCount: "Ingrédients",
+      layersSuffix: "Couches",
+      seeLayersInModal: "🔍 Voir les couches d'ingrédients",
+      without: "sans"
+    },
+    es: {
+      badgeBtn: "✨ Capas de ingredientes",
+      modalTitle: "Capas de ingredientes (Vista detallada)",
+      modalSub: "Toca un ingrediente para excluirlo del pedido",
+      excludedPill: "(SIN ✕)",
+      excludedNotePrefix: "Excluidos:",
+      excludedNoteSuffix: "se preparará sin estos ingredientes",
+      allFreshNote: "Todos los ingredientes incluidos, recién preparado",
+      addToCart: "🛒 Añadir al carrito",
+      layersCount: "Ingredientes",
+      layersSuffix: "Capas",
+      seeLayersInModal: "🔍 Ver capas de ingredientes",
+      without: "sin"
+    },
+    it: {
+      badgeBtn: "✨ Strati di ingredienti",
+      modalTitle: "Strati di ingredienti (Vista esplosa)",
+      modalSub: "Tocca un ingrediente per escluderlo dall'ordine",
+      excludedPill: "(SENZA ✕)",
+      excludedNotePrefix: "Esclusi:",
+      excludedNoteSuffix: "sarà preparato senza questi",
+      allFreshNote: "Tutti gli ingredienti inclusi, preparati freschi",
+      addToCart: "🛒 Aggiungi al carrello",
+      layersCount: "Ingredienti",
+      layersSuffix: "Strati",
+      seeLayersInModal: "🔍 Vedi strati di ingredienti",
+      without: "senza"
+    }
+  };
+
+  const INGREDIENTS_LANG = {
+    "POTATO SLICES": { tr: "Baharatlı Patates Dilimleri", en: "Potato Slices", de: "Kartoffelscheiben", ru: "Картофельные дольки", ar: "شرائح البطاطس", fr: "Quartiers de pommes de terre", es: "Gajos de patata" },
+    "MUSTARD CREAM": { tr: "Hardal Kreması & Özel Sos", en: "Mustard Cream", de: "Senfcreme & Spezialsauce", ru: "Горчичный крем и соус", ar: "كريمة الخردل والصلصة", fr: "Crème de moutarde", es: "Crema de mostaza" },
+    "TOMATO PUREE": { tr: "Köz Domates Püresi", en: "Tomato Puree", de: "Tomatenpüree", ru: "Томатное пюре", ar: "صلصة الطماطم", fr: "Purée de tomate", es: "Puré de tomate" },
+    "JUICY BEEF PATTY": { tr: "150g Sulu Dana Burger Köftesi", en: "Juicy Beef Patty", de: "Saftiges Rinder-Patty (150g)", ru: "Сочная говяжья котлета (150г)", ar: "شريحة لحم بقري عصارية", fr: "Steak de bœuf juteux", es: "Hamburguesa de ternera jugosa" },
+    "CRISPY BACON": { tr: "Çıtır Dana Füme", en: "Crispy Bacon", de: "Knuspriger Rinderspeck", ru: "Хрустящий бекон из говядины", ar: "لحم مقدد مقرمش", fr: "Bacon de bœuf croustillant", es: "Bacon crujiente" },
+    "MELTED CHEESE": { tr: "Erimiş Cheddar Peyniri", en: "Melted Cheese", de: "Geschmolzener Cheddar", ru: "Плавленый сыр чеддер", ar: "جبن شيدر ذائب", fr: "Fromage cheddar fondu", es: "Queso cheddar fundido" },
+    "RIPE TOMATO": { tr: "Taze Domates Dilimi", en: "Ripe Tomato", de: "Reife Tomatenscheiben", ru: "Спелые томаты", ar: "شرائح طماطم ناضجة", fr: "Tranche de tomate mûre", es: "Tomate maduro" },
+    "CRISP LETTUCE": { tr: "Taze Çıtır Marul", en: "Crisp Lettuce", de: "Knackiger Blattsalat", ru: "Хрустящий свежий салат", ar: "خس طازج ومقرمش", fr: "Laitue croquante", es: "Lechuga crujiente" },
+    "BUN": { tr: "Susamlı Brioche Ekmeği", en: "Sesame Brioche Bun", de: "Sesam-Brioche-Brötchen", ru: "Булочка бриошь с кунжутом", ar: "خبز بريوش بالسمسم", fr: "Pain brioché au sésame", es: "Pan brioche con sésamo" },
+    "FINISHED PRODUCT": { tr: "Özel Tabak Sunumu", en: "Finished Product", de: "Fertig serviert", ru: "Готовое блюдо", ar: "الطبق النهائي", fr: "Plat dressé", es: "Plato terminado" },
+    "BREAD": { tr: "Ekşi Mayalı Ekmek", en: "Sourdough Bread", de: "Sauerteigbrot", ru: "Хлеб на закваске", ar: "خبز العجين المخمر" },
+    "GUACAMOLE": { tr: "Taze Avokado Püresi", en: "Fresh Guacamole", de: "Frische Guacamole", ru: "Пюре из авокадо", ar: "صلصة الأفوكادو" },
+    "POACHED EGG": { tr: "Akışkan Poşe Yumurta", en: "Poached Egg", de: "Pochiertes Ei", ru: "Яйцо пашот", ar: "بيض مسلوق مائي" },
+    "HERBS": { tr: "Taze Otlar & Çörekotu", en: "Fresh Herbs & Seeds", de: "Frische Kräuter & Samen", ru: "Свежая зелень и семена", ar: "أعشاب طازجة وحبة البركة" },
+    "OLIVE OIL": { tr: "Sızma Zeytinyağı", en: "Extra Virgin Olive Oil", de: "Natives Olivenöl Extra", ru: "Оливковое масло первого отжима", ar: "زيت زيتون بكر ممتاز" },
+    "BAZLAMA": { tr: "Taş Fırın Bazlama Ekmeği", en: "Stone Oven Flatbread", de: "Steinofen-Fladenbrot", ru: "Лепешка базлама из печи", ar: "خبز البازلاما بالفرن" },
+    "SUCUK": { tr: "Doğal Kasap Sucuğu", en: "Spiced Turkish Beef Sucuk", de: "Würzige Rindersudschuk", ru: "Турецкий суджук", ar: "سجق تركي بقري" },
+    "KASAR CHEESE": { tr: "Eski Kaşar Peyniri", en: "Kashar Cheese", de: "Kaschar-Käse", ru: "Сыр кашар", ar: "جبن قشقوان" },
+    "BUTTER": { tr: "Köy Tereyağı", en: "Farm Butter", de: "Bauernbutter", ru: "Деревенское сливочное масло", ar: "زبدة ريفية" },
+    "TOMATO": { tr: "Kiraz Domates", en: "Cherry Tomato", de: "Kirschtomate", ru: "Помидоры черри", ar: "طماطم كرزية" },
+    "CIABATTA": { tr: "Çıtır Ciabatta Ekmeği", en: "Crispy Ciabatta", de: "Knuspriges Ciabatta", ru: "Хрустящая чиабатта", ar: "خبز الشاباتا المقرمش" },
+    "MOZZARELLA": { tr: "Taze Süt Mozzarella", en: "Fresh Mozzarella", de: "Frischer Mozzarella", ru: "Свежая моцарелла", ar: "جبنة موزاريلا طازجة" },
+    "PESTO SAUCE": { tr: "Fesleğen Pesto Sos", en: "Basil Pesto Sauce", de: "Basilikum-Pesto", ru: "Соус песто с базиликом", ar: "صلصة بيستو الريحان" },
+    "SUN TOMATO": { tr: "Kurutulmuş Domates", en: "Sun-Dried Tomato", de: "Getrocknete Tomaten", ru: "Вяленые томаты", ar: "طماطم مجففة" },
+    "COFFEE": { tr: "Taze Çekilmiş Türk Kahvesi", en: "Fresh Turkish Coffee", de: "Türkischer Kaffee", ru: "Турецкий кофе", ar: "قهوة تركية طازجة" },
+    "WATER": { tr: "Kaynak Suyu", en: "Spring Water", de: "Quellwasser", ru: "Родниковая вода", ar: "مياه نقية" },
+    "TREAT": { tr: "Antep Fıstıklı Lokum", en: "Pistachio Turkish Delight", de: "Türkischer Honig (Lokum)", ru: "Рахат-лукум с фисташками", ar: "حلقوم بالفستق" },
+    "ESPRESSO": { tr: "Double Espresso Shot", en: "Double Espresso Shot", de: "Doppelter Espresso", ru: "Двойной эспрессо", ar: "شوت اسبريسو مزدوج" },
+    "HOT WATER": { tr: "Filtre Sıcak Su", en: "Filtered Hot Water", de: "Heißes Wasser", ru: "Горячая вода", ar: "ماء ساخن" },
+    "STEAMED MILK": { tr: "Buharlanmış İpeksi Süt", en: "Steamed Milk", de: "Gedämpfte Milch", ru: "Взбитое молоко", ar: "حليب مبخر ناعم" },
+    "FOAM": { tr: "Kadife Süt Köpüğü", en: "Velvet Milk Foam", de: "Samtiger Milchschaum", ru: "Бархатистая молочная пенка", ar: "رغوة حليب مخملية" },
+    "ART": { tr: "Barista Latte Sanatı", en: "Latte Art", de: "Latte Art", ru: "Латте-арт", ar: "فن اللاتيه" },
+    "MILK": { tr: "Taze Süt", en: "Fresh Milk", de: "Frische Milch", ru: "Свежее молоко", ar: "حليب طازج" },
+    "RICH FOAM": { tr: "Yoğun Tepeleme Köpük", en: "Rich Milk Foam", de: "Dichter Milchschaum", ru: "Густая молочная пенка", ar: "رغوة حليب كثيفة" },
+    "COCOA": { tr: "Kakao Pudrası", en: "Cocoa Powder", de: "Kakaopulver", ru: "Какао-порошок", ar: "بودرة كاكاو" },
+    "RISTRETTO": { tr: "Çift Shot Ristretto", en: "Double Ristretto Shot", de: "Doppelter Ristretto", ru: "Двойной ристретто", ar: "ريستريتو مزدوج" },
+    "VELVET MILK": { tr: "Kadife Mikro Köpüklü Süt", en: "Velvety Micro-Foam Milk", de: "Mikroschaummilch", ru: "Шелковистое микропенное молоко", ar: "حليب برغوة مخملية" },
+    "TEA LEAVES": { tr: "Rize Mayıs Hasadı Çay", en: "Black Tea Leaves", de: "Schwarzteeblätter", ru: "Черный чай сбор май", ar: "أوراق شاي أسود فاخرة" },
+    "PURE WATER": { tr: "Doğal Kaynak Suyu", en: "Pure Spring Water", de: "Reines Quellwasser", ru: "Чистая вода", ar: "ماء نقي" },
+    "SALEP": { tr: "Doğal Dağ Salebi", en: "Natural Mountain Salep", de: "Natürliches Bergsahlep", ru: "Натуральный горный салеп", ar: "سحلب جبلي طبيعي" },
+    "CINNAMON": { tr: "Toz Tarçın", en: "Cinnamon Powder", de: "Zimtpulver", ru: "Корица", ar: "قرفة مطحونة" },
+    "ICE": { tr: "Kristal Buz Küpleri", en: "Crystal Ice Cubes", de: "Kristall-Eiswürfel", ru: "Кубики льда", ar: "مكعبات ثلج" },
+    "COLD MILK": { tr: "Soğuk Taze Süt", en: "Cold Fresh Milk", de: "Kalte frische Milch", ru: "Холодное свежее молоко", ar: "حليب بارد طازج" },
+    "FRESH ESPRESSO": { tr: "Süzülen Double Espresso", en: "Fresh Double Espresso", de: "Frischer doppelter Espresso", ru: "Свежий эспрессо", ar: "اسبريسو طازج" },
+    "COLD WATER": { tr: "Soğuk Su", en: "Cold Filtered Water", de: "Kaltes Wasser", ru: "Холодная вода", ar: "ماء بارد" },
+    "LEMON": { tr: "Taze Sıkılmış Köy Limonları", en: "Fresh Pressed Lemons", de: "Frisch gepresste Zitronen", ru: "Свежевыжатый сок лимона", ar: "ليمون طازج معصور" },
+    "MINT": { tr: "Taze Nane Yaprakları", en: "Fresh Mint Leaves", de: "Frische Minzblätter", ru: "Листья свежей мяты", ar: "أوراق نعناع طازجة" },
+    "CRUSHED ICE": { tr: "Kırılmış Buz", en: "Crushed Ice", de: "Crushed Ice", ru: "Дробленый лед", ar: "ثلج مجروش" },
+    "CITRUS": { tr: "Doğal Şerbet", en: "Natural Citrus Syrup", de: "Zitrus-Sirup", ru: "Цитрусовый сироп", ar: "شربات طبيعي" },
+    "ORANGES": { tr: "Finike Portakalları", en: "Finike Oranges Squeeze", de: "Frisch gepresste Orangen", ru: "Свежевыжатый апельсиновый сок", ar: "برتقال طازج معصور" },
+    "PULP": { tr: "Doğal Meyve Parçacıkları", en: "Natural Fruit Pulp", de: "Fruchtfleisch", ru: "Мякоть фруктов", ar: "قطع فاكهة طبيعية" },
+    "HIBISCUS": { tr: "Demlenmiş Hibiskus Çiçeği", en: "Brewed Hibiscus Flower", de: "Hibiskusblütentee", ru: "Заваренный каркаде", ar: "شاي كركديه مثلج" },
+    "BERRIES": { tr: "Orman Meyveleri Aroması", en: "Wild Berry Essence", de: "Waldbeeren", ru: "Лесные ягоды", ar: "توت بري" },
+    "CREAM CHEESE": { tr: "Taze Krem Peynir", en: "Fresh Cream Cheese", de: "Frischkäse", ru: "Сливочный крем-сыр", ar: "جبن كريمي طازج" },
+    "BAKED TOP": { tr: "Karamelize Yanık Üst Katman", en: "Caramelized Basque Top", de: "Karamellisierte Kruste", ru: "Карамелизированная корочка", ar: "طبقة مكرملة مخبوزة" },
+    "CHOCOLATE": { tr: "Sıcak Akışkan Belçika Çikolatası", en: "Warm Belgian Chocolate Sauce", de: "Heiße belgische Schokolade", ru: "Горячий бельгийский шоколад", ar: "شوكولاتة بلجيكية ساخنة" },
+    "LADYFINGERS": { tr: "Espresso ile Islatılmış Kedidili", en: "Espresso Soaked Ladyfingers", de: "Espresso-Savoiardi", ru: "Савоярди с эспрессо", ar: "بسكويت سافوياردي بالقهوة" },
+    "MASCARPONE": { tr: "İtalyan Mascarpone Kreması", en: "Italian Mascarpone Cream", de: "Italienische Mascarpone-Creme", ru: "Итальянский крем маскарпоне", ar: "كريمة ماسكاربوني إيطالية" },
+    "DARK CHOCOLATE": { tr: "%70 Bitter Belçika Çikolatası", en: "70% Dark Belgian Chocolate", de: "70% Zartbitterschokolade", ru: "70% темный шоколад", ar: "شوكولاتة داكنة 70%" },
+    "WALNUTS": { tr: "Kavrulmuş Ceviz", en: "Roasted Walnuts", de: "Geröstete Walnüsse", ru: "Обжаренный грецкий орех", ar: "جوز محمص" },
+    "ICE CREAM": { tr: "Vanilyalı Dondurma Topu", en: "Vanilla Ice Cream Scoop", de: "Vanilleeis-Kugel", ru: "Шарик ванильного мороженого", ar: "آيس كريم فانيليا" },
+    "PASTRY": { tr: "Kat Kat Açılmış Fransız Hamuru", en: "Flaky French Pastry", de: "Blättriger französischer Teig", ru: "Французское слоеное тесто", ar: "عجينة فرنسية مورقة" },
+    "CRISP CRUST": { tr: "Altın Sarısı Çıtır Kabuk", en: "Golden Crispy Crust", de: "Goldbraune Kruste", ru: "Золотистая корочка", ar: "قشرة ذهبية مقرمشة" },
+    "SPONGE": { tr: "Yumuşak Sünger Pandispanya", en: "Soft Sponge Cake", de: "Lockerer Biskuitboden", ru: "Нежный бисквит", ar: "كعكة إسفنجية طرية" },
+    "CREAM": { tr: "Hafif Pasta Kreması", en: "Light Pastry Cream", de: "Leichte Konditorcreme", ru: "Легкий заварной крем", ar: "كريمة حلويات خفيفة" },
+    "FRESH FRUITS": { tr: "Taze Çilek, Kivi ve Muz", en: "Fresh Strawberry, Kiwi & Banana", de: "Frische Erdbeeren, Kiwi & Banane", ru: "Свежая клубника, киви и банан", ar: "فراولة وكيوي وموز طازج" },
+    "GLAZE": { tr: "Parlatıcı Meyve Jeli", en: "Fruit Glaze", de: "Fruchtglasur", ru: "Фруктовое желе", ar: "ملمع فواكه" }
+  };
 
   function syncLangSelectUI() {
     const m = document.cookie.match(/googtrans=\/tr\/([a-zA-Z\-]+)/);
@@ -925,52 +1164,72 @@
   let explodedCurrentItemId = null;
   let excludedIngredientsSet = new Set();
 
-  function parseIngredientsList(raw) {
+  function parseIngredientsList(raw, lang) {
     if (!raw) return [];
+    const currentLang = (lang || getActiveLang() || "tr").toLowerCase();
     return raw.split("|").map(s => s.trim()).filter(Boolean).map(part => {
-      let title = "";
-      let detail = part;
+      let key = "";
+      let trDetail = part;
       let icon = "✨";
       if (part.includes(":")) {
         const colonIdx = part.indexOf(":");
-        title = part.substring(0, colonIdx).trim();
-        detail = part.substring(colonIdx + 1).trim();
+        key = part.substring(0, colonIdx).trim().toUpperCase();
+        trDetail = part.substring(colonIdx + 1).trim();
       }
-      // Detay içinden emoji ayıklamaya çalışalım
-      const m = detail.match(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u);
+      const m = trDetail.match(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u);
       if (m) {
         icon = m[0];
       }
-      if (!title) {
-        title = detail.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").trim();
+      const trClean = trDetail.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").trim();
+
+      let displayTitle = "";
+      const langDict = INGREDIENTS_LANG[key];
+      if (langDict && langDict[currentLang]) {
+        displayTitle = langDict[currentLang];
+      } else if (currentLang.startsWith("en") && key) {
+        displayTitle = key;
+      } else if (currentLang.startsWith("tr")) {
+        displayTitle = trClean || key || part;
+      } else if (langDict && langDict.en) {
+        displayTitle = langDict.en;
+      } else {
+        displayTitle = trClean || key || part;
       }
-      return { title, detail, icon, original: part };
+
+      return { key: key || trClean, title: displayTitle, detail: trDetail, icon, original: part };
     });
   }
 
   function renderMenu() {
+    const lang = getActiveLang();
+    const i18n = I18N_EXPLODED[lang] || I18N_EXPLODED.tr;
     const items = activeCategory === "Tümü" ? menu : menu.filter(i => i.category === activeCategory);
     const grid = document.getElementById("menuGrid");
     grid.innerHTML = items.map(item => {
       const q = cart[item.id] || 0;
+      const calBadge = (item.calories && item.calories > 0)
+        ? `<span class="calorie-badge">🔥 ${item.calories} kcal</span>`
+        : "";
       const visualHtml = item.image_url
         ? `<div class="item-img-wrap" onclick="openProductModal(${item.id})" title="Tam ekran görmek için dokunun">
              <img src="${item.image_url}" class="item-img" alt="${item.name}">
+             ${calBadge}
              <span class="zoom-hint">🔍</span>
            </div>`
         : `<div class="item-emoji" onclick="openProductModal(${item.id})" title="Tam ekran görmek için dokunun">
              ${item.emoji}
+             ${calBadge}
              <span class="zoom-hint">🔍</span>
            </div>`;
 
-      const ings = parseIngredientsList(item.ingredients);
+      const ings = parseIngredientsList(item.ingredients, lang);
       let ingredientsHtml = "";
       if (ings.length > 0) {
         const topChips = ings.slice(0, 3).map(x => `<span class="ing-chip">${x.icon} ${x.title}</span>`).join("");
         ingredientsHtml = `
           <div class="item-ingredients-chips">${topChips}</div>
           <button type="button" class="btn-see-layers" onclick="event.stopPropagation(); openExplodedModal(${item.id})">
-            ✨ Malzeme Katmanları (Exploded View)
+            ${i18n.badgeBtn}
           </button>
         `;
       }
@@ -1001,6 +1260,9 @@
     const item = menu.find(x => x.id === Number(itemId));
     if (!item) return;
     currentModalItemId = item.id;
+    const lang = getActiveLang();
+    const i18n = I18N_EXPLODED[lang] || I18N_EXPLODED.tr;
+
     const mediaEl = document.getElementById("lightboxMedia");
     if (item.image_url) {
       mediaEl.innerHTML = `<img src="${item.image_url}" alt="${item.name}">`;
@@ -1012,20 +1274,30 @@
     document.getElementById("lightboxDesc").textContent = item.description || "";
     document.getElementById("lightboxPrice").textContent = `${item.price} ₺`;
 
-    const ings = parseIngredientsList(item.ingredients);
+    const calPill = document.getElementById("lightboxCaloriePill");
+    if (calPill) {
+      if (item.calories && item.calories > 0) {
+        calPill.textContent = `🔥 ${item.calories} kcal`;
+        calPill.style.display = "inline-flex";
+      } else {
+        calPill.style.display = "none";
+      }
+    }
+
+    const ings = parseIngredientsList(item.ingredients, lang);
     const ingsArea = document.getElementById("lightboxIngredientsArea");
     if (ingsArea) {
       if (ings.length > 0) {
         ingsArea.innerHTML = `
           <div style="margin-top:4px;">
             <div style="font-size:0.75rem; color:#94a3b8; font-weight:700; margin-bottom:5px; text-transform:uppercase;">
-              🥞 İçerik Malzemeleri (${ings.length} Katman):
+              🥞 ${i18n.layersCount} (${ings.length} ${i18n.layersSuffix}):
             </div>
             <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;">
               ${ings.map(x => `<span style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:#f8fafc; font-size:0.75rem; padding:3px 9px; border-radius:999px;">${x.icon} ${x.title}</span>`).join("")}
             </div>
             <button type="button" onclick="closeProductModal(); openExplodedModal(${item.id});" style="background:linear-gradient(135deg, #f59e0b, #d97706); color:#000; border:none; padding:8px 14px; border-radius:10px; font-weight:900; font-size:0.8rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
-              🔍 Malzeme Katmanlarını Gör (Exploded View)
+              ${i18n.seeLayersInModal}
             </button>
           </div>
         `;
@@ -1045,9 +1317,22 @@
     explodedCurrentItemId = item.id;
     excludedIngredientsSet.clear();
 
-    document.getElementById("explodedHeaderTitle").innerHTML = `${item.emoji} ${item.name} — Malzeme Katmanları`;
-    document.getElementById("explodedHeaderSub").textContent = `${item.category} · İstemediğiniz malzemeye dokunarak çıkarabilirsiniz`;
+    const lang = getActiveLang();
+    const i18n = I18N_EXPLODED[lang] || I18N_EXPLODED.tr;
+
+    document.getElementById("explodedHeaderTitle").innerHTML = `${item.emoji} ${item.name} — ${i18n.modalTitle}`;
+    document.getElementById("explodedHeaderSub").textContent = `${item.category} · ${i18n.modalSub}`;
     document.getElementById("explodedFooterPrice").textContent = `${item.price} ₺`;
+
+    const expCal = document.getElementById("explodedCalorieBadge");
+    if (expCal) {
+      if (item.calories && item.calories > 0) {
+        expCal.textContent = `🔥 ${item.calories} kcal`;
+        expCal.style.display = "inline-flex";
+      } else {
+        expCal.style.display = "none";
+      }
+    }
 
     renderExplodedLayers(item);
     document.getElementById("explodedModal").classList.add("open");
@@ -1055,7 +1340,9 @@
   }
 
   function renderExplodedLayers(item) {
-    const ings = parseIngredientsList(item.ingredients);
+    const lang = getActiveLang();
+    const i18n = I18N_EXPLODED[lang] || I18N_EXPLODED.tr;
+    const ings = parseIngredientsList(item.ingredients, lang);
     const contentArea = document.getElementById("explodedContentArea");
 
     if (ings.length === 0) {
@@ -1075,7 +1362,7 @@
         const badgeHtml = `
           <div class="exploded-badge ${isExcluded ? 'excluded' : ''}" onclick="toggleExcludeIngredient('${ing.title.replace(/'/g, "\\'")}')" title="İstemiyorsanız dokunun">
             <span>${ing.title}</span>
-            ${isExcluded ? '<span style="font-size:0.65rem; color:#fca5a5;">(İSTEMİYORUM ✕)</span>' : ''}
+            ${isExcluded ? `<span style="font-size:0.65rem; color:#fca5a5;">${i18n.excludedPill}</span>` : ''}
           </div>
         `;
 
@@ -1087,7 +1374,7 @@
           : `<div></div>`;
 
         const iconNode = `
-          <div class="exploded-icon-node" onclick="toggleExcludeIngredient('${ing.title.replace(/'/g, "\\'")}')" title="${ing.detail}">
+          <div class="exploded-icon-node" onclick="toggleExcludeIngredient('${ing.title.replace(/'/g, "\\'")}')" title="${ing.title}">
             ${ing.icon}
           </div>
         `;
@@ -1125,18 +1412,20 @@
   }
 
   function updateExplodedFooterState(item) {
+    const lang = getActiveLang();
+    const i18n = I18N_EXPLODED[lang] || I18N_EXPLODED.tr;
     const noteEl = document.getElementById("explodedCustomNoteText");
     if (excludedIngredientsSet.size > 0) {
       const arr = Array.from(excludedIngredientsSet);
-      noteEl.innerHTML = `<span style="color:#f87171; font-weight:800;">Çıkarılanlar:</span> ${arr.join(", ")} olmadan hazırlanacak`;
+      noteEl.innerHTML = `<span style="color:#f87171; font-weight:800;">${i18n.excludedNotePrefix}</span> ${arr.join(", ")} ${i18n.excludedNoteSuffix}`;
     } else {
-      noteEl.textContent = "Tüm malzemeler eksiksiz ve taze hazırlanır";
+      noteEl.textContent = i18n.allFreshNote;
     }
 
     const actionBtn = document.getElementById("explodedFooterActionBtn");
     actionBtn.innerHTML = `
       <button type="button" onclick="addExplodedItemToCart()" style="background:#22c55e; color:#052e16; border:none; padding:12px 22px; border-radius:12px; font-weight:900; font-size:0.95rem; cursor:pointer; display:flex; align-items:center; gap:8px;">
-        🛒 Sepete Ekle
+        ${i18n.addToCart}
       </button>
     `;
   }
@@ -1149,8 +1438,10 @@
     changeQty(item.id, 1);
 
     if (excludedIngredientsSet.size > 0) {
-      const noteInput = document.getElementById("orderNoteInput");
-      const excludedStr = `${item.name} (${Array.from(excludedIngredientsSet).join(", ")} istemiyorum)`;
+      const lang = getActiveLang();
+      const i18n = I18N_EXPLODED[lang] || I18N_EXPLODED.tr;
+      const noteInput = document.getElementById("orderNote") || document.getElementById("orderNoteInput");
+      const excludedStr = `${item.name} (${Array.from(excludedIngredientsSet).join(", ")} ${i18n.without})`;
       if (noteInput) {
         const cur = noteInput.value.trim();
         noteInput.value = cur ? `${cur} | ${excludedStr}` : excludedStr;

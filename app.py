@@ -98,6 +98,32 @@ DEFAULT_INGREDIENTS = {
     "meyveli pasta": "SPONGE: 🍰 Yumuşak Sünger Pandispanya | CREAM: 🥛 Hafif Pasta Kreması | FRESH FRUITS: 🍓 Çilek, Kivi ve Muz Dilimleri | GLAZE: 🍯 Parlatıcı Meyve Jeli"
 }
 
+DEFAULT_CALORIES = {
+    "Artisan Gurme Burger": 680,
+    "Avokadolu Poşe Yumurta Tost": 340,
+    "Kaşarlı & Sucuklu Bazlama Tost": 480,
+    "Mozzarella & Pesto Sandviç": 420,
+    "Türk Kahvesi": 25,
+    "Americano": 15,
+    "Caffe Latte": 140,
+    "Cappuccino": 120,
+    "Flat White": 130,
+    "Demleme Çay": 2,
+    "Sahlep": 210,
+    "Buzlu Matcha Latte": 160,
+    "Iced Latte": 130,
+    "Iced Americano": 15,
+    "Ev Yapımı Limonata": 110,
+    "Taze Portakal Suyu": 115,
+    "Soğuk Hibiskus Çayı": 35,
+    "San Sebastian Cheesecake": 450,
+    "Tiramisu": 380,
+    "Sıcak Brownie": 520,
+    "Kruvasan": 290,
+    "Limonlu & Yaban Mersinli Pasta": 360,
+    "Oreolu & Böğürtlenli Yaş Pasta": 420
+}
+
 
 def get_lan_ip() -> str:
     try:
@@ -234,6 +260,10 @@ def init_db():
         cur.execute("ALTER TABLE menu ADD COLUMN ingredients TEXT DEFAULT ''")
     except sqlite3.OperationalError:
         pass
+    try:
+        cur.execute("ALTER TABLE menu ADD COLUMN calories INTEGER DEFAULT 0")
+    except sqlite3.OperationalError:
+        pass
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS orders (
@@ -317,6 +347,13 @@ def init_db():
         cur.execute(
             "UPDATE menu SET ingredients = ? WHERE name = ? AND (ingredients = '' OR ingredients IS NULL)",
             (ings, m_name),
+        )
+
+    # Kalorileri güncelle
+    for m_name, cal in DEFAULT_CALORIES.items():
+        cur.execute(
+            "UPDATE menu SET calories = ? WHERE name = ? AND (calories = 0 OR calories IS NULL)",
+            (cal, m_name),
         )
 
     # Videodaki ürünleri ekle ve görsellerini bağla
@@ -1202,18 +1239,29 @@ class PersonelHandler(BaseKafeHandler):
             emoji = str(payload.get("emoji", "☕")).strip() or "☕"
             description = str(payload.get("description", "")).strip()
             ingredients = str(payload.get("ingredients", "")).strip()
+            calories = int(payload.get("calories", 0) or 0)
             raw_image = str(payload.get("image_url", "") or payload.get("image_data", "")).strip()
             image_url = save_uploaded_image(raw_image)
             if not name or price <= 0:
                 return self._send_json({"error": "Geçersiz ürün bilgisi"}, status=400)
             conn = db_conn()
             conn.execute(
-                "INSERT INTO menu (name, category, price, emoji, description, image_url, ingredients) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (name, category, price, emoji, description, image_url, ingredients),
+                "INSERT INTO menu (name, category, price, emoji, description, image_url, ingredients, calories) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (name, category, price, emoji, description, image_url, ingredients, calories),
             )
             conn.commit()
             conn.close()
             return self._send_json({"ok": True, "image_url": image_url}, status=201)
+
+        if path.startswith("/api/menu/") and path.endswith("/calories"):
+            parts = path.strip("/").split("/")
+            item_id = int(parts[2])
+            calories = int(payload.get("calories", 0) or 0)
+            conn = db_conn()
+            conn.execute("UPDATE menu SET calories = ? WHERE id = ?", (calories, item_id))
+            conn.commit()
+            conn.close()
+            return self._send_json({"ok": True, "calories": calories})
 
         if path.startswith("/api/menu/") and path.endswith("/ingredients"):
             parts = path.strip("/").split("/")
