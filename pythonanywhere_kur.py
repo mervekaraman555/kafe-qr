@@ -22,6 +22,10 @@ FILES = [
     "sw.js",
     "icon-192.png",
     "icon-512.png",
+    "uploads/urun_artisan_burger.jpg",
+    "uploads/urun_matcha_latte.jpg",
+    "uploads/urun_limonlu_cheesecake.jpg",
+    "uploads/urun_oreolu_pasta.jpg",
 ]
 
 home_dir = os.path.expanduser("~")
@@ -33,7 +37,9 @@ for tdir in sorted(target_dirs):
     print(f"⏳ Güncel dosyalar indiriliyor: {tdir}")
     for fname in FILES:
         try:
-            urllib.request.urlretrieve(f"{RAW_BASE}/{fname}", os.path.join(tdir, fname))
+            target_file = os.path.join(tdir, fname)
+            os.makedirs(os.path.dirname(target_file), exist_ok=True)
+            urllib.request.urlretrieve(f"{RAW_BASE}/{fname}", target_file)
             print(f"  ✅ Güncellendi: {fname}")
         except Exception as e:
             print(f"  ⚠️ {fname} indirilemedi: {e}")

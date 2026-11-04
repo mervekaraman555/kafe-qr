@@ -59,11 +59,14 @@ DEFAULT_MENU = [
     ("Ev Yapımı Limonata", "Soğuk İçecekler", 95, "🍋", "Taze nane yaprakları ile"),
     ("Taze Portakal Suyu", "Soğuk İçecekler", 110, "🍊", "Sipariş anında sıkılmış"),
     ("Soğuk Hibiskus Çayı", "Soğuk İçecekler", 100, "🌺", "Orman meyveli ferahlatıcı"),
+    ("Buzlu Matcha Latte", "Soğuk İçecekler", 135, "🍵", "Özel Japon matcha çayı, taze soğuk süt ve kristal buz küpleri ile"),
     # Tatlılar
     ("San Sebastian Cheesecake", "Tatlılar", 165, "🍰", "Belçika çikolatası sosu ile"),
     ("Tiramisu", "Tatlılar", 155, "🍮", "Mascarpone peynirli ve espresso ıslatmalı"),
     ("Sıcak Brownie", "Tatlılar", 150, "🍫", "Vanilyalı dondurma topu ile"),
     ("Kruvasan", "Tatlılar", 95, "🥐", "Tereyağlı çıtır Fransız kruvasanı"),
+    ("Limonlu & Yaban Mersinli Pasta", "Tatlılar", 170, "🍋", "Taze limon dilimleri, yaban mersini taneleri ve kadifemsi krema ile"),
+    ("Oreolu & Böğürtlenli Yaş Pasta", "Tatlılar", 180, "🍰", "Beyaz çikolata akışlı, oreo bisküvili ve taze böğürtlenli özel pasta"),
     # Atıştırmalık & Yiyecekler
     ("Artisan Gurme Burger", "Yiyecekler", 240, "🍔", "150g Sulu Dana Köfte, Çıtır Dana Füme, Erimiş Cheddar Peyniri, Taze Domates ve Çıtır Marul ile (Patates Dilimleri ve Özel Hardal Sosu Eşliğinde)"),
     ("Avokadolu Poşe Yumurta Tost", "Yiyecekler", 185, "🥑", "Ekşi mayalı ekmek üzerinde"),
@@ -315,6 +318,12 @@ def init_db():
             "UPDATE menu SET ingredients = ? WHERE name = ? AND (ingredients = '' OR ingredients IS NULL)",
             (ings, m_name),
         )
+
+    # Videodaki ürün görsellerini bağla
+    cur.execute("UPDATE menu SET image_url = '/uploads/urun_artisan_burger.jpg' WHERE name = 'Artisan Gurme Burger' AND (image_url = '' OR image_url IS NULL)")
+    cur.execute("UPDATE menu SET image_url = '/uploads/urun_matcha_latte.jpg' WHERE name = 'Buzlu Matcha Latte' AND (image_url = '' OR image_url IS NULL)")
+    cur.execute("UPDATE menu SET image_url = '/uploads/urun_limonlu_cheesecake.jpg' WHERE name = 'Limonlu & Yaban Mersinli Pasta' AND (image_url = '' OR image_url IS NULL)")
+    cur.execute("UPDATE menu SET image_url = '/uploads/urun_oreolu_pasta.jpg' WHERE name = 'Oreolu & Böğürtlenli Yaş Pasta' AND (image_url = '' OR image_url IS NULL)")
     user_count = cur.execute("SELECT COUNT(*) FROM users").fetchone()[0]
     if user_count == 0:
         cur.executemany(
@@ -687,12 +696,18 @@ class BaseKafeHandler(BaseHTTPRequestHandler):
             update_files = [
                 "app.py", "giris_ekrani.html", "musteri_ekrani.html", "calisan_ekrani.html",
                 "yetkili_ekrani.html", "adisyon.html", "qr_kodlar.html", "kurulum_ekrani.html",
-                "reklam_videosu.html", "manifest.json", "sw.js"
+                "reklam_videosu.html", "manifest.json", "sw.js",
+                "uploads/urun_artisan_burger.jpg",
+                "uploads/urun_matcha_latte.jpg",
+                "uploads/urun_limonlu_cheesecake.jpg",
+                "uploads/urun_oreolu_pasta.jpg"
             ]
             downloaded = 0
             for fn in update_files:
                 try:
-                    urllib.request.urlretrieve(f"{raw_base}/{fn}", os.path.join(BASE_DIR, fn))
+                    target_path = os.path.join(BASE_DIR, fn)
+                    os.makedirs(os.path.dirname(target_path), exist_ok=True)
+                    urllib.request.urlretrieve(f"{raw_base}/{fn}", target_path)
                     downloaded += 1
                 except Exception:
                     pass
