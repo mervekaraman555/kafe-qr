@@ -729,6 +729,11 @@ class BaseKafeHandler(BaseHTTPRequestHandler):
                     logs.append(f"WSGI yenilendi: {wsgi_file}")
                 except Exception as e:
                     logs.append(f"WSGI hata: {e}")
+            try:
+                init_db()
+                logs.append("Veritabanı ve ürün görselleri başarıyla senkronize edildi.")
+            except Exception as e:
+                logs.append(f"DB senkronizasyon: {e}")
             msg_html = "<br>".join(logs) or "Güncelleme tamamlandı."
             self._send_html(
                 f"<!DOCTYPE html><html lang='tr'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
