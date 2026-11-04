@@ -116,6 +116,85 @@
   .order-card.hazir { border-color: #a855f7; box-shadow: 0 0 18px rgba(168,85,247,0.22); }
   .order-card.tamamlandi { border-color: var(--green); opacity: 0.92; }
 
+  /* Boş Masa Kartı Görünümü */
+  .order-card.empty-table {
+    border: 2px dashed #334155;
+    background: #090d16;
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 290px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .order-card.empty-table:hover {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.04);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.15);
+  }
+  .table-tag.empty {
+    font-size: 1.2rem;
+    font-weight: 900;
+    background: #1e293b;
+    color: #94a3b8;
+    border: 1px solid #334155;
+    padding: 5px 14px;
+    border-radius: 8px;
+    display: inline-block;
+  }
+  .table-view-tabs {
+    display: inline-flex;
+    gap: 4px;
+    background: #020617;
+    padding: 3px;
+    border-radius: 9px;
+    border: 1px solid #334155;
+  }
+  .view-tab-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    padding: 5px 11px;
+    border-radius: 7px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .view-tab-btn.active {
+    background: #0284c7;
+    color: #fff;
+  }
+  .view-tab-btn:hover:not(.active) {
+    color: #f8fafc;
+    background: rgba(255,255,255,0.05);
+  }
+  .btn-pos-empty {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #022c22;
+    border: none;
+    padding: 11px 14px;
+    border-radius: 9px;
+    font-weight: 900;
+    font-size: 0.92rem;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+    transition: all 0.15s;
+  }
+  .btn-pos-empty:hover {
+    background: #4ade80;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+  }
+
   .table-tag {
     font-size: 1.2rem; font-weight: 900; background: var(--amber); color: #020617;
     padding: 5px 14px; border-radius: 8px; display: inline-block;
@@ -677,9 +756,25 @@
 
 <div class="layout">
   <div class="section-box">
-    <div class="section-title">
-      <span>🍽️ Masa Siparişleri (Hangi Masa Ne İstedi?)</span>
-      <span id="activeCount" style="font-size:0.88rem; color:var(--muted);">0 aktif masa siparişi</span>
+    <div class="section-title" style="flex-wrap:wrap; gap:12px;">
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <span style="font-size:1.05rem; font-weight:800; color:#f8fafc;">🍽️ Masalar & Sipariş Yönetimi</span>
+        <div class="table-view-tabs">
+          <button type="button" class="view-tab-btn active" id="tabAllTables" onclick="setTableViewFilter('all')">
+            📋 Tüm Masalar (<span id="countAllTables">12</span>)
+          </button>
+          <button type="button" class="view-tab-btn" id="tabActiveTables" onclick="setTableViewFilter('active')">
+            🔥 Dolu Masalar (<span id="countActiveTables">0</span>)
+          </button>
+          <button type="button" class="view-tab-btn" id="tabEmptyTables" onclick="setTableViewFilter('empty')">
+            🟢 Boş Masalar (<span id="countEmptyTables">12</span>)
+          </button>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:0.8rem; color:#94a3b8; font-weight:700;">Toplam Masa:</span>
+        <input type="number" id="settingTableCount" value="12" min="1" max="100" style="width:54px; padding:4px 8px; border-radius:7px; background:#0f172a; border:1px solid #334155; color:#fff; font-weight:800; font-size:0.88rem; text-align:center;" onchange="updateTotalTableCount(this.value)">
+      </div>
     </div>
     <div class="orders-grid" id="ordersGrid"></div>
   </div>
@@ -696,6 +791,8 @@
   let knownOrderIds = new Set();
   let knownCallIds = new Set();
   let byTableCache = {};
+  let currentTableFilter = "all";
+  let totalTables = parseInt(localStorage.getItem("kafe_total_tables") || "12", 10);
   let firstLoad = true;
   let firstCallLoad = true;
 
@@ -835,22 +932,43 @@
       renderPosQuickTables();
     }
 
-    const combinedOrders = Object.values(byTableMap).sort((a, b) => a.table_no - b.table_no);
-    document.getElementById("activeCount").textContent = `${combinedOrders.length} aktif masa siparişi`;
+    const activeTableNumbers = Object.keys(byTableMap).map(n => parseInt(n, 10));
+    const highestActive = activeTableNumbers.length > 0 ? Math.max(...activeTableNumbers) : 0;
+    const maxTables = Math.max(totalTables, highestActive, 12);
+
+    const activeCount = Object.keys(byTableMap).length;
+    const emptyCount = Math.max(0, maxTables - activeCount);
+
+    const cAll = document.getElementById("countAllTables");
+    if (cAll) cAll.textContent = maxTables;
+    const cAct = document.getElementById("countActiveTables");
+    if (cAct) cAct.textContent = activeCount;
+    const cEmp = document.getElementById("countEmptyTables");
+    if (cEmp) cEmp.textContent = emptyCount;
+
+    const settingInput = document.getElementById("settingTableCount");
+    if (settingInput && document.activeElement !== settingInput) {
+      settingInput.value = totalTables;
+    }
 
     const grid = document.getElementById("ordersGrid");
-    if (combinedOrders.length === 0) {
-      grid.innerHTML = `<p style="color:var(--muted); font-size:0.95rem;">Şu anda bekleyen veya hazırlanan masa siparişi yok.</p>`;
-    } else {
-      const rankMap = { bekliyor: 0, onaylandi: 0, hazirlaniyor: 1, hazir: 2, tamamlandi: 3 };
-      const stages = [
-        { key: "onaylandi", idx: 0, icon: "📋", label: "Onaylandı" },
-        { key: "hazirlaniyor", idx: 1, icon: "👨‍🍳", label: "Hazırlanıyor" },
-        { key: "hazir", idx: 2, icon: "🍽️", label: "Hazır" },
-        { key: "tamamlandi", idx: 3, icon: "✅", label: "Teslim Edildi" }
-      ];
+    const rankMap = { bekliyor: 0, onaylandi: 0, hazirlaniyor: 1, hazir: 2, tamamlandi: 3 };
+    const stages = [
+      { key: "onaylandi", idx: 0, icon: "📋", label: "Onaylandı" },
+      { key: "hazirlaniyor", idx: 1, icon: "👨‍🍳", label: "Hazırlanıyor" },
+      { key: "hazir", idx: 2, icon: "🍽️", label: "Hazır" },
+      { key: "tamamlandi", idx: 3, icon: "✅", label: "Teslim Edildi" }
+    ];
 
-      grid.innerHTML = combinedOrders.map(o => {
+    const cardsHtml = [];
+    for (let t = 1; t <= maxTables; t++) {
+      const o = byTableMap[t];
+      const hasOrder = !!o;
+
+      if (currentTableFilter === "active" && !hasOrder) continue;
+      if (currentTableFilter === "empty" && hasOrder) continue;
+
+      if (hasOrder) {
         const itemsList = Object.values(o.itemsMap);
         const itemsHtml = itemsList.map(i => `
           <div>
@@ -883,7 +1001,7 @@
           `;
         }).join("");
 
-        return `
+        cardsHtml.push(`
           <div class="order-card ${o.status}">
             <div>
               <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -921,8 +1039,56 @@
               </div>
             </div>
           </div>
-        `;
-      }).join("");
+        `);
+      } else {
+        // Boş Masa Kartı
+        cardsHtml.push(`
+          <div class="order-card empty-table" onclick="openNewOrderModal(${t})">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="table-tag empty">MASA ${t}</span>
+                <span style="font-size:0.75rem; background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.35); padding:3px 8px; border-radius:6px; font-weight:800;">
+                  🟢 MASA BOŞ
+                </span>
+              </div>
+              <div style="text-align:center; padding:32px 10px 22px;">
+                <div style="font-size:2.8rem; margin-bottom:6px; opacity:0.85;">🍽️</div>
+                <div style="font-size:1.05rem; font-weight:800; color:#f8fafc;">Masa ${t} Müsait</div>
+                <p style="font-size:0.82rem; color:#64748b; margin-top:4px;">Yeni sipariş girmek için dokunun</p>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn-pos-empty" onclick="event.stopPropagation(); openNewOrderModal(${t})">
+                ➕ Sipariş Gir
+              </button>
+            </div>
+          </div>
+        `);
+      }
+    }
+
+    if (cardsHtml.length === 0) {
+      grid.innerHTML = `<p style="color:var(--muted); font-size:0.95rem; grid-column:1/-1; text-align:center; padding:40px;">Bu filtrede gösterilecek masa bulunamadı.</p>`;
+    } else {
+      grid.innerHTML = cardsHtml.join("");
+    }
+  }
+
+  function setTableViewFilter(filterMode) {
+    currentTableFilter = filterMode;
+    document.querySelectorAll(".view-tab-btn").forEach(b => b.classList.remove("active"));
+    if (filterMode === "all") document.getElementById("tabAllTables").classList.add("active");
+    if (filterMode === "active") document.getElementById("tabActiveTables").classList.add("active");
+    if (filterMode === "empty") document.getElementById("tabEmptyTables").classList.add("active");
+    loadAllOrders();
+  }
+
+  function updateTotalTableCount(val) {
+    const num = parseInt(val, 10);
+    if (!isNaN(num) && num >= 1 && num <= 100) {
+      totalTables = num;
+      localStorage.setItem("kafe_total_tables", String(num));
+      loadAllOrders();
     }
   }
 
