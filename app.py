@@ -319,11 +319,23 @@ def init_db():
             (ings, m_name),
         )
 
-    # Videodaki ürün görsellerini bağla
-    cur.execute("UPDATE menu SET image_url = '/uploads/urun_artisan_burger.jpg' WHERE name = 'Artisan Gurme Burger' AND (image_url = '' OR image_url IS NULL)")
-    cur.execute("UPDATE menu SET image_url = '/uploads/urun_matcha_latte.jpg' WHERE name = 'Buzlu Matcha Latte' AND (image_url = '' OR image_url IS NULL)")
-    cur.execute("UPDATE menu SET image_url = '/uploads/urun_limonlu_cheesecake.jpg' WHERE name = 'Limonlu & Yaban Mersinli Pasta' AND (image_url = '' OR image_url IS NULL)")
-    cur.execute("UPDATE menu SET image_url = '/uploads/urun_oreolu_pasta.jpg' WHERE name = 'Oreolu & Böğürtlenli Yaş Pasta' AND (image_url = '' OR image_url IS NULL)")
+    # Videodaki ürünleri ekle ve görsellerini bağla
+    video_products = [
+        ("Artisan Gurme Burger", "Yiyecekler", 240, "🍔", "150g Sulu Dana Köfte, Çıtır Dana Füme, Erimiş Cheddar Peyniri, Taze Domates ve Çıtır Marul ile (Patates Dilimleri ve Özel Hardal Sosu Eşliğinde)", "/uploads/urun_artisan_burger.jpg", DEFAULT_INGREDIENTS.get("Artisan Gurme Burger", "")),
+        ("Buzlu Matcha Latte", "Soğuk İçecekler", 135, "🍵", "Özel Japon matcha çayı, taze soğuk süt ve kristal buz küpleri ile", "/uploads/urun_matcha_latte.jpg", "MATCHA: 🍵 Japon Seremoniyel Matcha | MILK: 🥛 Soğuk Süt | ICE: 🧊 Buz Küpleri | SPLASH: 🌊 Soğuk Köpürtme"),
+        ("Limonlu & Yaban Mersinli Pasta", "Tatlılar", 170, "🍋", "Taze limon dilimleri, yaban mersini taneleri ve kadifemsi krema ile", "/uploads/urun_limonlu_cheesecake.jpg", "LEMON: 🍋 Taze Limon Dilimleri | BLUEBERRIES: 🫐 Yaban Mersini | CREAM: 🥛 Kadifemsi Krema | MINT: 🌿 Nane Yaprakları"),
+        ("Oreolu & Böğürtlenli Yaş Pasta", "Tatlılar", 180, "🍰", "Beyaz çikolata akışlı, oreo bisküvili ve taze böğürtlenli özel pasta", "/uploads/urun_oreolu_pasta.jpg", "OREO: 🍪 Çıtır Oreo Bisküvileri | BERRIES: 🫐 Taze Böğürtlen | CHOCOLATE: 🍫 Beyaz Çikolata Akışı | SPONGE: 🍰 Sünger Kek")
+    ]
+    cur.execute("UPDATE menu SET name = 'Oreolu & Böğürtlenli Yaş Pasta', image_url = '/uploads/urun_oreolu_pasta.jpg' WHERE name = 'meyveli pasta'")
+    for vp_name, vp_cat, vp_price, vp_emoji, vp_desc, vp_img, vp_ings in video_products:
+        row_ex = cur.execute("SELECT id FROM menu WHERE name = ?", (vp_name,)).fetchone()
+        if not row_ex:
+            cur.execute(
+                "INSERT INTO menu (name, category, price, emoji, description, image_url, ingredients) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (vp_name, vp_cat, vp_price, vp_emoji, vp_desc, vp_img, vp_ings)
+            )
+        else:
+            cur.execute("UPDATE menu SET image_url = ?, ingredients = ? WHERE name = ?", (vp_img, vp_ings, vp_name))
     user_count = cur.execute("SELECT COUNT(*) FROM users").fetchone()[0]
     if user_count == 0:
         cur.executemany(
