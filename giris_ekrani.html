@@ -66,8 +66,8 @@
   /* Rol Seçim Sekmeleri */
   .role-tabs {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
     background: #0b1120;
     padding: 6px;
     border-radius: 14px;
@@ -75,13 +75,13 @@
     margin-bottom: 22px;
   }
   .role-tab {
-    padding: 12px 10px;
+    padding: 10px 6px;
     border: none;
     border-radius: 10px;
     background: transparent;
     color: var(--muted);
     font-weight: 800;
-    font-size: 0.88rem;
+    font-size: 0.8rem;
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -89,14 +89,19 @@
     gap: 4px;
     transition: all 0.2s;
   }
-  .role-tab span.icon { font-size: 1.35rem; }
+  .role-tab span.icon { font-size: 1.25rem; }
   .role-tab.active.personel {
     background: linear-gradient(135deg, #0284c7, #0369a1);
     color: #fff;
     box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
   }
   .role-tab.active.yetkili {
-    background: linear-gradient(135deg, #f59e0b, #b45309);
+    background: linear-gradient(135deg, #38bdf8, #0284c7);
+    color: #020617;
+    box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
+  }
+  .role-tab.active.yonetici {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: #090d16;
     box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
   }
@@ -146,11 +151,15 @@
     transition: transform 0.12s, opacity 0.15s;
   }
   .btn-login.personel {
-    background: linear-gradient(135deg, #38bdf8, #0284c7);
-    color: #090d16;
+    background: linear-gradient(135deg, #0284c7, #0369a1);
+    color: #fff;
   }
   .btn-login.yetkili {
-    background: linear-gradient(135deg, #fbbf24, #d97706);
+    background: linear-gradient(135deg, #38bdf8, #0284c7);
+    color: #020617;
+  }
+  .btn-login.yonetici {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: #090d16;
   }
   .btn-login:hover { transform: translateY(-1px); }
@@ -162,17 +171,21 @@
   <div class="brand-head">
     <div class="brand-logo">☕</div>
     <h1>Giriş Ekranı</h1>
-    <p>Yetkili & Çalışan Personel Girişi</p>
+    <p>Kafe Yönetim & Sipariş Sistemi</p>
   </div>
 
   <div class="role-tabs">
-    <button type="button" class="role-tab yetkili active" id="tabYetkili" onclick="selectRole('yetkili')">
-      <span class="icon">👔</span>
-      <span>Yetkili / Yönetici</span>
-    </button>
     <button type="button" class="role-tab personel" id="tabPersonel" onclick="selectRole('personel')">
       <span class="icon">👨‍🍳</span>
-      <span>Çalışan Personel</span>
+      <span>Personel</span>
+    </button>
+    <button type="button" class="role-tab yetkili active" id="tabYetkili" onclick="selectRole('yetkili')">
+      <span class="icon">👔</span>
+      <span>Yetkili</span>
+    </button>
+    <button type="button" class="role-tab yonetici" id="tabYonetici" onclick="selectRole('yonetici')">
+      <span class="icon">👑</span>
+      <span>Yönetici</span>
     </button>
   </div>
 
@@ -180,7 +193,7 @@
 
   <form onsubmit="handleLogin(event)">
     <div class="form-group">
-      <label id="userLabel">Yetkili / Yönetici Kullanıcı Adı</label>
+      <label id="userLabel">Yetkili Kullanıcı Adı</label>
       <input type="text" id="username" class="form-input" placeholder="Örn: yetkili" required autocomplete="username">
     </div>
     <div class="form-group">
@@ -188,7 +201,7 @@
       <input type="password" id="password" class="form-input" placeholder="••••" required autocomplete="current-password">
     </div>
     <button type="submit" class="btn-login yetkili" id="submitBtn">
-      👔 Yetkili Paneline Giriş Yap
+      👔 Yetkili Ekranına Giriş Yap
     </button>
   </form>
 
@@ -213,16 +226,22 @@
     selectedRole = role;
     document.getElementById("tabPersonel").classList.toggle("active", role === "personel");
     document.getElementById("tabYetkili").classList.toggle("active", role === "yetkili");
+    document.getElementById("tabYonetici").classList.toggle("active", role === "yonetici");
 
     const userLabel = document.getElementById("userLabel");
     const usernameInput = document.getElementById("username");
     const submitBtn = document.getElementById("submitBtn");
 
-    if (role === "yetkili") {
-      userLabel.textContent = "Yetkili / Yönetici Kullanıcı Adı";
+    if (role === "yonetici") {
+      userLabel.textContent = "Yönetici (Tam Yetki) Kullanıcı Adı";
+      usernameInput.placeholder = "Örn: yonetici";
+      submitBtn.className = "btn-login yonetici";
+      submitBtn.textContent = "👑 Yönetici Paneline Giriş Yap";
+    } else if (role === "yetkili") {
+      userLabel.textContent = "Yetkili (Masa & Kasa) Kullanıcı Adı";
       usernameInput.placeholder = "Örn: yetkili";
       submitBtn.className = "btn-login yetkili";
-      submitBtn.textContent = "👔 Yetkili Paneline Giriş Yap";
+      submitBtn.textContent = "👔 Yetkili Ekranına Giriş Yap";
     } else {
       userLabel.textContent = "Personel Kullanıcı Adı";
       usernameInput.placeholder = "Örn: personel";
@@ -254,7 +273,7 @@
         errEl.style.display = "block";
         return;
       }
-      const target = data.redirect || (role === "yetkili" ? "/yetkili" : "/personel");
+      const target = data.redirect || (role === "yonetici" ? "/yonetici" : (role === "yetkili" ? "/yetkili" : "/calisan"));
       window.location.href = `${API_BASE}${target}`;
     } catch (err) {
       errEl.textContent = "Sunucuya bağlanılamadı! Lütfen sistemin açık olduğundan emin olun.";

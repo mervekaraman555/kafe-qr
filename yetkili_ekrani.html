@@ -3,332 +3,702 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Artisan Kafe — Yetkili / Yönetici Paneli</title>
+<title>Artisan Kafe — 👔 Yetkili Kasa & Masa Yönetim Ekranı</title>
 <style>
   :root {
-    --bg: #090d16;
-    --panel: #111827;
-    --card: #1e293b;
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --card: #334155;
     --ink: #f8fafc;
     --muted: #94a3b8;
     --amber: #f59e0b;
     --blue: #38bdf8;
     --green: #22c55e;
     --red: #ef4444;
-    --border: #334155;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  body { background: var(--bg); color: var(--ink); min-height: 100vh; padding-bottom: 40px; }
+  body { background: var(--bg); color: var(--ink); min-height: 100vh; }
   header {
-    background: #020617;
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
+    background: #020617; padding: 16px 24px; border-bottom: 1px solid #334155;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
   }
   .title-area h1 { font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
-  .role-badge {
-    background: rgba(245, 158, 11, 0.2);
-    color: #fbbf24;
-    border: 1px solid var(--amber);
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 0.76rem;
-    font-weight: 800;
+  .live-pill {
+    background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid #22c55e;
+    padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;
   }
-  .nav-btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-  .nav-btns a, .nav-btns button {
-    background: var(--panel);
-    color: var(--ink);
-    text-decoration: none;
-    padding: 8px 13px;
-    border-radius: 8px;
-    font-size: 0.84rem;
-    font-weight: 700;
-    border: 1px solid #475569;
-    cursor: pointer;
+  .nav-btns { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .nav-btns a {
+    background: var(--panel); color: var(--ink); text-decoration: none;
+    padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; border: 1px solid #475569; font-weight: 700;
   }
-  .nav-btns a.staff-btn { background: #0284c7; border-color: #38bdf8; color: #fff; }
-  .nav-btns button.logout-btn { background: rgba(239, 68, 68, 0.18); border-color: var(--red); color: #fca5a5; }
 
-  .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
-
-  /* İstatistik Kartları */
-  .stats-grid {
+  /* Yetkili Hızlı Kasa & Ciro Göstergeleri */
+  .yetkili-stats-bar {
+    max-width: 1400px;
+    margin: 16px auto 0;
+    padding: 0 20px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
-    margin-bottom: 22px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
   }
-  .stat-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 18px 20px;
-  }
-  .stat-label { font-size: 0.82rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
-  .stat-val { font-size: 1.75rem; font-weight: 900; }
-  .stat-val.green { color: #4ade80; }
-  .stat-val.amber { color: #fbbf24; }
-  .stat-val.blue { color: #38bdf8; }
-
-  .main-grid {
-    display: grid;
-    grid-template-columns: 1.35fr 1fr;
-    gap: 20px;
-  }
-  @media (max-width: 980px) { .main-grid { grid-template-columns: 1fr; } }
-
-  .section-box {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  .section-title {
-    font-size: 1.05rem;
-    font-weight: 800;
-    margin-bottom: 14px;
+  .stat-mini-card {
+    background: #0b1120;
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 14px 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 10px;
   }
-
-  .form-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 8px;
-    margin-bottom: 14px;
-  }
-  input, select {
-    padding: 9px 11px;
-    border-radius: 8px;
-    border: 1px solid #475569;
-    background: #090d16;
-    color: #fff;
-    font-size: 0.86rem;
-  }
-  .btn-add {
-    background: var(--amber);
-    color: #090d16;
-    border: none;
-    padding: 9px 14px;
-    border-radius: 8px;
-    font-weight: 800;
-    font-size: 0.86rem;
-    cursor: pointer;
-  }
-
-  table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
-  th, td { padding: 9px 8px; text-align: left; border-bottom: 1px solid #1e293b; }
-  th { color: var(--muted); font-size: 0.76rem; text-transform: uppercase; }
-  .btn-sm {
-    background: rgba(239, 68, 68, 0.18);
-    color: #fca5a5;
-    border: 1px solid var(--red);
-    padding: 4px 9px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  .btn-img-upload {
-    background: rgba(56, 189, 248, 0.15);
-    color: #38bdf8;
-    border: 1px solid #38bdf8;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-  }
-  .btn-img-upload:hover {
-    background: #38bdf8;
-    color: #090d16;
-  }
-  .btn-img-sm {
-    background: rgba(56, 189, 248, 0.15);
-    color: #38bdf8;
-    border: 1px solid #38bdf8;
-    padding: 4px 9px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-  .btn-img-sm:hover {
-    background: #38bdf8;
-    color: #090d16;
-  }
-  .menu-thumb {
-    width: 42px;
-    height: 42px;
-    border-radius: 8px;
-    object-fit: cover;
-    border: 1px solid #475569;
-    flex-shrink: 0;
-  }
-  .menu-emoji-box {
-    width: 42px;
-    height: 42px;
-    border-radius: 8px;
-    background: #1e293b;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    flex-shrink: 0;
-  }
-
-  /* Günlük Takvim & Hesaplama Stilleri */
-  .calendar-layout {
-    display: grid;
-    grid-template-columns: 1.25fr 1fr;
-    gap: 18px;
-    align-items: start;
-  }
-  @media (max-width: 980px) {
-    .calendar-layout { grid-template-columns: 1fr; }
-  }
-  .cal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-  }
-  .cal-nav-btn {
-    background: #090d16;
-    color: var(--ink);
-    border: 1px solid #475569;
-    padding: 6px 11px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  .cal-nav-btn:hover {
-    border-color: var(--blue);
-    color: var(--blue);
-  }
-  .cal-weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-    text-align: center;
-    font-size: 0.74rem;
-    font-weight: 800;
+  .stat-mini-card .lbl {
+    font-size: 0.78rem;
     color: var(--muted);
-    margin-bottom: 6px;
+    font-weight: 800;
+    margin-bottom: 4px;
     text-transform: uppercase;
+    letter-spacing: 0.4px;
   }
-  .cal-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
+  .stat-mini-card .val {
+    font-size: 1.45rem;
+    font-weight: 900;
   }
-  .cal-day {
+  .stat-mini-card .val.green { color: #4ade80; }
+  .stat-mini-card .val.yellow { color: #fbbf24; }
+  .stat-mini-card .val.blue { color: #38bdf8; }
+
+  /* Garson Zili Çağrı Alanı */
+  .calls-container {
+    max-width: 1400px; margin: 18px auto 0; padding: 0 20px;
+  }
+  .calls-box {
+    background: rgba(239, 68, 68, 0.16); border: 2px solid var(--red);
+    border-radius: 16px; padding: 16px 18px;
+    box-shadow: 0 0 28px rgba(239, 68, 68, 0.35);
+    animation: staffBoxBlink 0.9s ease-in-out infinite;
+  }
+  @keyframes staffBoxBlink {
+    0%, 100% {
+      background: rgba(239, 68, 68, 0.14);
+      border-color: #ef4444;
+      box-shadow: 0 0 24px rgba(239, 68, 68, 0.35);
+    }
+    50% {
+      background: rgba(245, 158, 11, 0.24);
+      border-color: #facc15;
+      box-shadow: 0 0 34px rgba(250, 204, 21, 0.65);
+    }
+  }
+  .calls-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+  }
+  .calls-title {
+    font-size: 1.05rem; font-weight: 800; color: #fca5a5;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .calls-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px;
+  }
+  .call-card {
+    background: #0f172a; border: 2px solid var(--red); border-radius: 12px;
+    padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    animation: callPulse 0.75s ease-in-out infinite;
+  }
+  @keyframes callPulse {
+    0%, 100% {
+      border-color: #ef4444;
+      background: #0f172a;
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      transform: scale(1);
+    }
+    50% {
+      border-color: #facc15;
+      background: #3b0d0d;
+      box-shadow: 0 0 18px 4px rgba(250, 204, 21, 0.55);
+      transform: scale(1.02);
+    }
+  }
+  .call-table-badge {
+    background: var(--red); color: #fff; font-weight: 900; font-size: 1rem;
+    padding: 4px 10px; border-radius: 8px; display: inline-block; margin-bottom: 4px;
+    animation: badgeFlash 0.75s ease-in-out infinite;
+  }
+  @keyframes badgeFlash {
+    0%, 100% { background: #ef4444; color: #fff; }
+    50% { background: #facc15; color: #020617; }
+  }
+  .call-reason { font-weight: 700; font-size: 0.9rem; color: #f8fafc; }
+  .call-time { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  .btn-resolve-call {
+    background: var(--green); color: #020617; border: none; padding: 9px 12px;
+    border-radius: 8px; font-weight: 800; font-size: 0.82rem; cursor: pointer; white-space: nowrap;
+  }
+
+  /* Sadece Masa Siparişleri Tam Genişlik Görünümü */
+  .layout { padding: 20px; max-width: 1400px; margin: 0 auto; }
+
+  .section-box { background: var(--panel); border-radius: 16px; padding: 20px; border: 1px solid #334155; }
+  .section-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+
+  .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .order-card {
+    background: #0f172a; border: 2px solid #475569; border-radius: 14px; padding: 16px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .order-card.bekliyor, .order-card.onaylandi { border-color: var(--amber); box-shadow: 0 0 18px rgba(245,158,11,0.18); }
+  .order-card.hazirlaniyor { border-color: var(--blue); }
+  .order-card.hazir { border-color: #a855f7; box-shadow: 0 0 18px rgba(168,85,247,0.22); }
+  .order-card.tamamlandi { border-color: var(--green); opacity: 0.92; }
+
+  /* Boş Masa Kartı Görünümü */
+  .order-card.empty-table {
+    border: 2px dashed #334155;
     background: #090d16;
-    border: 1px solid #1e293b;
-    border-radius: 10px;
-    min-height: 68px;
-    padding: 6px 7px;
-    cursor: pointer;
+    border-radius: 14px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: all 0.15s ease;
-    position: relative;
+    min-height: 290px;
+    cursor: pointer;
+    transition: all 0.2s ease;
   }
-  .cal-day:hover {
+  .order-card.empty-table:hover {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.04);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.15);
+  }
+  .table-tag.empty {
+    font-size: 1.2rem;
+    font-weight: 900;
+    background: #1e293b;
+    color: #94a3b8;
+    border: 1px solid #334155;
+    padding: 5px 14px;
+    border-radius: 8px;
+    display: inline-block;
+  }
+  .table-view-tabs {
+    display: inline-flex;
+    gap: 4px;
+    background: #020617;
+    padding: 3px;
+    border-radius: 9px;
+    border: 1px solid #334155;
+  }
+  .view-tab-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    padding: 5px 11px;
+    border-radius: 7px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .view-tab-btn.active {
+    background: #0284c7;
+    color: #fff;
+  }
+  .view-tab-btn:hover:not(.active) {
+    color: #f8fafc;
+    background: rgba(255,255,255,0.05);
+  }
+  .btn-pos-empty {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #022c22;
+    border: none;
+    padding: 11px 14px;
+    border-radius: 9px;
+    font-weight: 900;
+    font-size: 0.92rem;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+    transition: all 0.15s;
+  }
+  .btn-pos-empty:hover {
+    background: #4ade80;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+  }
+
+  .table-tag {
+    font-size: 1.2rem; font-weight: 900; background: var(--amber); color: #020617;
+    padding: 5px 14px; border-radius: 8px; display: inline-block;
+  }
+  .order-card.hazirlaniyor .table-tag { background: var(--blue); }
+  .order-card.hazir .table-tag { background: #a855f7; color: #fff; }
+  .order-card.tamamlandi .table-tag { background: var(--green); }
+
+  /* Personel Kartı 4 Aşamalı Sıralama İkonları */
+  .staff-stepper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #1e293b;
+  }
+  .staff-step-btn {
+    background: #1e293b;
+    border: 1.5px solid #334155;
+    border-radius: 10px;
+    padding: 8px 4px;
+    color: #94a3b8;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    transition: all 0.15s;
+  }
+  .staff-step-btn:hover {
     border-color: #64748b;
+    color: #f8fafc;
     transform: translateY(-1px);
   }
-  .cal-day.empty {
-    background: transparent;
-    border-color: transparent;
-    cursor: default;
-    min-height: 68px;
+  .staff-step-btn .st-icon {
+    font-size: 1.15rem;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .cal-day.today {
-    border-color: var(--amber);
-    box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.35);
+  .staff-step-btn.done {
+    border-color: #16a34a;
+    color: #86efac;
+    background: rgba(22, 163, 74, 0.12);
   }
-  .cal-day.selected {
-    border-color: var(--blue);
-    background: rgba(56, 189, 248, 0.12);
-    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.35);
+  .staff-step-btn.done .st-icon {
+    background: #16a34a;
+    color: #fff;
   }
-  .cal-day.has-sales {
-    background: rgba(34, 197, 94, 0.07);
-    border-color: rgba(34, 197, 94, 0.35);
+  .staff-step-btn.active {
+    border-color: #f59e0b;
+    color: #fef08a;
+    background: rgba(245, 158, 11, 0.18);
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
   }
-  .cal-day.has-sales.selected {
-    background: rgba(56, 189, 248, 0.16);
-    border-color: var(--blue);
+  .staff-step-btn.active .st-icon {
+    background: #f59e0b;
+    color: #020617;
   }
-  .cal-day-num {
-    font-size: 0.8rem;
-    font-weight: 800;
-    color: #cbd5e1;
+  .staff-step-btn.active.final-done {
+    border-color: #22c55e;
+    color: #4ade80;
+    background: rgba(34, 197, 94, 0.18);
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.25);
+  }
+  .staff-step-btn.active.final-done .st-icon {
+    background: #22c55e;
+    color: #020617;
+  }
+
+  .items-list { margin: 14px 0; font-size: 0.98rem; line-height: 1.6; }
+  .items-list div { padding: 5px 0; border-bottom: 1px dashed #1e293b; display: flex; justify-content: space-between; align-items: center; }
+  .qty-badge {
+    background: #1e293b; color: #fbbf24; font-weight: 900; padding: 2px 8px;
+    border-radius: 6px; margin-right: 6px; font-size: 0.92rem;
+  }
+  .note-box {
+    background: rgba(245,158,11,0.12); color: #fcd34d; padding: 8px 10px;
+    border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px;
+  }
+  .action-row { display: flex; gap: 8px; margin-top: 8px; }
+  .btn-act {
+    flex: 1; padding: 10px 12px; border: none; border-radius: 8px;
+    font-weight: 800; font-size: 0.86rem; cursor: pointer;
+  }
+  .btn-prep { background: var(--blue); color: #020617; }
+  .btn-done { background: var(--green); color: #020617; }
+
+  /* Kart altı Adisyon ve Ödeme / Masayı Kapat Alanı */
+  .card-pay-section {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #334155;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .card-total-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: #090d16;
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid #1e293b;
   }
-  .cal-day-revenue {
-    font-size: 0.76rem;
+  .card-total-label {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+  .card-total-val {
+    font-size: 1.25rem;
     font-weight: 900;
     color: #4ade80;
-    margin-top: 4px;
-    line-height: 1.15;
   }
-  .cal-day-open {
-    font-size: 0.68rem;
-    font-weight: 700;
-    color: #fbbf24;
-  }
-  .cal-day-count {
-    font-size: 0.66rem;
-    color: var(--muted);
-  }
-  .day-detail-box {
-    background: #090d16;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 16px;
-  }
-  .day-metrics-grid {
+  .card-actions-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .btn-adisyon {
+    background: #f59e0b;
+    color: #020617;
+    border: none;
+    padding: 10px 8px;
+    border-radius: 9px;
+    font-weight: 800;
+    font-size: 0.82rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+  }
+  .btn-adisyon:hover {
+    background: #fbbf24;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+  }
+  .btn-pay-close {
+    background: #22c55e;
+    color: #020617;
+    border: none;
+    padding: 10px 8px;
+    border-radius: 9px;
+    font-weight: 800;
+    font-size: 0.82rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+  }
+  .btn-pay-close:hover {
+    background: #4ade80;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35);
+  }
+  .toast-notification {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    background: #15803d;
+    color: #fff;
+    padding: 14px 22px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.92rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 100000;
+    animation: toastIn 0.25s ease;
+  }
+  @keyframes toastIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* POS Masaya Sipariş Modalı */
+  .pos-modal-box {
+    width: 100%;
+    max-width: 980px;
+    height: 90vh;
+    max-height: 740px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+  }
+  .pos-header {
+    background: #1e293b;
+    border-bottom: 1px solid #334155;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .pos-close-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #cbd5e1;
+    font-size: 1.1rem;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pos-close-btn:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
+  .pos-table-bar {
+    background: #1e293b;
+    border-bottom: 1px solid #334155;
+    padding: 8px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .pos-quick-tables {
+    display: flex;
+    gap: 5px;
+    overflow-x: auto;
+    max-width: 100%;
+    padding-bottom: 2px;
+  }
+  .pos-table-chip {
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: #94a3b8;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .pos-table-chip.active {
+    background: #f59e0b;
+    color: #0f172a;
+    border-color: #f59e0b;
+  }
+  .pos-table-chip.has-orders {
+    border-color: rgba(56,189,248,0.5);
+    color: #38bdf8;
+  }
+  .pos-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+  @media (max-width: 768px) {
+    .pos-body { flex-direction: column; overflow-y: auto; }
+    .pos-modal-box { height: 96vh; max-height: none; }
+  }
+  .pos-menu-col {
+    flex: 1.4;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #334155;
+    overflow: hidden;
+  }
+  .pos-filter-bar {
+    padding: 10px 14px;
+    border-bottom: 1px solid #334155;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .pos-filter-bar input {
+    background: #020617;
+    border: 1px solid #334155;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .pos-cat-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  .pos-cat-btn {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #94a3b8;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .pos-cat-btn.active {
+    background: #0284c7;
+    color: #fff;
+    border-color: #0284c7;
+  }
+  .pos-items-grid {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
     gap: 10px;
-    margin: 12px 0;
+    align-content: start;
   }
-  .day-metric {
-    background: var(--panel);
-    border: 1px solid #1e293b;
-    border-radius: 10px;
-    padding: 10px 12px;
+  .pos-item-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    transition: transform 0.1s, border-color 0.1s;
+    position: relative;
   }
-  .day-metric .lbl {
-    font-size: 0.73rem;
-    color: var(--muted);
-    margin-bottom: 4px;
+  .pos-item-card:hover {
+    transform: translateY(-2px);
+    border-color: #f59e0b;
   }
-  .day-metric .val {
-    font-size: 1.2rem;
+  .pos-item-thumb {
+    width: 100%;
+    height: 70px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .pos-item-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .pos-item-cal {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    background: rgba(15,12,10,0.85);
+    color: #fbbf24;
+    font-size: 0.6rem;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 999px;
+  }
+  .pos-item-title {
+    font-size: 0.84rem;
+    font-weight: 800;
+    color: #f8fafc;
+    line-height: 1.2;
+  }
+  .pos-item-price {
+    font-size: 0.85rem;
     font-weight: 900;
+    color: #22c55e;
+  }
+  .pos-item-ctrl {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+  }
+  .pos-btn-qty {
+    background: #334155;
+    color: #fff;
+    border: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pos-btn-qty.plus {
+    background: #f59e0b;
+    color: #0f172a;
+  }
+  .pos-cart-col {
+    flex: 1;
+    min-width: 280px;
+    background: #090d16;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .pos-cart-header {
+    background: #0f172a;
+    border-bottom: 1px solid #1e293b;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .pos-cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pos-cart-item {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .pos-cart-footer {
+    background: #0f172a;
+    border-top: 1px solid #1e293b;
+    padding: 14px 16px;
+    flex-shrink: 0;
+  }
+  .pos-submit-btn {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #022c22;
+    border: none;
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 900;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(34,197,94,0.35);
+    transition: transform 0.1s, opacity 0.2s;
+  }
+  .pos-submit-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .pos-submit-btn:not(:disabled):hover {
+    transform: translateY(-1px);
+    background: #4ade80;
   }
 </style>
 </head>
@@ -336,22 +706,147 @@
 
 <header>
   <div class="title-area">
-    <h1>👔 Kafe Yetkili / Yönetici Paneli <span class="role-badge" id="userBadge">YETKİLİ</span></h1>
+    <h1>👔 Kafe Yetkili Ekranı <span class="live-pill">● CANLI</span> <span id="yetkiliUserBadge" style="font-size:0.82rem; color:#94a3b8; font-weight:700;"></span></h1>
   </div>
   <div class="nav-btns">
-    <a href="/personel" class="staff-btn">👨‍🍳 Çalışan Sipariş Ekranı</a>
-    <a href="/adisyon?no=1" onclick="openOverlayModal(event, '/adisyon?no=1')">🧾 Masa Adisyonları</a>
-    <a href="/qr" onclick="openOverlayModal(event, '/qr')">🔳 Masa QR Kodları</a>
-    <button class="logout-btn" onclick="logout()">🚪 Çıkış Yap</button>
+    <button type="button" onclick="openNewOrderModal()" style="background:#10b981; color:#022c22; border:1px solid #10b981; padding:9px 16px; border-radius:10px; font-weight:900; font-size:0.88rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 14px rgba(16,185,129,0.35);">
+      ➕ Masaya Sipariş Gir
+    </button>
+    <a href="/adisyon?no=1" onclick="openAdisyonModal(1); return false;" style="background:#f59e0b; color:#020617; border-color:#f59e0b; font-weight:800;">🧾 Masa Adisyonları</a>
+    <a href="/qr" onclick="openQrModal(); return false;" style="background:#6366f1; color:#fff; border-color:#6366f1; font-weight:800;">🔳 Masa QR Kodları</a>
+    <a href="/yonetici" id="yoneticiLink" style="display:none; background:linear-gradient(135deg, #f59e0b, #d97706); color:#020617; border-color:#f59e0b; font-weight:900;">👑 Yönetici Paneli</a>
+    <a href="/personel" style="background:#1e293b; color:#cbd5e1; border-color:#475569;">👨‍🍳 Çalışan Ekranı</a>
+    <a href="/giris" onclick="logoutYetkili(event)" style="background:rgba(239,68,68,0.18); border-color:#ef4444; color:#fca5a5; font-weight:700;">🚪 Çıkış Yap</a>
   </div>
 </header>
 
-<!-- Uygulama İçi Adisyon / QR Kapatılabilir Tam Ekran Modal -->
-<div id="overlayModal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(9,13,22,0.95); backdrop-filter:blur(6px); flex-direction:column;">
-  <div style="background:#0f172a; border-bottom:1px solid #334155; padding:10px 18px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+<div class="yetkili-stats-bar">
+  <div class="stat-mini-card">
+    <div>
+      <div class="lbl">💰 Bugün Tahsil Edilen Kasa / Ciro</div>
+      <div class="val green" id="statPaidToday">0 ₺</div>
+    </div>
+    <span style="font-size:1.8rem; opacity:0.75;">💵</span>
+  </div>
+  <div class="stat-mini-card">
+    <div>
+      <div class="lbl">⏳ Masalardaki Açık Hesaplar</div>
+      <div class="val yellow" id="statOpenBills">0 ₺</div>
+    </div>
+    <span style="font-size:1.8rem; opacity:0.75;">⏳</span>
+  </div>
+  <div class="stat-mini-card">
+    <div>
+      <div class="lbl">🍽️ Dolu / Toplam Masa</div>
+      <div class="val blue" id="statTableOccupancy">0 / 12</div>
+    </div>
+    <span style="font-size:1.8rem; opacity:0.75;">📍</span>
+  </div>
+</div>
+
+<!-- Personel Masaya Sipariş Girişi Modalı (POS) -->
+<div id="staffNewOrderModal" style="display:none; position:fixed; inset:0; background:rgba(2,6,23,0.88); z-index:99998; justify-content:center; align-items:center; padding:16px; backdrop-filter:blur(6px);">
+  <div class="pos-modal-box">
+    <!-- Header -->
+    <div class="pos-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.4rem;">📝</span>
+        <div>
+          <h2 style="font-size:1.15rem; margin:0; color:#f8fafc; font-weight:800;">Masaya Sipariş Girişi (Garson POS)</h2>
+          <p style="font-size:0.78rem; color:#94a3b8; margin:2px 0 0;">Masayı seçin, menüden ürünleri ekleyin ve siparişi anında onaylayın</p>
+        </div>
+      </div>
+      <button type="button" class="pos-close-btn" onclick="closeNewOrderModal()">✕</button>
+    </div>
+
+    <!-- Table selector row -->
+    <div class="pos-table-bar">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-weight:800; font-size:0.88rem; color:#fbbf24;">📍 Sipariş Verilecek Masa:</span>
+        <input type="number" id="posTableNo" min="1" max="200" value="1" style="width:70px; padding:6px 10px; border-radius:8px; border:1px solid #475569; background:#0f172a; color:#fff; font-weight:800; font-size:1rem; text-align:center;" onchange="syncPosTableQuickChips()">
+      </div>
+      <div class="pos-quick-tables" id="posQuickTables">
+        <!-- Quick table chips rendered via JS -->
+      </div>
+    </div>
+
+    <!-- Main 2-column body: Left menu browser, Right cart -->
+    <div class="pos-body">
+      <!-- Left side: Search, Category Tabs, Product Grid -->
+      <div class="pos-menu-col">
+        <div class="pos-filter-bar">
+          <input type="text" id="posSearchInput" placeholder="🔍 Ürün ara (ör: latte, burger, tiramisu)..." oninput="filterPosMenu()">
+          <div class="pos-cat-tabs" id="posCatTabs"></div>
+        </div>
+        <div class="pos-items-grid" id="posItemsGrid"></div>
+      </div>
+
+      <!-- Right side: Cart / Summary -->
+      <div class="pos-cart-col">
+        <div class="pos-cart-header">
+          <span style="font-weight:800; color:#f8fafc; font-size:0.95rem;">🛒 Masa <span id="posCartTableNo">1</span> Sepeti</span>
+          <button type="button" onclick="clearPosCart()" style="background:none; border:none; color:#f87171; font-size:0.78rem; font-weight:700; cursor:pointer;">Sepeti Temizle</button>
+        </div>
+        <div class="pos-cart-items" id="posCartItems">
+          <!-- Cart items list -->
+        </div>
+        <div class="pos-cart-footer">
+          <input type="text" id="posOrderNote" placeholder="📝 Sipariş notu (ör: az şekerli, ekstra sıcak)..." style="width:100%; box-sizing:border-box; padding:8px 10px; border-radius:8px; border:1px solid #334155; background:#0f172a; color:#fff; font-size:0.82rem; margin-bottom:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:0.85rem; color:#94a3b8; font-weight:700;">Toplam Hesap:</span>
+            <span style="font-size:1.35rem; font-weight:900; color:#22c55e;" id="posTotalAmount">0 ₺</span>
+          </div>
+          <button type="button" id="posSubmitBtn" onclick="submitPosOrder()" class="pos-submit-btn" disabled>
+            🚀 Siparişi Masaya Gönder (0 ₺)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="calls-container" id="callsWrapper" style="display:none;">
+  <div class="calls-box">
+    <div class="calls-header">
+      <div class="calls-title">🔔 GARSON ZİLİ ÇAĞRILARI (Masadan Çağrı Var!)</div>
+      <span id="activeCallsCount" style="font-size:0.82rem; color:#fca5a5; font-weight:700;">0 aktif çağrı</span>
+    </div>
+    <div class="calls-grid" id="callsGrid"></div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="section-box">
+    <div class="section-title" style="flex-wrap:wrap; gap:12px;">
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <span style="font-size:1.05rem; font-weight:800; color:#f8fafc;">🍽️ Masalar & Sipariş Yönetimi</span>
+        <div class="table-view-tabs">
+          <button type="button" class="view-tab-btn active" id="tabAllTables" onclick="setTableViewFilter('all')">
+            📋 Tüm Masalar (<span id="countAllTables">12</span>)
+          </button>
+          <button type="button" class="view-tab-btn" id="tabActiveTables" onclick="setTableViewFilter('active')">
+            🔥 Dolu Masalar (<span id="countActiveTables">0</span>)
+          </button>
+          <button type="button" class="view-tab-btn" id="tabEmptyTables" onclick="setTableViewFilter('empty')">
+            🟢 Boş Masalar (<span id="countEmptyTables">12</span>)
+          </button>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:0.8rem; color:#94a3b8; font-weight:700;">Toplam Masa:</span>
+        <input type="number" id="settingTableCount" value="12" min="1" max="100" style="width:54px; padding:4px 8px; border-radius:7px; background:#0f172a; border:1px solid #334155; color:#fff; font-weight:800; font-size:0.88rem; text-align:center;" onchange="updateTotalTableCount(this.value)">
+      </div>
+    </div>
+    <div class="orders-grid" id="ordersGrid"></div>
+  </div>
+</div>
+
+<!-- Adisyon & QR Overlay Modalı -->
+<div id="overlayModal" style="display:none; position:fixed; inset:0; background:rgba(2,6,23,0.92); z-index:99999; flex-direction:column; backdrop-filter:blur(6px);">
+  <div style="background:#0f172a; border-bottom:1px solid #334155; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
     <div style="display:flex; align-items:center; gap:10px;">
-      <span style="font-size:1.15rem;">👔</span>
-      <span style="font-weight:800; font-size:0.92rem; color:#f8fafc;" id="overlayModalTitle">Masa Sipariş Kare Kodları (QR)</span>
+      <span style="font-size:1.2rem;">👔</span>
+      <span style="font-weight:800; font-size:0.95rem; color:#f8fafc;" id="overlayModalTitle">Masa Adisyon / QR Detayı</span>
     </div>
     <button type="button" onclick="closeOverlayModal()" style="background:#ef4444; color:#fff; border:none; padding:7px 16px; border-radius:8px; font-weight:800; font-size:0.85rem; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(239,68,68,0.35);">
       ✕ Kapat ve Yetkiliye Dön
@@ -360,1131 +855,341 @@
   <iframe id="overlayIframe" src="about:blank" style="width:100%; height:100%; border:none; flex:1; background:#f8fafc;"></iframe>
 </div>
 
-<!-- Kategori Yönetimi Modalı (Yönetici) -->
-<div id="categoryModal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(9,13,22,0.88); backdrop-filter:blur(5px); justify-content:center; align-items:center; padding:16px;">
-  <div style="background:#0f172a; border:1px solid #334155; border-radius:18px; width:100%; max-width:480px; padding:22px; box-shadow:0 25px 60px rgba(0,0,0,0.7);">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #1e293b; padding-bottom:12px;">
-      <div style="display:flex; align-items:center; gap:8px;">
-        <span style="font-size:1.3rem;">📁</span>
-        <h3 style="margin:0; font-size:1.1rem; color:#f8fafc; font-weight:800;">Ürün Kategori Yönetimi</h3>
-      </div>
-      <button type="button" onclick="closeCategoryModal()" style="background:none; border:none; color:#94a3b8; font-size:1.2rem; cursor:pointer; font-weight:800;">✕</button>
-    </div>
-    <form onsubmit="handleCreateCategory(event)" style="display:flex; gap:8px; margin-bottom:16px;">
-      <input type="text" id="newCategoryInput" placeholder="Yeni kategori adı (ör: Kahvaltılıklar)..." required style="flex:1; padding:9px 12px; border-radius:9px; border:1px solid #334155; background:#020617; color:#fff; font-size:0.85rem;">
-      <button type="submit" style="background:#f59e0b; color:#090d16; border:none; padding:9px 16px; border-radius:9px; font-weight:900; font-size:0.85rem; cursor:pointer; white-space:nowrap;">
-        + Kategori Ekle
-      </button>
-    </form>
-    <div style="font-size:0.78rem; color:#94a3b8; font-weight:700; margin-bottom:8px; text-transform:uppercase;">Mevcut Kategoriler:</div>
-    <div id="categoryChipsList" style="display:flex; flex-wrap:wrap; gap:8px; max-height:220px; overflow-y:auto; padding:4px 0;"></div>
-  </div>
-</div>
-
-<div class="container">
-  <!-- 1. BÖLÜM: BUGÜNKÜ GÜNLÜK CİRO İSTATİSTİKLERİ -->
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-    <div style="font-weight:800; font-size:0.95rem; color:#cbd5e1; display:flex; align-items:center; gap:8px;">
-      <span style="background:#0284c7; color:#fff; font-size:0.7rem; padding:3px 8px; border-radius:6px; font-weight:800;">GÜNLÜK</span>
-      <span id="dailyTitleLabel">📌 Bugünün Günlük Ciro İstatistikleri</span>
-    </div>
-  </div>
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label" id="lblPaidTotal">💰 Bugün Tahsil Edilen Ciro</div>
-      <div class="stat-val green" id="statPaidTotal">0 ₺</div>
-      <div style="font-size:0.74rem; color:var(--muted); margin-top:5px;" id="statPaidAllTime">Genel Toplam: 0 ₺</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label" id="lblOpenTotal">⏳ Bugün Açık Kalan Tutar</div>
-      <div class="stat-val amber" id="statOpenTotal">0 ₺</div>
-      <div style="font-size:0.74rem; color:var(--muted); margin-top:5px;" id="statOpenAllTime">Genel Toplam: 0 ₺</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label" id="lblAllTotal">🧾 Bugün Toplam Günün Cirosu</div>
-      <div class="stat-val blue" id="statAllTotal">0 ₺</div>
-      <div style="font-size:0.74rem; color:var(--muted); margin-top:5px;" id="statAllTimeTotal">Genel Toplam: 0 ₺</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label" id="lblCounts">📍 Bugün Aktif / Kapanan Adisyon</div>
-      <div class="stat-val" id="statCounts">0 Açık · 0 Ödendi</div>
-      <div style="font-size:0.74rem; color:var(--muted); margin-top:5px;" id="statCountsAllTime">Genel: 0 Açık · 0 Ödendi</div>
-    </div>
-  </div>
-
-  <!-- 2. BÖLÜM: AY SONU YAPILAN CİRO TOPLAMI (AYRI BLOK) -->
-  <div style="background:linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); border:1px solid #3b82f6; border-radius:16px; padding:18px 20px; margin-bottom:24px; box-shadow:0 8px 24px rgba(0,0,0,0.35);">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
-      <div style="font-weight:900; font-size:1.05rem; color:#38bdf8; display:flex; align-items:center; gap:8px;">
-        <span style="background:rgba(56,189,248,0.2); color:#38bdf8; border:1px solid #38bdf8; font-size:0.72rem; padding:3px 9px; border-radius:6px; font-weight:900;">AY SONU RAPORU</span>
-        <span id="monthlyTitleLabel">🗓️ Ay Sonu Yapılan Ciro Toplamı</span>
-      </div>
-      <div style="font-size:0.82rem; color:#cbd5e1; font-weight:700;" id="monthlyDateRangeText">Ay Sonu Kapanış Değerleri</div>
-    </div>
-    
-    <div class="stats-grid" style="margin-bottom:0;">
-      <div class="stat-card" style="background:#090d16; border-color:#334155;">
-        <div class="stat-label">🏦 Ay Sonu Tahsil Edilen (Ödenen)</div>
-        <div class="stat-val green" id="statMonthPaidTotal">0 ₺</div>
-        <div style="font-size:0.72rem; color:var(--muted); margin-top:5px;" id="statMonthPaidSub">Ödenmiş hesaplar</div>
-      </div>
-      <div class="stat-card" style="background:#090d16; border-color:#334155;">
-        <div class="stat-label">⏳ Ay İçi Bekleyen Açık Tutar</div>
-        <div class="stat-val amber" id="statMonthOpenTotal">0 ₺</div>
-        <div style="font-size:0.72rem; color:var(--muted); margin-top:5px;" id="statMonthOpenSub">Kapanmamış açık masalar</div>
-      </div>
-      <div class="stat-card" style="background:#090d16; border:2px solid #38bdf8; box-shadow:0 0 16px rgba(56,189,248,0.15);">
-        <div class="stat-label" style="color:#38bdf8; font-weight:900;">🏆 AY SONU GENEL TOPLAM CİRO</div>
-        <div class="stat-val blue" id="statMonthAllTotal">0 ₺</div>
-        <div style="font-size:0.74rem; color:#cbd5e1; margin-top:5px;" id="statMonthKdvSub">KDV Hariç: 0 ₺ · %10 KDV: 0 ₺</div>
-      </div>
-      <div class="stat-card" style="background:#090d16; border-color:#334155;">
-        <div class="stat-label">🧾 Ay Boyunca Toplam Adisyon</div>
-        <div class="stat-val" id="statMonthCounts" style="color:#f8fafc;">0 Adet</div>
-        <div style="font-size:0.72rem; color:var(--muted); margin-top:5px;" id="statMonthCountsSub">0 Ödenen · 0 Açık</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Günlük Takvim & Gün Bazlı Ciro Hesaplamaları -->
-  <div class="section-box" style="margin-bottom:22px;">
-    <div class="section-title">
-      <span>📅 Günlük Takvim & Gün Bazlı Ciro Takibi</span>
-      <span style="font-size:0.84rem; color:#4ade80; font-weight:800; background:rgba(34,197,94,0.12); padding:5px 12px; border-radius:8px; border:1px solid rgba(34,197,94,0.3);" id="calMonthSummary">Bugün Günlük Toplam: 0 ₺</span>
-    </div>
-
-    <div class="calendar-layout">
-      <!-- Sol: Aylık İnteraktif Takvim -->
-      <div>
-        <div class="cal-header">
-          <div style="display:flex; gap:6px; align-items:center;">
-            <button type="button" class="cal-nav-btn" onclick="changeCalendarMonth(-1)">◀ Önceki Ay</button>
-            <button type="button" class="cal-nav-btn" onclick="selectTodayOnCalendar()">Bugün</button>
-            <button type="button" class="cal-nav-btn" onclick="changeCalendarMonth(1)">Sonraki Ay ▶</button>
-          </div>
-          <div style="font-weight:900; font-size:1rem; color:var(--amber);" id="calMonthTitle">-</div>
-          <div>
-            <input type="date" id="calDatePicker" onchange="onDatePickerChange(this.value)" style="padding:6px 10px; font-size:0.8rem;">
-          </div>
-        </div>
-
-        <div class="cal-weekdays">
-          <div>Pzt</div>
-          <div>Sal</div>
-          <div>Çar</div>
-          <div>Per</div>
-          <div>Cum</div>
-          <div>Cmt</div>
-          <div>Paz</div>
-        </div>
-        <div class="cal-grid" id="calendarGrid"></div>
-      </div>
-
-      <!-- Sağ: Seçili Gün Detaylı Hesaplama & Raporu -->
-      <div class="day-detail-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1e293b; padding-bottom:10px;">
-          <div>
-            <div style="font-size:0.75rem; color:var(--muted); font-weight:700;">SEÇİLİ GÜN HESAP ÖZETİ</div>
-            <div style="font-size:1.1rem; font-weight:900; color:#38bdf8; margin-top:2px;" id="selectedDateLabel">-</div>
-          </div>
-          <span class="role-badge" id="selectedDayCountBadge">0 Adisyon</span>
-        </div>
-
-        <div class="day-metrics-grid">
-          <div class="day-metric">
-            <div class="lbl">💰 Günlük Tahsil Edilen (Ödenen)</div>
-            <div class="val" style="color:#4ade80;" id="dayPaidTotal">0 ₺</div>
-          </div>
-          <div class="day-metric">
-            <div class="lbl">⏳ Günlük Açık (Bekleyen)</div>
-            <div class="val" style="color:#fbbf24;" id="dayOpenTotal">0 ₺</div>
-          </div>
-          <div class="day-metric">
-            <div class="lbl">🧾 Günlük Genel Toplam Ciro</div>
-            <div class="val" style="color:#38bdf8;" id="dayAllTotal">0 ₺</div>
-          </div>
-          <div class="day-metric">
-            <div class="lbl">📊 KDV Hariç Net / %10 KDV</div>
-            <div class="val" style="font-size:0.92rem; color:#cbd5e1;" id="dayKdvBreakdown">0 ₺ / 0 ₺</div>
-          </div>
-        </div>
-
-        <div style="margin-top:10px;">
-          <div style="font-size:0.78rem; font-weight:800; color:var(--muted); margin-bottom:6px; text-transform:uppercase;">
-            🏆 Seçili Günde Satılan Ürünler (<span id="daySoldQty">0</span> Adet)
-          </div>
-          <div id="dayTopItemsBox" style="max-height:110px; overflow-y:auto; font-size:0.82rem; background:var(--panel); border:1px solid #1e293b; border-radius:8px; padding:8px 10px;"></div>
-        </div>
-
-        <div style="margin-top:12px;">
-          <div style="font-size:0.78rem; font-weight:800; color:var(--muted); margin-bottom:6px; text-transform:uppercase;">
-            📋 Seçili Günün Adisyon Kayıtları
-          </div>
-          <div id="dayOrdersListBox" style="max-height:140px; overflow-y:auto; font-size:0.8rem; background:var(--panel); border:1px solid #1e293b; border-radius:8px; padding:8px 10px;"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Açık Masa Hesapları & Hesap Kapatma -->
-  <div class="section-box" style="margin-bottom:22px;">
-    <div class="section-title">
-      <span>💳 Açık Masa Hesapları & Hesap Kapatma (Adisyon)</span>
-      <span style="font-size:0.8rem; color:var(--muted);" id="openTablesCount">0 açık masa</span>
-    </div>
-    <div id="openTablesBox"></div>
-  </div>
-
-  <div class="main-grid">
-    <!-- Sol Sütun: Menü & Fiyat Yönetimi -->
-    <div>
-      <div class="section-box">
-        <div class="section-title">
-          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-            <span>📋 Menü & Ürün Fiyat Yönetimi</span>
-            <button type="button" id="btnCategoryManage" onclick="openCategoryModal()" style="display:none; background:linear-gradient(135deg, #f59e0b, #d97706); color:#090d16; border:none; padding:5px 12px; border-radius:8px; font-weight:900; font-size:0.78rem; cursor:pointer; align-items:center; gap:5px; box-shadow:0 2px 8px rgba(245,158,11,0.3);">
-              📁 Kategori Yönetimi (+ Yeni Kategori)
-            </button>
-          </div>
-          <span style="font-size:0.78rem; color:var(--muted);" id="menuCount">0 ürün</span>
-        </div>
-
-        <!-- Yetkili için ürün ekleme kilitli uyarısı -->
-        <div id="productAddLockedNotice" style="display:none; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; padding:12px 16px; border-radius:12px; font-size:0.85rem; font-weight:700; align-items:center; gap:8px; margin-bottom:16px;">
-          <span style="font-size:1.15rem;">🔒</span>
-          <span><b>Ürün Ekleme Kilitli:</b> Yeni ürün ve kategori ekleme yetkisi yalnızca <b>Yönetici (Tam Yetkili)</b> hesabına aittir. Yetkili hesabı ürün ekleyemez.</span>
-        </div>
-
-        <form id="addProductForm" onsubmit="addMenuItem(event)" style="margin-bottom:16px;">
-          <div class="form-row">
-            <input type="text" id="mName" placeholder="Ürün Adı (ör: Mocha)" required>
-            <select id="mCategory"></select>
-            <input type="number" id="mPrice" placeholder="Fiyat (₺)" required min="1" step="0.5">
-            <input type="number" id="mCalories" placeholder="Kalori (kcal)" min="0" style="max-width:115px;">
-            <input type="text" id="mEmoji" placeholder="Emoji (☕)" value="☕" style="max-width:80px;">
-          </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-            <input type="text" id="mDesc" placeholder="Kısa açıklama..." style="flex:1; min-width:140px;">
-            <input type="text" id="mIngredients" placeholder="Katmanlar / Malzemeler (| ile ayırın: Dana Köfte | Cheddar | Marul...)" style="flex:1.4; min-width:200px;">
-            <input type="file" id="mImageFile" accept="image/*" style="display:none;" onchange="handleNewItemImage(event)">
-            <button type="button" class="btn-img-upload" onclick="document.getElementById('mImageFile').click()">
-              📷 Resim
-            </button>
-            <div id="newImgPreviewBox" style="display:none; align-items:center; gap:6px; background:#090d16; padding:4px 8px; border-radius:8px; border:1px solid #38bdf8;">
-              <img id="newImgPreview" src="" alt="Önizleme" style="width:28px; height:28px; object-fit:cover; border-radius:5px;">
-              <span style="font-size:0.75rem; color:#38bdf8; font-weight:700;">Resim</span>
-              <button type="button" onclick="clearNewItemImage()" style="background:none; border:none; color:#fca5a5; cursor:pointer; font-weight:800; font-size:0.8rem;">✕</button>
-            </div>
-            <button type="submit" class="btn-add">+ Ürün Ekle</button>
-          </div>
-        </form>
-        <input type="file" id="rowImageInput" accept="image/*" style="display:none;" onchange="handleRowImageSelected(event)">
-        <div style="max-height: 420px; overflow-y: auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Ürün</th>
-                <th>Kategori</th>
-                <th>Fiyat</th>
-                <th>Ürün Resmi & İşlem</th>
-              </tr>
-            </thead>
-            <tbody id="menuTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Sağ Sütun: Personel & Yetkili Hesapları + Son Adisyonlar -->
-    <div>
-      <div class="section-box">
-        <div class="section-title">
-          <span>👥 Yönetici, Yetkili & Çalışan Personel Hesapları</span>
-        </div>
-        <div id="userAddLockedNotice" style="display:none; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; padding:10px 14px; border-radius:10px; font-size:0.82rem; font-weight:700; align-items:center; gap:6px; margin-bottom:12px;">
-          <span>🔒</span>
-          <span>Yeni kullanıcı hesabı açma yetkisi yalnızca <b>Yönetici</b> hesabına aittir.</span>
-        </div>
-        <div id="addUserBox">
-          <form onsubmit="addUser(event)" style="margin-bottom:14px;">
-            <div class="form-row">
-              <input type="text" id="uName" placeholder="Ad Soyad (ör: Ahmet)" required>
-              <input type="text" id="uUsername" placeholder="Kullanıcı Adı" required>
-              <input type="text" id="uPassword" placeholder="Şifre / PIN" required>
-              <select id="uRole">
-                <option value="yonetici">👑 Yönetici (Tam Yetkili)</option>
-                <option value="yetkili">👔 Yetkili (Ürün Ekleme Kapalı)</option>
-                <option value="personel" selected>👨‍🍳 Çalışan Personel</option>
-              </select>
-            </div>
-            <button type="submit" class="btn-add" style="width:100%;">+ Yeni Hesap Ekle</button>
-          </form>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Ad Soyad</th>
-              <th>Kullanıcı Adı</th>
-              <th>Rol / Yetki</th>
-              <th>İşlem</th>
-            </tr>
-          </thead>
-          <tbody id="usersTableBody"></tbody>
-        </table>
-      </div>
-
-      <div class="section-box">
-        <div class="section-title">
-          <span>🧾 Son Kapanan & Açık Masa Adisyonları</span>
-        </div>
-        <div style="max-height: 260px; overflow-y: auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Masa</th>
-                <th>İçerik</th>
-                <th>Tutar</th>
-                <th>Durum</th>
-              </tr>
-            </thead>
-            <tbody id="ordersHistoryBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
-  let currentUserRole = "yetkili";
-  let currentUserName = "";
+  let knownOrderIds = new Set();
+  let knownCallIds = new Set();
+  let byTableCache = {};
+  let currentTableFilter = "all";
+  let totalTables = parseInt(localStorage.getItem("kafe_total_tables") || "12", 10);
+  let firstLoad = true;
+  let firstCallLoad = true;
 
-  async function checkAuth() {
-    const res = await fetch("/api/me");
-    const data = await res.json();
-    if (!data.user) {
-      window.location.href = "/giris";
-      return;
-    }
-    if (data.user.role !== "yetkili" && data.user.role !== "yonetici") {
-      window.location.href = "/personel";
-      return;
-    }
-    currentUserRole = data.user.role;
-    currentUserName = data.user.name;
-
-    const badge = document.getElementById("userBadge");
-    if (currentUserRole === "yonetici") {
-      badge.textContent = `${data.user.name} (👑 YÖNETİCİ - TAM YETKİ)`;
-      badge.style.background = "linear-gradient(135deg, #f59e0b, #d97706)";
-      badge.style.color = "#020617";
-      badge.style.fontWeight = "900";
-    } else {
-      badge.textContent = `${data.user.name} (👔 YETKİLİ)`;
-      badge.style.background = "#0284c7";
-      badge.style.color = "#fff";
-    }
-
-    applyRolePermissions(currentUserRole);
-    loadCategories();
-  }
-
-  function applyRolePermissions(role) {
-    const isYonetici = role === "yonetici";
-    const addForm = document.getElementById("addProductForm");
-    const lockNotice = document.getElementById("productAddLockedNotice");
-    if (addForm) addForm.style.display = isYonetici ? "block" : "none";
-    if (lockNotice) lockNotice.style.display = isYonetici ? "none" : "flex";
-
-    const btnCat = document.getElementById("btnCategoryManage");
-    if (btnCat) btnCat.style.display = isYonetici ? "inline-flex" : "none";
-
-    const addUserBox = document.getElementById("addUserBox");
-    const userLockNotice = document.getElementById("userAddLockedNotice");
-    if (addUserBox) addUserBox.style.display = isYonetici ? "block" : "none";
-    if (userLockNotice) userLockNotice.style.display = isYonetici ? "none" : "flex";
-  }
-
-  async function logout() {
-    await fetch("/api/logout", { method: "POST" });
-    window.location.href = "/giris";
-  }
-
-  let pendingNewImageData = "";
-  let editingRowItemId = null;
-
-  function fileToResizedDataURL(file, maxDim = 600) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = e => {
-        const img = new Image();
-        img.onload = () => {
-          let w = img.width;
-          let h = img.height;
-          if (w > maxDim || h > maxDim) {
-            if (w > h) {
-              h = Math.round((h * maxDim) / w);
-              w = maxDim;
-            } else {
-              w = Math.round((w * maxDim) / h);
-              h = maxDim;
-            }
-          }
-          const canvas = document.createElement("canvas");
-          canvas.width = w;
-          canvas.height = h;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL("image/jpeg", 0.85));
-        };
-        img.onerror = reject;
-        img.src = e.target.result;
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
-
-  async function handleNewItemImage(e) {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-    pendingNewImageData = await fileToResizedDataURL(file);
-    document.getElementById("newImgPreview").src = pendingNewImageData;
-    document.getElementById("newImgPreviewBox").style.display = "inline-flex";
-  }
-
-  function clearNewItemImage() {
-    pendingNewImageData = "";
-    document.getElementById("mImageFile").value = "";
-    document.getElementById("newImgPreview").src = "";
-    document.getElementById("newImgPreviewBox").style.display = "none";
-  }
-
-  function triggerRowImageUpload(itemId) {
-    editingRowItemId = itemId;
-    const inp = document.getElementById("rowImageInput");
-    inp.value = "";
-    inp.click();
-  }
-
-  async function handleRowImageSelected(e) {
-    const file = e.target.files && e.target.files[0];
-    if (!file || !editingRowItemId) return;
-    const dataUrl = await fileToResizedDataURL(file);
-    await fetch(`/api/menu/${editingRowItemId}/image`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image_data: dataUrl })
-    });
-    editingRowItemId = null;
-    loadMenu();
-  }
-
-  async function removeRowImage(itemId) {
-    await fetch(`/api/menu/${itemId}/image`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image_url: "" })
-    });
-    loadMenu();
-  }
-
-  let cafeCategories = [];
-
-  async function loadCategories() {
+  function beep() {
     try {
-      const res = await fetch("/api/categories");
-      if (res.ok) {
-        const data = await res.json();
-        cafeCategories = data.categories || [];
-      }
-    } catch(e) {}
-
-    const sel = document.getElementById("mCategory");
-    if (sel && cafeCategories.length > 0) {
-      const curVal = sel.value;
-      sel.innerHTML = cafeCategories.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
-      if (curVal && cafeCategories.some(c => c.name === curVal)) {
-        sel.value = curVal;
-      }
-    }
-
-    renderCategoryChips();
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.18);
+    } catch (e) {}
   }
 
-  function renderCategoryChips() {
-    const list = document.getElementById("categoryChipsList");
-    if (!list) return;
-    const defaultProtected = new Set(["Sıcak İçecekler", "Soğuk İçecekler", "Tatlılar", "Yiyecekler"]);
-    list.innerHTML = cafeCategories.map(c => `
-      <div style="background:#1e293b; border:1px solid #334155; padding:6px 12px; border-radius:999px; font-size:0.8rem; font-weight:700; color:#f8fafc; display:flex; align-items:center; gap:8px;">
-        <span>📁 ${c.name}</span>
-        ${!defaultProtected.has(c.name) ? `<button type="button" onclick="deleteCategory(${c.id})" style="background:none; border:none; color:#f87171; cursor:pointer; font-weight:900; font-size:0.85rem;" title="Kategoriyi Sil">✕</button>` : ''}
+  function bellSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = ctx.currentTime;
+      const notes = [1046.5, 880.0, 1046.5];
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(freq, now + idx * 0.16);
+        gain.gain.setValueAtTime(0.25, now + idx * 0.16);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.16 + 0.35);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.16);
+        osc.stop(now + idx * 0.16 + 0.35);
+      });
+    } catch (e) {}
+  }
+
+  async function resolveCall(callId) {
+    await fetch(`/api/calls/${callId}/resolve`, { method: "POST" });
+    loadAllCalls();
+  }
+
+  async function loadAllCalls() {
+    const res = await fetch("/api/calls");
+    if (!res.ok) return;
+    const data = await res.json();
+    const activeCalls = data.calls.filter(c => c.status === "bekliyor");
+
+    for (const c of activeCalls) {
+      if (!knownCallIds.has(c.id)) {
+        knownCallIds.add(c.id);
+        if (!firstCallLoad) bellSound();
+      }
+    }
+    firstCallLoad = false;
+
+    const wrapper = document.getElementById("callsWrapper");
+    const grid = document.getElementById("callsGrid");
+    const countEl = document.getElementById("activeCallsCount");
+
+    if (activeCalls.length === 0) {
+      wrapper.style.display = "none";
+      grid.innerHTML = "";
+      return;
+    }
+
+    wrapper.style.display = "block";
+    countEl.textContent = `${activeCalls.length} aktif çağrı`;
+    grid.innerHTML = activeCalls.map(c => `
+      <div class="call-card">
+        <div>
+          <span class="call-table-badge">🔔 MASA ${c.table_no}</span>
+          <div class="call-reason">${c.reason}</div>
+          <div class="call-time">Saat: ${c.created_at}</div>
+        </div>
+        <button class="btn-resolve-call" onclick="resolveCall(${c.id})">✅ İlgilenildi</button>
       </div>
     `).join("");
   }
 
-  function openCategoryModal() {
-    loadCategories();
-    document.getElementById("categoryModal").style.display = "flex";
-    document.body.style.overflow = "hidden";
-  }
-
-  function closeCategoryModal() {
-    document.getElementById("categoryModal").style.display = "none";
-    document.body.style.overflow = "";
-  }
-
-  async function handleCreateCategory(e) {
-    e.preventDefault();
-    const input = document.getElementById("newCategoryInput");
-    const name = input.value.trim();
-    if (!name) return;
-
-    const res = await fetch("/api/categories", {
+  async function setStatus(orderId, status) {
+    await fetch(`/api/orders/${orderId}/status`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name })
+      body: JSON.stringify({ status })
     });
-    if (res.ok) {
-      input.value = "";
-      await loadCategories();
-      alert(`✅ "${name}" kategorisi başarıyla eklendi!`);
-    } else {
-      const err = await res.json();
-      alert(err.error || "Kategori eklenemedi");
-    }
+    loadAllOrders();
   }
 
-  async function deleteCategory(id) {
-    if (!confirm("Bu kategoriyi silmek istediğinize emin misiniz?")) return;
-    const res = await fetch(`/api/categories/${id}/delete`, { method: "POST" });
-    if (res.ok) {
-      await loadCategories();
-    } else {
-      const err = await res.json();
-      alert(err.error || "Kategori silinemedi");
-    }
-  }
-
-  async function loadMenu() {
-    const res = await fetch("/api/menu");
-    const data = await res.json();
-    document.getElementById("menuCount").textContent = `${data.items.length} ürün`;
-    const isYonetici = currentUserRole === "yonetici";
-
-    document.getElementById("menuTableBody").innerHTML = data.items.map(i => {
-      const thumbHtml = i.image_url
-        ? `<img src="${i.image_url}" class="menu-thumb" alt="${i.name}">`
-        : `<div class="menu-emoji-box">${i.emoji}</div>`;
-      const ingChips = (i.ingredients || "").split("|").map(s => s.trim()).filter(Boolean);
-      const ingHtml = ingChips.length > 0
-        ? `<div style="display:flex; flex-wrap:wrap; gap:3px; margin-top:4px;">${ingChips.slice(0, 3).map(c => `<span style="font-size:0.68rem; background:#1e293b; color:#94a3b8; padding:1px 6px; border-radius:4px;">${c.split(':')[0]}</span>`).join("")}${ingChips.length > 3 ? `<span style="font-size:0.68rem; color:var(--amber);">+${ingChips.length - 3}</span>` : ""}</div>`
-        : "";
-
-      const calBadge = isYonetici
-        ? `<span style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); font-size:0.7rem; font-weight:800; padding:1px 6px; border-radius:999px; margin-left:6px; cursor:pointer;" onclick="editItemCalories(${i.id}, ${i.calories || 0})" title="Kaloriyi güncellemek için tıklayın">🔥 ${i.calories || 0} kcal</span>`
-        : `<span style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); font-size:0.7rem; font-weight:800; padding:1px 6px; border-radius:999px; margin-left:6px;">🔥 ${i.calories || 0} kcal</span>`;
-
-      const actionButtons = isYonetici ? `
-        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-          <button type="button" class="btn-img-sm" style="background:rgba(245,158,11,0.15); color:#fbbf24; border-color:#f59e0b;" onclick="editItemIngredients(${i.id}, '${(i.ingredients || "").replace(/'/g, "\\'")}')">
-            ✨ Katmanlar
-          </button>
-          <button type="button" class="btn-img-sm" onclick="triggerRowImageUpload(${i.id})">
-            📷 ${i.image_url ? "Resim" : "+ Resim"}
-          </button>
-          ${i.image_url ? `<button type="button" class="btn-sm" title="Resmi Kaldır" onclick="removeRowImage(${i.id})">🖼️✕</button>` : ""}
-          <button type="button" class="btn-sm" onclick="deleteMenuItem(${i.id})">Sil</button>
-        </div>
-      ` : `
-        <span style="font-size:0.74rem; color:var(--muted); font-weight:600;">🔒 Sadece Yönetici Düzenleyebilir</span>
-      `;
-
-      return `
-        <tr>
-          <td>
-            <div style="display:flex; align-items:center; gap:10px;">
-              ${thumbHtml}
-              <div>
-                <b>${i.emoji} ${i.name}</b>
-                ${calBadge}
-                <div style="font-size:0.74rem;color:var(--muted);">${i.description || ""}</div>
-                ${ingHtml}
-              </div>
-            </div>
-          </td>
-          <td>${i.category}</td>
-          <td><b>${i.price} ₺</b></td>
-          <td>${actionButtons}</td>
-        </tr>
-      `;
-    }).join("");
-  }
-
-  async function editItemIngredients(id, currentIngs) {
-    if (currentUserRole !== "yonetici") {
-      alert("Bu işlem yalnızca Yönetici (Tam Yetkili) hesabına aittir.");
-      return;
-    }
-    const newVal = prompt("Ürün İçerik ve Katmanları (| ile ayırarak yazın):\nÖrnek: POTATO SLICES: Patates Dilimleri | JUICY BEEF PATTY: Dana Köfte | MELTED CHEESE: Cheddar Peyniri", currentIngs || "");
-    if (newVal === null) return;
-    await fetch(`/api/menu/${id}/ingredients`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ingredients: newVal.trim() })
-    });
-    loadMenu();
-  }
-
-  async function editItemCalories(id, currentCal) {
-    if (currentUserRole !== "yonetici") {
-      alert("Bu işlem yalnızca Yönetici (Tam Yetkili) hesabına aittir.");
-      return;
-    }
-    const newVal = prompt("Ürün Kalorisi (kcal):\nÖrnek: 450", currentCal || 0);
-    if (newVal === null) return;
-    const cal = parseInt(newVal.trim(), 10) || 0;
-    await fetch(`/api/menu/${id}/calories`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ calories: cal })
-    });
-    loadMenu();
-  }
-
-  async function addMenuItem(e) {
-    e.preventDefault();
-    if (currentUserRole !== "yonetici") {
-      alert("Yeni ürün ekleme yetkisi yalnızca Yönetici (Tam Yetkili) hesabına aittir.");
-      return;
-    }
-    const payload = {
-      name: document.getElementById("mName").value.trim(),
-      category: document.getElementById("mCategory").value,
-      price: parseFloat(document.getElementById("mPrice").value),
-      calories: parseInt(document.getElementById("mCalories").value || 0, 10),
-      emoji: document.getElementById("mEmoji").value.trim() || "☕",
-      description: document.getElementById("mDesc").value.trim(),
-      ingredients: (document.getElementById("mIngredients") ? document.getElementById("mIngredients").value.trim() : ""),
-      image_data: pendingNewImageData
-    };
-    const res = await fetch("/api/menu", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    if (res.ok) {
-      document.getElementById("mName").value = "";
-      document.getElementById("mPrice").value = "";
-      document.getElementById("mCalories").value = "";
-      document.getElementById("mDesc").value = "";
-      if (document.getElementById("mIngredients")) document.getElementById("mIngredients").value = "";
-      clearNewItemImage();
-      loadMenu();
-    } else {
-      const err = await res.json();
-      alert(err.error || "Ürün eklenemedi");
-    }
-  }
-
-  async function deleteMenuItem(id) {
-    if (currentUserRole !== "yonetici") {
-      alert("Ürün silme yetkisi yalnızca Yönetici (Tam Yetkili) hesabına aittir.");
-      return;
-    }
-    if (!confirm("Bu ürünü menüden silmek istediğinize emin misiniz?")) return;
-    await fetch(`/api/menu/${id}/delete`, { method: "POST" });
-    loadMenu();
-  }
-
-  async function loadUsers() {
-    const res = await fetch("/api/users");
-    if (!res.ok) return;
-    const data = await res.json();
-    document.getElementById("usersTableBody").innerHTML = data.users.map(u => {
-      const roleBadge = u.role === "yonetici"
-        ? `<span style="background:linear-gradient(135deg, #f59e0b, #d97706); color:#020617; font-size:0.72rem; font-weight:900; padding:2px 8px; border-radius:6px;">👑 Yönetici (Tam Yetki)</span>`
-        : (u.role === "yetkili"
-          ? `<span style="background:#0284c7; color:#fff; font-size:0.72rem; font-weight:800; padding:2px 8px; border-radius:6px;">👔 Yetkili</span>`
-          : `<span style="background:#1e293b; color:#94a3b8; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:6px;">👨‍🍳 Personel</span>`);
-
-      const canDelete = currentUserRole === "yonetici" && u.username !== "yonetici" && u.username !== "yetkili";
-      const actionHtml = canDelete
-        ? `<button class="btn-sm" onclick="deleteUser(${u.id})">Sil</button>`
-        : `<span style='color:var(--muted);font-size:0.72rem;'>${u.username === "yonetici" ? "Ana Yönetici" : (u.username === "yetkili" ? "Ana Yetkili" : "—")}</span>`;
-
-      return `
-        <tr>
-          <td><b>${u.name}</b></td>
-          <td><code>${u.username}</code></td>
-          <td>${roleBadge}</td>
-          <td>${actionHtml}</td>
-        </tr>
-      `;
-    }).join("");
-  }
-
-  async function addUser(e) {
-    e.preventDefault();
-    const payload = {
-      name: document.getElementById("uName").value.trim(),
-      username: document.getElementById("uUsername").value.trim(),
-      password: document.getElementById("uPassword").value.trim(),
-      role: document.getElementById("uRole").value
-    };
-    const res = await fetch("/api/users", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    if (res.ok) {
-      document.getElementById("uName").value = "";
-      document.getElementById("uUsername").value = "";
-      document.getElementById("uPassword").value = "";
-      loadUsers();
-    } else {
-      const err = await res.json();
-      alert(err.error || "Kullanıcı eklenemedi");
-    }
-  }
-
-  async function deleteUser(id) {
-    await fetch(`/api/users/${id}/delete`, { method: "POST" });
-    loadUsers();
-  }
-
-  function getLocalTodayStr() {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
-  }
-
-  let selectedDateStr = getLocalTodayStr();
-  let calViewYear = new Date().getFullYear();
-  let calViewMonth = new Date().getMonth(); // 0..11
-  let cachedAllOrders = [];
-
-  const TR_MONTHS = [
-    "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
-    "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"
-  ];
-
-  function formatTrDateFull(dateStr) {
-    if (!dateStr) return "-";
-    const parts = dateStr.split("-");
-    if (parts.length !== 3) return dateStr;
-    const y = parseInt(parts[0], 10);
-    const m = parseInt(parts[1], 10) - 1;
-    const d = parseInt(parts[2], 10);
-    const dt = new Date(y, m, d);
-    const days = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
-    return `${d} ${TR_MONTHS[m]} ${y} ${days[dt.getDay()]}`;
-  }
-
-  function changeCalendarMonth(delta) {
-    calViewMonth += delta;
-    if (calViewMonth < 0) {
-      calViewMonth = 11;
-      calViewYear -= 1;
-    } else if (calViewMonth > 11) {
-      calViewMonth = 0;
-      calViewYear += 1;
-    }
-    renderDailyCalendar(cachedAllOrders);
-  }
-
-  function selectTodayOnCalendar() {
-    const today = new Date();
-    calViewYear = today.getFullYear();
-    calViewMonth = today.getMonth();
-    selectedDateStr = getLocalTodayStr();
-    document.getElementById("calDatePicker").value = selectedDateStr;
-    renderDailyCalendar(cachedAllOrders);
-  }
-
-  function selectCalendarDay(dateStr) {
-    selectedDateStr = dateStr;
-    document.getElementById("calDatePicker").value = selectedDateStr;
-    renderDailyCalendar(cachedAllOrders);
-  }
-
-  function onDatePickerChange(val) {
-    if (!val) return;
-    selectedDateStr = val;
-    const parts = val.split("-");
-    if (parts.length === 3) {
-      calViewYear = parseInt(parts[0], 10);
-      calViewMonth = parseInt(parts[1], 10) - 1;
-    }
-    renderDailyCalendar(cachedAllOrders);
-  }
-
-  function renderDailyCalendar(orders) {
-    const todayStr = getLocalTodayStr();
-    const picker = document.getElementById("calDatePicker");
-    if (picker && !picker.value) picker.value = selectedDateStr;
-
-    // Gün bazlı siparişleri grupla
-    const byDate = {};
-    for (const o of orders) {
-      const dStr = o.order_date || todayStr;
-      if (!byDate[dStr]) {
-        byDate[dStr] = { paid: 0, open: 0, total: 0, count: 0, orders: [] };
-      }
-      if (o.status === "odendi") {
-        byDate[dStr].paid += o.total;
-      } else {
-        byDate[dStr].open += o.total;
-      }
-      byDate[dStr].total += o.total;
-      byDate[dStr].count += 1;
-      byDate[dStr].orders.push(o);
-    }
-
-    // Ay başlığı ve aylık toplam hesapla
-    document.getElementById("calMonthTitle").textContent = `${TR_MONTHS[calViewMonth]} ${calViewYear}`;
-    const monthPrefix = `${calViewYear}-${String(calViewMonth + 1).padStart(2, "0")}-`;
-    let monthPaid = 0;
-    let monthAll = 0;
-    for (const [dKey, info] of Object.entries(byDate)) {
-      if (dKey.startsWith(monthPrefix)) {
-        monthPaid += info.paid;
-        monthAll += info.total;
-      }
-    }
-
-    const DAYS_TR = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
-    const todayDayName = DAYS_TR[new Date().getDay()];
-    const todayInfo = byDate[todayStr] || { paid: 0, open: 0, total: 0, count: 0 };
-    document.getElementById("calMonthSummary").innerHTML =
-      `Bugün (<b>${todayDayName}</b>) Günlük: <b style="color:#38bdf8; font-size:0.95rem;">${todayInfo.total} ₺</b> · <span style="color:#fbbf24; font-weight:800;">${TR_MONTHS[calViewMonth]} ${calViewYear} Ay Sonu Toplam Ciro: <b style="color:#fff;">${monthAll} ₺</b></span> <span style="font-size:0.75rem; color:#cbd5e1; font-weight:600;">(Tahsil: ${monthPaid} ₺ · Açık: ${monthAll - monthPaid} ₺)</span>`;
-
-    // 2. BÖLÜM: Üstteki "Ay Sonu Yapılan Ciro Toplamı" panelini de görüntülenen aya göre güncelle
-    const viewMonthName = TR_MONTHS[calViewMonth];
-    const lastDayOfViewMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
-    const viewMonthOrders = orders.filter(o => (o.order_date || todayStr).startsWith(monthPrefix));
-    const viewMonthPaidOrders = viewMonthOrders.filter(o => o.status === "odendi");
-    const viewMonthOpenOrders = viewMonthOrders.filter(o => o.status !== "odendi");
-    const vNet = (monthAll / 1.10).toFixed(2);
-    const vKdv = (monthAll - monthAll / 1.10).toFixed(2);
-
-    const elMonthTitle = document.getElementById("monthlyTitleLabel");
-    if (elMonthTitle) elMonthTitle.textContent = `🗓️ ${viewMonthName} ${calViewYear} — Ay Sonu Yapılan Ciro Toplamı`;
-    const elMonthRange = document.getElementById("monthlyDateRangeText");
-    if (elMonthRange) elMonthRange.textContent = `Dönem: 1 - ${lastDayOfViewMonth} ${viewMonthName} ${calViewYear}`;
-
-    const elStatMonthPaid = document.getElementById("statMonthPaidTotal");
-    if (elStatMonthPaid) elStatMonthPaid.textContent = `${monthPaid} ₺`;
-    const elStatMonthOpen = document.getElementById("statMonthOpenTotal");
-    if (elStatMonthOpen) elStatMonthOpen.textContent = `${monthAll - monthPaid} ₺`;
-    const elStatMonthAll = document.getElementById("statMonthAllTotal");
-    if (elStatMonthAll) elStatMonthAll.textContent = `${monthAll} ₺`;
-    const elStatMonthCounts = document.getElementById("statMonthCounts");
-    if (elStatMonthCounts) elStatMonthCounts.textContent = `${viewMonthOrders.length} Adisyon`;
-
-    const elStatMonthPaidSub = document.getElementById("statMonthPaidSub");
-    if (elStatMonthPaidSub) elStatMonthPaidSub.textContent = `${viewMonthPaidOrders.length} hesap ödendi`;
-    const elStatMonthOpenSub = document.getElementById("statMonthOpenSub");
-    if (elStatMonthOpenSub) elStatMonthOpenSub.textContent = `${viewMonthOpenOrders.length} masa açık bekliyor`;
-    const elStatMonthKdvSub = document.getElementById("statMonthKdvSub");
-    if (elStatMonthKdvSub) elStatMonthKdvSub.textContent = `KDV Hariç Net: ${vNet} ₺ · %10 KDV: ${vKdv} ₺`;
-    const elStatMonthCountsSub = document.getElementById("statMonthCountsSub");
-    if (elStatMonthCountsSub) elStatMonthCountsSub.textContent = `${viewMonthPaidOrders.length} Ödenen · ${viewMonthOpenOrders.length} Açık`;
-
-    // Takvim ızgarasını oluştur (Pazartesi=0 ... Pazar=6)
-    const firstDay = new Date(calViewYear, calViewMonth, 1);
-    const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
-    const startOffset = (firstDay.getDay() + 6) % 7;
-
-    const cells = [];
-    for (let i = 0; i < startOffset; i++) {
-      cells.push(`<div class="cal-day empty"></div>`);
-    }
-
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dStr = `${calViewYear}-${String(calViewMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-      const info = byDate[dStr];
-      const isToday = dStr === todayStr;
-      const isSelected = dStr === selectedDateStr;
-      const hasSales = info && info.total > 0;
-
-      const classes = [
-        "cal-day",
-        isToday ? "today" : "",
-        isSelected ? "selected" : "",
-        hasSales ? "has-sales" : ""
-      ].filter(Boolean).join(" ");
-
-      let bodyHtml = `<div class="cal-day-count" style="margin-top:auto;">İşlem yok</div>`;
-      if (info) {
-        bodyHtml = `
-          <div>
-            <div class="cal-day-revenue" style="color:#38bdf8;" title="Günün Toplam Tutarı">${info.total} ₺</div>
-            <div style="font-size:0.67rem; color:#4ade80; font-weight:700;">${info.paid} ₺ ödendi</div>
-            ${info.open > 0 ? `<div class="cal-day-open">+${info.open} ₺ açık</div>` : ""}
-            <div class="cal-day-count">${info.count} adisyon</div>
-          </div>
-        `;
-      }
-
-      cells.push(`
-        <div class="${classes}" onclick="selectCalendarDay('${dStr}')">
-          <div class="cal-day-num">
-            <span>${day}</span>
-            ${isToday ? `<span style="font-size:0.62rem; color:var(--amber);">BUGÜN</span>` : ""}
-          </div>
-          ${bodyHtml}
-        </div>
-      `);
-    }
-
-    document.getElementById("calendarGrid").innerHTML = cells.join("");
-
-    // Seçili gün detaylarını hesapla ve doldur
-    const selInfo = byDate[selectedDateStr] || { paid: 0, open: 0, total: 0, count: 0, orders: [] };
-    const isSelToday = selectedDateStr === todayStr;
-    document.getElementById("selectedDateLabel").innerHTML =
-      `${formatTrDateFull(selectedDateStr)} ${isSelToday ? `<span style="background:var(--amber); color:#090d16; font-size:0.72rem; padding:2px 7px; border-radius:5px; font-weight:900; margin-left:6px;">BUGÜN</span>` : ""}`;
-    document.getElementById("selectedDayCountBadge").textContent = `${selInfo.count} Adisyon`;
-    document.getElementById("dayPaidTotal").textContent = `${selInfo.paid} ₺`;
-    document.getElementById("dayOpenTotal").textContent = `${selInfo.open} ₺`;
-    document.getElementById("dayAllTotal").textContent = `${selInfo.total} ₺`;
-
-    const netTutar = (selInfo.total / 1.10).toFixed(2);
-    const kdvTutar = (selInfo.total - selInfo.total / 1.10).toFixed(2);
-    document.getElementById("dayKdvBreakdown").textContent = `${netTutar} ₺ / ${kdvTutar} ₺`;
-
-    // Seçili günde satılan ürünleri hesapla
-    const itemStats = {};
-    let totalSoldQty = 0;
-    for (const o of selInfo.orders) {
-      for (const it of o.items) {
-        totalSoldQty += it.qty;
-        if (!itemStats[it.name]) {
-          itemStats[it.name] = { name: it.name, qty: 0, revenue: 0 };
-        }
-        itemStats[it.name].qty += it.qty;
-        itemStats[it.name].revenue += it.qty * it.price;
-      }
-    }
-    document.getElementById("daySoldQty").textContent = totalSoldQty;
-    const sortedItems = Object.values(itemStats).sort((a, b) => b.qty - a.qty);
-    const topItemsEl = document.getElementById("dayTopItemsBox");
-    if (sortedItems.length === 0) {
-      topItemsEl.innerHTML = `<div style="color:var(--muted);">Bu tarihte henüz ürün satışı bulunmuyor.</div>`;
-    } else {
-      topItemsEl.innerHTML = sortedItems.map(it => `
-        <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #1e293b;">
-          <span><b>${it.qty}x</b> ${it.name}</span>
-          <b style="color:#4ade80;">${it.revenue} ₺</b>
-        </div>
-      `).join("");
-    }
-
-    // Seçili günün adisyon listesi
-    const dayOrdersEl = document.getElementById("dayOrdersListBox");
-    if (selInfo.orders.length === 0) {
-      dayOrdersEl.innerHTML = `<div style="color:var(--muted);">Bu tarihte kayıtlı adisyon yok.</div>`;
-    } else {
-      dayOrdersEl.innerHTML = selInfo.orders.map(o => {
-        const stBadge = o.status === "odendi"
-          ? `<span style="color:#4ade80; font-weight:700;">Ödendi</span>`
-          : `<span style="color:#fbbf24; font-weight:700;">Açık</span>`;
-        const itemsSummary = o.items.map(i => `${i.qty}x ${i.name}`).join(", ");
-        return `
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid #1e293b;">
-            <div>
-              <b>Masa ${o.table_no}</b> <span style="color:var(--muted); font-size:0.72rem;">(${o.created_at})</span>
-              <div style="color:#cbd5e1; font-size:0.74rem;">${itemsSummary}</div>
-            </div>
-            <div style="text-align:right; flex-shrink:0;">
-              <div><b>${o.total} ₺</b></div>
-              <div style="font-size:0.72rem;">${stBadge}</div>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-  }
-
-  async function closeTableBill(tableNo) {
-    await fetch(`/api/tables/${tableNo}/pay`, { method: "POST" });
-    await loadStatsAndOrders();
-  }
-
-  async function loadStatsAndOrders() {
+  async function loadAllOrders() {
     const res = await fetch("/api/orders");
-    if (!res.ok) return;
     const data = await res.json();
-    const orders = data.orders;
-    cachedAllOrders = orders;
+    const active = data.orders.filter(o => o.status !== "odendi");
 
-    const todayStr = getLocalTodayStr();
-    const DAYS_TR = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
-    const todayDayName = DAYS_TR[new Date().getDay()];
-
-    renderDailyCalendar(orders);
-
-    // Bugünün siparişleri (Günlük Toplam)
-    const todayOrders = orders.filter(o => (o.order_date || todayStr) === todayStr);
-    const todayPaidOrders = todayOrders.filter(o => o.status === "odendi");
-    const todayOpenOrders = todayOrders.filter(o => o.status !== "odendi");
-
-    const todayPaidTotal = todayPaidOrders.reduce((s, o) => s + o.total, 0);
-    const todayOpenTotal = todayOpenOrders.reduce((s, o) => s + o.total, 0);
-    const todayTotal = todayPaidTotal + todayOpenTotal;
-
-    // Tüm zamanlar genel toplam
-    const allPaidOrders = orders.filter(o => o.status === "odendi");
-    const allOpenOrders = orders.filter(o => o.status !== "odendi");
-    const allPaidTotal = allPaidOrders.reduce((s, o) => s + o.total, 0);
-    const allOpenTotal = allOpenOrders.reduce((s, o) => s + o.total, 0);
-    const allTotal = allPaidTotal + allOpenTotal;
-
-    // Kart başlıkları: Bugün hangi gün ise o günün adı ile
-    const lblPaid = document.getElementById("lblPaidTotal");
-    if (lblPaid) lblPaid.textContent = `💰 Bugün (${todayDayName}) Tahsil Edilen`;
-    const lblOpen = document.getElementById("lblOpenTotal");
-    if (lblOpen) lblOpen.textContent = `⏳ Bugün (${todayDayName}) Açık Kalan`;
-    const lblAll = document.getElementById("lblAllTotal");
-    if (lblAll) lblAll.textContent = `🧾 Bugün (${todayDayName}) Toplam Günün Cirosu`;
-    const lblCounts = document.getElementById("lblCounts");
-    if (lblCounts) lblCounts.textContent = `📍 Bugün (${todayDayName}) Adisyonları`;
-
-    // Günlük değerler
-    document.getElementById("statPaidTotal").textContent = `${todayPaidTotal} ₺`;
-    document.getElementById("statOpenTotal").textContent = `${todayOpenTotal} ₺`;
-    document.getElementById("statAllTotal").textContent = `${todayTotal} ₺`;
-    document.getElementById("statCounts").textContent = `${todayOpenOrders.length} Açık · ${todayPaidOrders.length} Ödendi`;
-
-    // Alt bilgi (Genel Toplam)
-    const elPaidAll = document.getElementById("statPaidAllTime");
-    if (elPaidAll) elPaidAll.textContent = `Genel Toplam: ${allPaidTotal} ₺`;
-    const elOpenAll = document.getElementById("statOpenAllTime");
-    if (elOpenAll) elOpenAll.textContent = `Genel Açık: ${allOpenTotal} ₺`;
-    const elAllTime = document.getElementById("statAllTimeTotal");
-    if (elAllTime) elAllTime.textContent = `Genel Toplam: ${allTotal} ₺`;
-    const elCountsAll = document.getElementById("statCountsAllTime");
-    if (elCountsAll) elCountsAll.textContent = `Genel: ${allOpenOrders.length} Açık · ${allPaidOrders.length} Ödendi`;
-
-    // 2. BÖLÜM: AY SONU YAPILAN CİRO TOPLAMLARI (AYRI HESAPLAMA)
-    const curYear = new Date().getFullYear();
-    const curMonthIdx = new Date().getMonth();
-    const curMonthPrefix = `${curYear}-${String(curMonthIdx + 1).padStart(2, "0")}-`;
-    const curMonthName = TR_MONTHS[curMonthIdx];
-    const lastDayOfMonth = new Date(curYear, curMonthIdx + 1, 0).getDate();
-
-    const monthOrders = orders.filter(o => (o.order_date || todayStr).startsWith(curMonthPrefix));
-    const monthPaidOrders = monthOrders.filter(o => o.status === "odendi");
-    const monthOpenOrders = monthOrders.filter(o => o.status !== "odendi");
-
-    const monthPaidTotal = monthPaidOrders.reduce((s, o) => s + o.total, 0);
-    const monthOpenTotal = monthOpenOrders.reduce((s, o) => s + o.total, 0);
-    const monthTotal = monthPaidTotal + monthOpenTotal;
-
-    const monthNetTutar = (monthTotal / 1.10).toFixed(2);
-    const monthKdvTutar = (monthTotal - monthTotal / 1.10).toFixed(2);
-
-    const elMonthTitle = document.getElementById("monthlyTitleLabel");
-    if (elMonthTitle) elMonthTitle.textContent = `🗓️ ${curMonthName} ${curYear} — Ay Sonu Yapılan Ciro Toplamı`;
-    const elMonthRange = document.getElementById("monthlyDateRangeText");
-    if (elMonthRange) elMonthRange.textContent = `Dönem: 1 - ${lastDayOfMonth} ${curMonthName} ${curYear}`;
-
-    const elStatMonthPaid = document.getElementById("statMonthPaidTotal");
-    if (elStatMonthPaid) elStatMonthPaid.textContent = `${monthPaidTotal} ₺`;
-    const elStatMonthOpen = document.getElementById("statMonthOpenTotal");
-    if (elStatMonthOpen) elStatMonthOpen.textContent = `${monthOpenTotal} ₺`;
-    const elStatMonthAll = document.getElementById("statMonthAllTotal");
-    if (elStatMonthAll) elStatMonthAll.textContent = `${monthTotal} ₺`;
-    const elStatMonthCounts = document.getElementById("statMonthCounts");
-    if (elStatMonthCounts) elStatMonthCounts.textContent = `${monthOrders.length} Adisyon`;
-
-    const elStatMonthPaidSub = document.getElementById("statMonthPaidSub");
-    if (elStatMonthPaidSub) elStatMonthPaidSub.textContent = `${monthPaidOrders.length} hesap ödendi`;
-    const elStatMonthOpenSub = document.getElementById("statMonthOpenSub");
-    if (elStatMonthOpenSub) elStatMonthOpenSub.textContent = `${monthOpenOrders.length} masa açık bekliyor`;
-    const elStatMonthKdvSub = document.getElementById("statMonthKdvSub");
-    if (elStatMonthKdvSub) elStatMonthKdvSub.textContent = `KDV Hariç Net: ${monthNetTutar} ₺ · %10 KDV: ${monthKdvTutar} ₺`;
-    const elStatMonthCountsSub = document.getElementById("statMonthCountsSub");
-    if (elStatMonthCountsSub) elStatMonthCountsSub.textContent = `${monthPaidOrders.length} Ödenen · ${monthOpenOrders.length} Açık`;
-
-    // Açık masaları birleştirerek listele
-    const byTable = {};
-    for (const o of openOrders) {
-      const tNo = o.table_no;
-      if (!byTable[tNo]) {
-        byTable[tNo] = { table_no: tNo, total: 0, status: o.status, itemsMap: {} };
+    const byTableMap = {};
+    for (const o of active) {
+      const keySig = `${o.id}_${o.updated_at}`;
+      if (!knownOrderIds.has(keySig)) {
+        knownOrderIds.add(keySig);
+        if (!firstLoad) beep();
       }
-      byTable[tNo].total += o.total;
-      if (o.status !== "tamamlandi") byTable[tNo].status = o.status;
+      const tNo = o.table_no;
+      if (!byTableMap[tNo]) {
+        byTableMap[tNo] = {
+          id: o.id,
+          table_no: tNo,
+          itemsMap: {},
+          notes: [],
+          status: o.status,
+          total: 0,
+          orderCount: 0,
+          created_at: o.created_at,
+          updated_at: o.updated_at
+        };
+      }
+      const grp = byTableMap[tNo];
+      grp.orderCount = (grp.orderCount || 0) + 1;
+      grp.total += (o.total || 0);
+      if (o.note && !grp.notes.includes(o.note)) grp.notes.push(o.note);
+      const rankMap = { bekliyor: 0, onaylandi: 0, hazirlaniyor: 1, hazir: 2, tamamlandi: 3 };
+      const rNew = rankMap[o.status] !== undefined ? rankMap[o.status] : 0;
+      const rCur = rankMap[grp.status] !== undefined ? rankMap[grp.status] : 0;
+      if (rNew < rCur) grp.status = o.status;
       for (const it of o.items) {
-        const key = `${it.name}_${it.price}`;
-        if (!byTable[tNo].itemsMap[key]) byTable[tNo].itemsMap[key] = { name: it.name, price: it.price, qty: 0 };
-        byTable[tNo].itemsMap[key].qty += it.qty;
+        const ikey = `${it.name}_${it.price}`;
+        if (!grp.itemsMap[ikey]) {
+          grp.itemsMap[ikey] = { name: it.name, price: it.price, qty: 0 };
+        }
+        grp.itemsMap[ikey].qty += it.qty;
       }
     }
-    const openTablesList = Object.values(byTable).sort((a, b) => a.table_no - b.table_no);
-    document.getElementById("openTablesCount").textContent = `${openTablesList.length} açık masa`;
-    const openBox = document.getElementById("openTablesBox");
-    if (openTablesList.length === 0) {
-      openBox.innerHTML = `<p style="color:var(--muted); font-size:0.88rem;">Şu anda açık hesabı olan masa bulunmuyor.</p>`;
-    } else {
-      openBox.innerHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:12px;">` +
-        openTablesList.map(t => {
-          const itemsStr = Object.values(t.itemsMap).map(i => `${i.qty}x ${i.name}`).join(", ");
-          const done = t.status === "tamamlandi";
-          let stText = "📋 Onaylandı";
-          if (t.status === "hazirlaniyor") stText = "👨‍🍳 Hazırlanıyor";
-          else if (t.status === "hazir") stText = "🍽️ Hazır";
-          else if (done) stText = "✅ Teslim Edildi";
+    firstLoad = false;
+    byTableCache = byTableMap;
+    const modal = document.getElementById("staffNewOrderModal");
+    if (modal && modal.style.display !== "none") {
+      renderPosQuickTables();
+    }
+
+    const activeTableNumbers = Object.keys(byTableMap).map(n => parseInt(n, 10));
+    const highestActive = activeTableNumbers.length > 0 ? Math.max(...activeTableNumbers) : 0;
+    const maxTables = Math.max(totalTables, highestActive, 12);
+
+    const activeCount = Object.keys(byTableMap).length;
+    const emptyCount = Math.max(0, maxTables - activeCount);
+
+    const cAll = document.getElementById("countAllTables");
+    if (cAll) cAll.textContent = maxTables;
+    const cAct = document.getElementById("countActiveTables");
+    if (cAct) cAct.textContent = activeCount;
+    const cEmp = document.getElementById("countEmptyTables");
+    if (cEmp) cEmp.textContent = emptyCount;
+
+    // Yetkili Kasa & Ciro İstatistikleri Hesaplama
+    const allOrders = data.orders || [];
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayOrders = allOrders.filter(o => (o.order_date || todayStr) === todayStr);
+    const todayPaid = todayOrders.filter(o => o.status === "odendi").reduce((s, o) => s + (o.total || 0), 0);
+    const todayOpen = todayOrders.filter(o => o.status !== "odendi").reduce((s, o) => s + (o.total || 0), 0);
+
+    const paidEl = document.getElementById("statPaidToday");
+    if (paidEl) paidEl.textContent = `${todayPaid} ₺`;
+    const openEl = document.getElementById("statOpenBills");
+    if (openEl) openEl.textContent = `${todayOpen} ₺`;
+    const occEl = document.getElementById("statTableOccupancy");
+    if (occEl) occEl.textContent = `${activeCount} Dolu / ${emptyCount} Boş (${maxTables})`;
+
+    const settingInput = document.getElementById("settingTableCount");
+    if (settingInput && document.activeElement !== settingInput) {
+      settingInput.value = totalTables;
+    }
+
+    const grid = document.getElementById("ordersGrid");
+    const rankMap = { bekliyor: 0, onaylandi: 0, hazirlaniyor: 1, hazir: 2, tamamlandi: 3 };
+    const stages = [
+      { key: "onaylandi", idx: 0, icon: "📋", label: "Onaylandı" },
+      { key: "hazirlaniyor", idx: 1, icon: "👨‍🍳", label: "Hazırlanıyor" },
+      { key: "hazir", idx: 2, icon: "🍽️", label: "Hazır" },
+      { key: "tamamlandi", idx: 3, icon: "✅", label: "Teslim Edildi" }
+    ];
+
+    const cardsHtml = [];
+    for (let t = 1; t <= maxTables; t++) {
+      const o = byTableMap[t];
+      const hasOrder = !!o;
+
+      if (currentTableFilter === "active" && !hasOrder) continue;
+      if (currentTableFilter === "empty" && hasOrder) continue;
+
+      if (hasOrder) {
+        const itemsList = Object.values(o.itemsMap);
+        const itemsHtml = itemsList.map(i => `
+          <div>
+            <span><span class="qty-badge">${i.qty}x</span> <b>${i.name}</b></span>
+            ${i.price ? `<span style="font-size:0.82rem; color:#94a3b8;">${i.price * i.qty} ₺</span>` : ""}
+          </div>
+        `).join("");
+        const curIdx = rankMap[o.status] !== undefined ? rankMap[o.status] : 0;
+        let statusBadge = "📋 1/4 — Sipariş Onaylandı";
+        if (curIdx === 1) statusBadge = "👨‍🍳 2/4 — Mutfak / Barista Hazırlıyor";
+        if (curIdx === 2) statusBadge = "🍽️ 3/4 — Sipariş Hazır (Garson Bekliyor)";
+        if (curIdx === 3) statusBadge = "✅ 4/4 — Masaya Teslim Edildi";
+        const noteText = o.notes.join(" | ");
+
+        const calcTotal = Object.values(o.itemsMap).reduce((s, i) => s + ((i.price || 0) * i.qty), 0);
+        const displayTotal = o.total > 0 ? o.total : calcTotal;
+
+        const stepperBtns = stages.map(s => {
+          let cls = "staff-step-btn";
+          if (s.idx < curIdx) cls += " done";
+          else if (s.idx === curIdx) {
+            cls += " active";
+            if (curIdx === 3) cls += " final-done";
+          }
           return `
-            <div style="background:#090d16; border:1px solid #334155; border-radius:12px; padding:14px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
-              <div>
-                <div style="font-weight:800; font-size:1rem;">📍 Masa ${t.table_no} <span style="font-size:0.75rem; color:${done ? '#4ade80' : '#fbbf24'};">(${stText})</span></div>
-                <div style="font-size:0.8rem; color:#cbd5e1; margin-top:4px;">${itemsStr}</div>
+            <button type="button" class="${cls}" onclick="setStatus(${o.id}, '${s.key}')">
+              <span class="st-icon">${s.idx < curIdx ? "✓" : s.icon}</span>
+              <span>${s.idx + 1}. ${s.label}</span>
+            </button>
+          `;
+        }).join("");
+
+        cardsHtml.push(`
+          <div class="order-card ${o.status}">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                  <span class="table-tag">MASA ${o.table_no}</span>
+                  ${o.orderCount > 1 ? `<span style="font-size:0.75rem; background:rgba(245,158,11,0.22); color:#fbbf24; border:1px solid #f59e0b; padding:3px 8px; border-radius:8px; font-weight:800;">+${o.orderCount - 1} İlave Sipariş</span>` : ""}
+                </div>
+                <span style="font-size:0.78rem; color:var(--muted);">Saat: ${o.updated_at}</span>
               </div>
-              <div style="text-align:right; flex-shrink:0;">
-                <div style="font-size:1.25rem; font-weight:900; color:#4ade80; margin-bottom:6px;">${t.total} ₺</div>
-                <div style="display:flex; gap:6px;">
-                  <a href="/adisyon?no=${t.table_no}" onclick="openOverlayModal(event, '/adisyon?no=${t.table_no}')" style="background:#f59e0b; color:#090d16; text-decoration:none; padding:6px 10px; border-radius:7px; font-size:0.78rem; font-weight:800;">🧾 Adisyon</a>
-                  <button onclick="closeTableBill(${t.table_no})" style="background:#ef4444; color:#fff; border:none; padding:6px 10px; border-radius:7px; font-size:0.78rem; font-weight:800; cursor:pointer;">💳 Hesabı Kapat</button>
+              <div style="font-size:0.82rem; color:var(--muted); margin-top:8px; font-weight:700;">${statusBadge}</div>
+              <div class="items-list">${itemsHtml}</div>
+              ${noteText ? `<div class="note-box">📝 Sipariş Notu: ${noteText}</div>` : ""}
+            </div>
+            <div>
+              <div style="font-size:0.72rem; color:var(--muted); font-weight:700; margin-bottom:2px;">SİPARİŞ AŞAMASI (Müşteri Ekranında Canlı Görünür):</div>
+              <div class="staff-stepper">
+                ${stepperBtns}
+              </div>
+              <div class="card-pay-section">
+                <div class="card-total-row">
+                  <span class="card-total-label">${o.orderCount > 1 ? "BİRLEŞİK HESAP TOPLAMI:" : "MASA HESAP TOPLAMI:"}</span>
+                  <span class="card-total-val">${displayTotal} ₺</span>
+                </div>
+                <button type="button" onclick="openNewOrderModal(${o.table_no})" style="background:#0284c7; color:#fff; border:none; padding:9px 12px; border-radius:9px; font-weight:800; font-size:0.82rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:8px; width:100%; box-shadow:0 2px 8px rgba(2,132,199,0.35);">
+                  ➕ Bu Masaya İlave Sipariş Ekle
+                </button>
+                <div class="card-actions-grid">
+                  <button type="button" class="btn-adisyon" onclick="openAdisyonModal(${o.table_no})">
+                    🧾 Adisyon Fişi Oluştur
+                  </button>
+                  <button type="button" class="btn-pay-close" onclick="payAndCloseTable(${o.table_no}, ${displayTotal})">
+                    💳 Ödeme Al & Masayı Kapat
+                  </button>
                 </div>
               </div>
             </div>
-          `;
-        }).join("") + `</div>`;
+          </div>
+        `);
+      } else {
+        // Boş Masa Kartı
+        cardsHtml.push(`
+          <div class="order-card empty-table" onclick="openNewOrderModal(${t})">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="table-tag empty">MASA ${t}</span>
+                <span style="font-size:0.75rem; background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.35); padding:3px 8px; border-radius:6px; font-weight:800;">
+                  🟢 MASA BOŞ
+                </span>
+              </div>
+              <div style="text-align:center; padding:32px 10px 22px;">
+                <div style="font-size:2.8rem; margin-bottom:6px; opacity:0.85;">🍽️</div>
+                <div style="font-size:1.05rem; font-weight:800; color:#f8fafc;">Masa ${t} Müsait</div>
+                <p style="font-size:0.82rem; color:#64748b; margin-top:4px;">Yeni sipariş girmek için dokunun</p>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn-pos-empty" onclick="event.stopPropagation(); openNewOrderModal(${t})">
+                ➕ Sipariş Gir
+              </button>
+            </div>
+          </div>
+        `);
+      }
     }
 
-    document.getElementById("ordersHistoryBody").innerHTML = orders.slice(0, 20).map(o => {
-      const summary = o.items.map(i => `${i.qty}x ${i.name}`).join(", ");
-      const badge = o.status === "odendi"
-        ? `<span style="color:#4ade80;font-weight:700;">💳 Ödendi</span>`
-        : `<span style="color:#fbbf24;font-weight:700;">⏳ Açık (${o.status})</span>`;
-      return `
-        <tr>
-          <td><b>Masa ${o.table_no}</b></td>
-          <td style="font-size:0.8rem;">${summary}</td>
-          <td><b>${o.total} ₺</b></td>
-          <td>${badge}</td>
-        </tr>
-      `;
-    }).join("");
+    if (cardsHtml.length === 0) {
+      grid.innerHTML = `<p style="color:var(--muted); font-size:0.95rem; grid-column:1/-1; text-align:center; padding:40px;">Bu filtrede gösterilecek masa bulunamadı.</p>`;
+    } else {
+      grid.innerHTML = cardsHtml.join("");
+    }
   }
 
-  function openOverlayModal(e, url) {
-    if (e) e.preventDefault();
+  function setTableViewFilter(filterMode) {
+    currentTableFilter = filterMode;
+    document.querySelectorAll(".view-tab-btn").forEach(b => b.classList.remove("active"));
+    if (filterMode === "all") document.getElementById("tabAllTables").classList.add("active");
+    if (filterMode === "active") document.getElementById("tabActiveTables").classList.add("active");
+    if (filterMode === "empty") document.getElementById("tabEmptyTables").classList.add("active");
+    loadAllOrders();
+  }
+
+  function updateTotalTableCount(val) {
+    const num = parseInt(val, 10);
+    if (!isNaN(num) && num >= 1 && num <= 100) {
+      totalTables = num;
+      localStorage.setItem("kafe_total_tables", String(num));
+      loadAllOrders();
+    }
+  }
+
+  function openAdisyonModal(tableNo) {
     const modal = document.getElementById("overlayModal");
     const frame = document.getElementById("overlayIframe");
     const titleEl = document.getElementById("overlayModalTitle");
-    if (titleEl) {
-      if (url.includes("/qr")) titleEl.textContent = "🔳 Masa Sipariş Kare Kodları (QR)";
-      else if (url.includes("/adisyon")) titleEl.textContent = "🧾 Masa Adisyon Detayı";
-      else titleEl.textContent = "Önizleme Penceresi";
-    }
-    frame.src = url;
+    if (titleEl) titleEl.textContent = `🧾 Masa ${tableNo} Adisyon Detayı & Fiş`;
+    frame.src = `/adisyon?no=${tableNo}`;
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  function openQrModal() {
+    const modal = document.getElementById("overlayModal");
+    const frame = document.getElementById("overlayIframe");
+    const titleEl = document.getElementById("overlayModalTitle");
+    if (titleEl) titleEl.textContent = "🔳 Masa Sipariş Kare Kodları (QR)";
+    frame.src = "/qr";
     modal.style.display = "flex";
     document.body.style.overflow = "hidden";
   }
@@ -1495,16 +1200,326 @@
     modal.style.display = "none";
     frame.src = "about:blank";
     document.body.style.overflow = "";
-    loadStatsAndOrders();
+    loadAllOrders();
   }
   window.closeOverlayModal = closeOverlayModal;
 
-  checkAuth();
-  loadMenu();
-  loadUsers();
-  loadStatsAndOrders();
-  setInterval(loadStatsAndOrders, 3000);
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeOverlayModal();
+      closeNewOrderModal();
+    }
+  });
+
+  /* === GARSON POS: MASAYA SİPARİŞ GİRİŞİ === */
+  let posMenu = [];
+  let posActiveCat = "Tümü";
+  let posCart = {}; // { itemId: qty }
+  let posSelectedTable = 1;
+
+  async function loadPosMenu() {
+    if (posMenu.length > 0) return;
+    try {
+      const res = await fetch("/api/menu");
+      if (res.ok) {
+        const data = await res.json();
+        posMenu = data.items || [];
+      }
+    } catch(e) {}
+  }
+
+  async function openNewOrderModal(preselectedTable) {
+    await loadPosMenu();
+    if (preselectedTable) {
+      posSelectedTable = parseInt(preselectedTable, 10);
+    }
+    const tblInput = document.getElementById("posTableNo");
+    if (tblInput) tblInput.value = posSelectedTable;
+    const cartTbl = document.getElementById("posCartTableNo");
+    if (cartTbl) cartTbl.textContent = posSelectedTable;
+
+    renderPosQuickTables();
+    renderPosCatTabs();
+    renderPosItems();
+    renderPosCart();
+
+    const modal = document.getElementById("staffNewOrderModal");
+    if (modal) modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeNewOrderModal() {
+    const modal = document.getElementById("staffNewOrderModal");
+    if (modal) modal.style.display = "none";
+    document.body.style.overflow = "";
+  }
+
+  function setPosTable(tblNo) {
+    posSelectedTable = parseInt(tblNo, 10);
+    const tblInput = document.getElementById("posTableNo");
+    if (tblInput) tblInput.value = posSelectedTable;
+    const cartTbl = document.getElementById("posCartTableNo");
+    if (cartTbl) cartTbl.textContent = posSelectedTable;
+    renderPosQuickTables();
+    renderPosCart();
+  }
+
+  function syncPosTableQuickChips() {
+    const val = parseInt(document.getElementById("posTableNo").value, 10) || 1;
+    posSelectedTable = val;
+    const cartTbl = document.getElementById("posCartTableNo");
+    if (cartTbl) cartTbl.textContent = val;
+    renderPosQuickTables();
+    renderPosCart();
+  }
+
+  function renderPosQuickTables() {
+    const box = document.getElementById("posQuickTables");
+    if (!box) return;
+    const activeTables = new Set(Object.values(byTableCache || {}).map(o => o.table_no));
+    let chips = "";
+    for (let i = 1; i <= 16; i++) {
+      const isActive = activeTables.has(i);
+      const isSelected = i === posSelectedTable;
+      chips += `<div class="pos-table-chip ${isSelected ? 'active' : ''} ${isActive ? 'has-orders' : ''}" onclick="setPosTable(${i})">
+        Masa ${i}${isActive ? ' (Aktif)' : ''}
+      </div>`;
+    }
+    box.innerHTML = chips;
+  }
+
+  function renderPosCatTabs() {
+    const tabsEl = document.getElementById("posCatTabs");
+    if (!tabsEl) return;
+    const cats = ["Tümü", ...new Set(posMenu.map(x => x.category))];
+    tabsEl.innerHTML = cats.map(c => `
+      <button type="button" class="pos-cat-btn ${c === posActiveCat ? 'active' : ''}" onclick="selectPosCat('${c}')">
+        ${c}
+      </button>
+    `).join("");
+  }
+
+  function selectPosCat(cat) {
+    posActiveCat = cat;
+    renderPosCatTabs();
+    renderPosItems();
+  }
+
+  function filterPosMenu() {
+    renderPosItems();
+  }
+
+  function renderPosItems() {
+    const grid = document.getElementById("posItemsGrid");
+    if (!grid) return;
+    const searchEl = document.getElementById("posSearchInput");
+    const q = (searchEl ? searchEl.value : "").toLowerCase().trim();
+    let filtered = posMenu;
+    if (posActiveCat !== "Tümü") {
+      filtered = filtered.filter(i => i.category === posActiveCat);
+    }
+    if (q) {
+      filtered = filtered.filter(i => (i.name || "").toLowerCase().includes(q) || (i.description || "").toLowerCase().includes(q));
+    }
+
+    grid.innerHTML = filtered.map(item => {
+      const inCart = posCart[item.id] || 0;
+      const calHtml = (item.calories && item.calories > 0) ? `<span class="pos-item-cal">🔥 ${item.calories} kcal</span>` : "";
+      const thumbContent = item.image_url
+        ? `<img src="${item.image_url}" alt="${item.name}">${calHtml}`
+        : `${item.emoji || "☕"}${calHtml}`;
+
+      return `
+        <div class="pos-item-card" onclick="changePosQty(${item.id}, 1)">
+          <div class="pos-item-thumb">
+            ${thumbContent}
+          </div>
+          <div class="pos-item-title">${item.name}</div>
+          <div class="pos-item-ctrl" onclick="event.stopPropagation()">
+            <span class="pos-item-price">${item.price} ₺</span>
+            <div style="display:flex; align-items:center; gap:4px;">
+              ${inCart > 0 ? `
+                <button type="button" class="pos-btn-qty" onclick="changePosQty(${item.id}, -1)">−</button>
+                <span style="font-size:0.84rem; font-weight:800; min-width:16px; text-align:center;">${inCart}</span>
+              ` : ''}
+              <button type="button" class="pos-btn-qty plus" onclick="changePosQty(${item.id}, 1)">+</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function changePosQty(itemId, delta) {
+    posCart[itemId] = (posCart[itemId] || 0) + delta;
+    if (posCart[itemId] <= 0) delete posCart[itemId];
+    renderPosItems();
+    renderPosCart();
+  }
+
+  function clearPosCart() {
+    posCart = {};
+    renderPosItems();
+    renderPosCart();
+  }
+
+  function renderPosCart() {
+    const listEl = document.getElementById("posCartItems");
+    const totalEl = document.getElementById("posTotalAmount");
+    const btn = document.getElementById("posSubmitBtn");
+    if (!listEl) return;
+
+    const entries = Object.entries(posCart);
+    if (entries.length === 0) {
+      listEl.innerHTML = `
+        <div style="text-align:center; padding:35px 12px; color:#64748b; font-size:0.85rem;">
+          <div style="font-size:2.4rem; margin-bottom:8px;">🛒</div>
+          Sepet henüz boş.<br>Soldaki menüden ürün seçebilirsiniz.
+        </div>
+      `;
+      totalEl.textContent = "0 ₺";
+      btn.disabled = true;
+      btn.textContent = "🚀 Siparişi Masaya Gönder (0 ₺)";
+      return;
+    }
+
+    let total = 0;
+    listEl.innerHTML = entries.map(([id, qty]) => {
+      const item = posMenu.find(x => x.id === Number(id));
+      if (!item) return "";
+      const sub = item.price * qty;
+      total += sub;
+      return `
+        <div class="pos-cart-item">
+          <div style="flex:1;">
+            <div style="font-size:0.84rem; font-weight:800; color:#f8fafc;">${item.name}</div>
+            <div style="font-size:0.75rem; color:#94a3b8;">${item.price} ₺ × ${qty} = <b>${sub} ₺</b></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:5px;">
+            <button type="button" class="pos-btn-qty" onclick="changePosQty(${item.id}, -1)">−</button>
+            <span style="font-size:0.85rem; font-weight:800; min-width:18px; text-align:center;">${qty}</span>
+            <button type="button" class="pos-btn-qty plus" onclick="changePosQty(${item.id}, 1)">+</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    totalEl.textContent = `${total} ₺`;
+    btn.disabled = false;
+    btn.textContent = `🚀 Masa ${posSelectedTable}'ye Gönder (${total} ₺)`;
+  }
+
+  async function submitPosOrder() {
+    const entries = Object.entries(posCart);
+    if (entries.length === 0) return;
+    const items = entries.map(([id, qty]) => {
+      const item = posMenu.find(x => x.id === Number(id));
+      return { id: item.id, name: item.name, price: item.price, qty };
+    });
+    const note = (document.getElementById("posOrderNote").value || "").trim();
+    const btn = document.getElementById("posSubmitBtn");
+    btn.disabled = true;
+    btn.textContent = "Gönderiliyor...";
+
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          table_no: posSelectedTable,
+          items,
+          note: note ? `(Yetkili Siparişi) ${note}` : "(Yetkili Siparişi)",
+          status: "onaylandi"
+        })
+      });
+
+      if (res.ok) {
+        showToast(`✅ Masa ${posSelectedTable} için sipariş başarıyla oluşturuldu!`);
+        clearPosCart();
+        document.getElementById("posOrderNote").value = "";
+        closeNewOrderModal();
+        await loadAllOrders();
+      } else {
+        alert("Sipariş kaydedilemedi. Lütfen tekrar deneyin.");
+        btn.disabled = false;
+        renderPosCart();
+      }
+    } catch(e) {
+      alert("Sunucu bağlantı hatası!");
+      btn.disabled = false;
+      renderPosCart();
+    }
+  }
+
+  function showToast(msg) {
+    const existing = document.querySelector(".toast-notification");
+    if (existing) existing.remove();
+    const t = document.createElement("div");
+    t.className = "toast-notification";
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => {
+      t.style.opacity = "0";
+      t.style.transition = "opacity 0.3s";
+      setTimeout(() => t.remove(), 300);
+    }, 3200);
+  }
+
+  async function payAndCloseTable(tableNo, total) {
+    const onay = confirm(`Masa ${tableNo} için ${total} ₺ tutarındaki hesap tahsil edildi mi?\n\nMasa kapatılacak ve sıradaki yeni müşteriler için hazır hale gelecektir.\nİşlemi onaylıyor musunuz?`);
+    if (!onay) return;
+    try {
+      const res = await fetch(`/api/tables/${tableNo}/pay`, { method: "POST" });
+      if (res.ok) {
+        showToast(`✅ Masa ${tableNo} hesabı kapatıldı. Masa yeni siparişlere hazır!`);
+        await loadAllOrders();
+        await loadAllCalls();
+      } else {
+        alert("Ödeme işlemi tamamlanamadı.");
+      }
+    } catch (e) {
+      alert("Sunucuya bağlanılamadı.");
+    }
+  }
+
+  async function checkYetkiliAuth() {
+    try {
+      const res = await fetch("/api/me");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data.user) {
+        window.location.href = "/giris";
+        return;
+      }
+      if (data.user.role !== "yetkili" && data.user.role !== "yonetici") {
+        window.location.href = "/personel";
+        return;
+      }
+      const badge = document.getElementById("yetkiliUserBadge");
+      if (badge) {
+        const roleLabel = data.user.role === "yonetici" ? "👑 Yönetici" : "👔 Yetkili";
+        badge.textContent = `· 👤 ${data.user.name} (${roleLabel})`;
+      }
+      if (data.user.role === "yonetici") {
+        const yl = document.getElementById("yoneticiLink");
+        if (yl) yl.style.display = "inline-block";
+      }
+    } catch (e) {}
+  }
+
+  async function logoutYetkili(e) {
+    if (e) e.preventDefault();
+    await fetch("/api/logout", { method: "POST" });
+    window.location.href = "/giris";
+  }
+
+  checkYetkiliAuth();
+  loadAllOrders();
+  loadAllCalls();
+  setInterval(() => {
+    loadAllOrders();
+    loadAllCalls();
+  }, 2000);
 </script>
 </body>
 </html>
-

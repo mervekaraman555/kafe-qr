@@ -34,6 +34,7 @@ MUSTERI_HTML_PATH = os.path.join(BASE_DIR, "musteri_ekrani.html")
 CALISAN_HTML_PATH = os.path.join(BASE_DIR, "calisan_ekrani.html")
 GIRIS_HTML_PATH = os.path.join(BASE_DIR, "giris_ekrani.html")
 YETKILI_HTML_PATH = os.path.join(BASE_DIR, "yetkili_ekrani.html")
+YONETICI_HTML_PATH = os.path.join(BASE_DIR, "yonetici_ekrani.html")
 QR_HTML_PATH = os.path.join(BASE_DIR, "qr_kodlar.html")
 ADISYON_HTML_PATH = os.path.join(BASE_DIR, "adisyon.html")
 
@@ -852,12 +853,16 @@ class MusteriHandler(BaseKafeHandler):
             with open(GIRIS_HTML_PATH, "r", encoding="utf-8") as f:
                 return self._send_html(f.read())
 
-        if path == "/personel":
+        if path in ("/personel", "/calisan"):
             with open(CALISAN_HTML_PATH, "r", encoding="utf-8") as f:
                 return self._send_html(f.read())
 
         if path == "/yetkili":
             with open(YETKILI_HTML_PATH, "r", encoding="utf-8") as f:
+                return self._send_html(f.read())
+
+        if path == "/yonetici":
+            with open(YONETICI_HTML_PATH, "r", encoding="utf-8") as f:
                 return self._send_html(f.read())
 
         if path == "/reklam":
@@ -1125,12 +1130,16 @@ class PersonelHandler(BaseKafeHandler):
         if self._serve_upload(path) or self._serve_pwa_and_installers(path):
             return
 
-        if path == "/personel":
+        if path in ("/personel", "/calisan"):
             with open(CALISAN_HTML_PATH, "r", encoding="utf-8") as f:
                 return self._send_html(f.read())
 
         if path == "/yetkili":
             with open(YETKILI_HTML_PATH, "r", encoding="utf-8") as f:
+                return self._send_html(f.read())
+
+        if path == "/yonetici":
+            with open(YONETICI_HTML_PATH, "r", encoding="utf-8") as f:
                 return self._send_html(f.read())
 
         if path == "/adisyon":
@@ -1254,12 +1263,27 @@ class PersonelHandler(BaseKafeHandler):
                 return self._send_json({"ok": False, "error": "Kullanıcı adı veya şifre hatalı!"}, status=401)
 
             user_dict = dict(row)
+            if role == "yonetici" and user_dict["role"] != "yonetici":
+                return self._send_json({"ok": False, "error": "Bu hesabın Yönetici (Tam Yetki) paneline giriş yetkisi yok!"}, status=403)
             if role == "yetkili" and user_dict["role"] not in ("yetkili", "yonetici"):
-                return self._send_json({"ok": False, "error": "Bu hesabın Yetkili / Yönetici giriş yetkisi yok!"}, status=403)
+                return self._send_json({"ok": False, "error": "Bu hesabın Yetkili ekranına giriş yetkisi yok!"}, status=403)
+            if role == "personel" and user_dict["role"] not in ("personel", "calisan", "yetkili", "yonetici"):
+                return self._send_json({"ok": False, "error": "Bu hesabın Personel ekranına giriş yetkisi yok!"}, status=403)
 
             token = secrets.token_hex(16)
             SESSIONS[token] = user_dict
-            redirect_url = "/yetkili" if user_dict["role"] in ("yetkili", "yonetici") else "/personel"
+
+            if role == "yonetici":
+                redirect_url = "/yonetici"
+            elif role == "yetkili":
+                redirect_url = "/yetkili"
+            elif user_dict["role"] == "yonetici":
+                redirect_url = "/yonetici"
+            elif user_dict["role"] == "yetkili":
+                redirect_url = "/yetkili"
+            else:
+                redirect_url = "/calisan"
+
             cookie_hdr = f"kafe_session={token}; Path=/; HttpOnly; SameSite=Lax"
             return self._send_json({"ok": True, "user": user_dict, "redirect": redirect_url}, cookie_header=cookie_hdr)
 
