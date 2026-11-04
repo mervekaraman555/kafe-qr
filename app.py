@@ -773,7 +773,7 @@ class BaseKafeHandler(BaseHTTPRequestHandler):
             raw_base = "https://raw.githubusercontent.com/mervekaraman555/kafe-qr/main"
             update_files = [
                 "app.py", "giris_ekrani.html", "musteri_ekrani.html", "calisan_ekrani.html",
-                "yetkili_ekrani.html", "adisyon.html", "qr_kodlar.html", "kurulum_ekrani.html",
+                "yetkili_ekrani.html", "yonetici_ekrani.html", "adisyon.html", "qr_kodlar.html", "kurulum_ekrani.html",
                 "reklam_videosu.html", "manifest.json", "sw.js",
                 "uploads/urun_artisan_burger.jpg",
                 "uploads/urun_matcha_latte.jpg",
