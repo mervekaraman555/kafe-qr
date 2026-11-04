@@ -713,10 +713,17 @@ class BaseKafeHandler(BaseHTTPRequestHandler):
                 "uploads/urun_matcha_latte.jpg",
                 "uploads/urun_limonlu_cheesecake.jpg",
                 "uploads/urun_oreolu_pasta.jpg",
-                "luma_video_olusturucu.py",
                 "kafe.db"
             ]
             downloaded = 0
+            # Varsa eski luma dosyasını temizle
+            try:
+                for lf in ["luma_video_olusturucu.py", "Luma_AI_Dream_Machine.webloc"]:
+                    p = os.path.join(BASE_DIR, lf)
+                    if os.path.isfile(p):
+                        os.remove(p)
+            except Exception:
+                pass
             for fn in update_files:
                 try:
                     target_path = os.path.join(BASE_DIR, fn)
