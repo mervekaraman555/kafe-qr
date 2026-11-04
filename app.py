@@ -569,6 +569,20 @@ class BaseKafeHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(raw)
 
+    def _serve_template(self, file_path: str, fallback_filename: str):
+        if not os.path.isfile(file_path):
+            try:
+                import urllib.request
+                raw_url = f"https://raw.githubusercontent.com/mervekaraman555/kafe-qr/main/{fallback_filename}"
+                os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                urllib.request.urlretrieve(raw_url, file_path)
+            except Exception:
+                pass
+        if os.path.isfile(file_path):
+            with open(file_path, "r", encoding="utf-8") as f:
+                return self._send_html(f.read())
+        return self._send_html("<h3>Sayfa yüklenemedi. Lütfen az sonra tekrar deneyiniz.</h3>", status=404)
+
     def _get_session_user(self):
         raw_cookie = self.headers.get("Cookie", "")
         if not raw_cookie:
@@ -844,20 +858,16 @@ class MusteriHandler(BaseKafeHandler):
                 return self._send_html(f.read())
 
         if path in ("/", "/giris", "/login", "/giris_ekrani.html"):
-            with open(GIRIS_HTML_PATH, "r", encoding="utf-8") as f:
-                return self._send_html(f.read())
+            return self._serve_template(GIRIS_HTML_PATH, "giris_ekrani.html")
 
         if path in ("/personel", "/calisan"):
-            with open(CALISAN_HTML_PATH, "r", encoding="utf-8") as f:
-                return self._send_html(f.read())
+            return self._serve_template(CALISAN_HTML_PATH, "calisan_ekrani.html")
 
         if path == "/yetkili":
-            with open(YETKILI_HTML_PATH, "r", encoding="utf-8") as f:
-                return self._send_html(f.read())
+            return self._serve_template(YETKILI_HTML_PATH, "yetkili_ekrani.html")
 
         if path == "/yonetici":
-            with open(YONETICI_HTML_PATH, "r", encoding="utf-8") as f:
-                return self._send_html(f.read())
+            return self._serve_template(YONETICI_HTML_PATH, "yonetici_ekrani.html")
 
         if path == "/reklam":
             reklam_path = os.path.join(BASE_DIR, "reklam_videosu.html")
@@ -1125,16 +1135,13 @@ class PersonelHandler(BaseKafeHandler):
             return
 
         if path in ("/personel", "/calisan"):
-            with open(CALISAN_HTML_PATH, "r", encoding="utf-8") as f:
-                return self._send_html(f.read())
+            return self._serve_template(CALISAN_HTML_PATH, "calisan_ekrani.html")
 
         if path == "/yetkili":
-            with open(YETKILI_HTML_PATH, "r", encoding="utf-8") as f:
-                return self._send_html(f.read())
+            return self._serve_template(YETKILI_HTML_PATH, "yetkili_ekrani.html")
 
         if path == "/yonetici":
-            with open(YONETICI_HTML_PATH, "r", encoding="utf-8") as f:
-                return self._send_html(f.read())
+            return self._serve_template(YONETICI_HTML_PATH, "yonetici_ekrani.html")
 
         if path == "/adisyon":
             with open(ADISYON_HTML_PATH, "r", encoding="utf-8") as f:

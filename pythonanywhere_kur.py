@@ -14,6 +14,7 @@ FILES = [
     "musteri_ekrani.html",
     "calisan_ekrani.html",
     "yetkili_ekrani.html",
+    "yonetici_ekrani.html",
     "adisyon.html",
     "qr_kodlar.html",
     "kurulum_ekrani.html",
