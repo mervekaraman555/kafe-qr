@@ -713,6 +713,7 @@ class BaseKafeHandler(BaseHTTPRequestHandler):
                 "uploads/urun_matcha_latte.jpg",
                 "uploads/urun_limonlu_cheesecake.jpg",
                 "uploads/urun_oreolu_pasta.jpg",
+                "luma_video_olusturucu.py",
                 "kafe.db"
             ]
             downloaded = 0
