@@ -347,7 +347,16 @@
 </header>
 
 <!-- Uygulama İçi Adisyon / QR Kapatılabilir Tam Ekran Modal -->
-<div id="overlayModal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(9,13,22,0.92); backdrop-filter:blur(4px); flex-direction:column;">
+<div id="overlayModal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(9,13,22,0.95); backdrop-filter:blur(6px); flex-direction:column;">
+  <div style="background:#0f172a; border-bottom:1px solid #334155; padding:10px 18px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-size:1.15rem;">👔</span>
+      <span style="font-weight:800; font-size:0.92rem; color:#f8fafc;" id="overlayModalTitle">Masa Sipariş Kare Kodları (QR)</span>
+    </div>
+    <button type="button" onclick="closeOverlayModal()" style="background:#ef4444; color:#fff; border:none; padding:7px 16px; border-radius:8px; font-weight:800; font-size:0.85rem; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(239,68,68,0.35);">
+      ✕ Kapat ve Yetkiliye Dön
+    </button>
+  </div>
   <iframe id="overlayIframe" src="about:blank" style="width:100%; height:100%; border:none; flex:1; background:#f8fafc;"></iframe>
 </div>
 
@@ -1278,6 +1287,12 @@
     if (e) e.preventDefault();
     const modal = document.getElementById("overlayModal");
     const frame = document.getElementById("overlayIframe");
+    const titleEl = document.getElementById("overlayModalTitle");
+    if (titleEl) {
+      if (url.includes("/qr")) titleEl.textContent = "🔳 Masa Sipariş Kare Kodları (QR)";
+      else if (url.includes("/adisyon")) titleEl.textContent = "🧾 Masa Adisyon Detayı";
+      else titleEl.textContent = "Önizleme Penceresi";
+    }
     frame.src = url;
     modal.style.display = "flex";
     document.body.style.overflow = "hidden";

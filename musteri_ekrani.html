@@ -604,6 +604,24 @@
 </head>
 <body>
 
+<!-- Yetkili / Personel Önizleme Modu Üst Çubuğu -->
+<div id="adminPreviewBanner" style="display:none; position:sticky; top:0; z-index:999999; background:linear-gradient(90deg, #0f172a, #1e293b); color:#f8fafc; padding:10px 16px; border-bottom:2px solid #f59e0b; box-shadow:0 4px 16px rgba(0,0,0,0.45); font-family:-apple-system,BlinkMacSystemFont,sans-serif;">
+  <div style="max-width:980px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="background:#f59e0b; color:#0f172a; font-size:0.72rem; font-weight:900; padding:2px 8px; border-radius:6px; letter-spacing:0.5px;">👔 YETKİLİ ÖNİZLEMESİ</span>
+      <span style="font-size:0.85rem; color:#cbd5e1; font-weight:600;">Masa <span id="adminPreviewTableNo">1</span> Müşteri Menüsü Test Ediliyor</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <button type="button" onclick="returnToAdminScreen()" style="background:#f59e0b; color:#0f172a; border:none; padding:7px 15px; border-radius:8px; font-weight:900; font-size:0.82rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(245,158,11,0.3);">
+        🔙 Yetkili Paneline Dön
+      </button>
+      <button type="button" onclick="returnToQRScreen()" style="background:#334155; color:#f8fafc; border:1px solid #475569; padding:7px 12px; border-radius:8px; font-weight:700; font-size:0.82rem; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+        🔳 QR Kodlara Dön
+      </button>
+    </div>
+  </div>
+</div>
+
 <header>
   <div class="brand">
     <span style="font-size:1.6rem;">☕</span>
@@ -1797,6 +1815,65 @@
   }
   window.closeOverlayModal = closeOverlayModal;
 
+  function checkAdminPreviewMode() {
+    const urlRef = params.get("ref");
+    const isFromAdmin = urlRef === "qr" || urlRef === "yetkili" || urlRef === "admin";
+    
+    function showBanner() {
+      const banner = document.getElementById("adminPreviewBanner");
+      const tblNoEl = document.getElementById("adminPreviewTableNo");
+      if (tblNoEl) tblNoEl.textContent = tableNo;
+      if (banner) banner.style.display = "block";
+    }
+
+    if (isFromAdmin) {
+      showBanner();
+      return;
+    }
+
+    // Aktif yetkili veya personel oturumu varsa da otomatik göster
+    fetch("/api/me")
+      .then(r => r.json())
+      .then(d => {
+        if (d && d.user && (d.user.role === "yetkili" || d.user.role === "calisan")) {
+          showBanner();
+        }
+      })
+      .catch(() => {});
+  }
+
+  function returnToAdminScreen() {
+    // 1. Eğer bir iframe içindeyse üst pencere modalını kapat
+    if (window.parent && window.parent !== window && typeof window.parent.closeOverlayModal === "function") {
+      window.parent.closeOverlayModal();
+      return;
+    }
+    // 2. Eğer yeni sekmede açıldıysa ve opener varsa sekmeyi kapat
+    if (window.opener && !window.opener.closed) {
+      try { window.opener.focus(); } catch(e){}
+      window.close();
+      setTimeout(() => { window.location.href = "/yetkili"; }, 150);
+      return;
+    }
+    // 3. Doğrudan yetkili paneline yönlendir
+    window.location.href = "/yetkili";
+  }
+
+  function returnToQRScreen() {
+    if (window.parent && window.parent !== window && typeof window.parent.closeOverlayModal === "function") {
+      window.parent.location.href = "/qr";
+      return;
+    }
+    if (window.opener && !window.opener.closed) {
+      try { window.opener.focus(); } catch(e){}
+      window.close();
+      setTimeout(() => { window.location.href = "/qr"; }, 150);
+      return;
+    }
+    window.location.href = "/qr";
+  }
+
+  checkAdminPreviewMode();
   updateTableUI();
   syncLangSelectUI();
   loadMenu();
