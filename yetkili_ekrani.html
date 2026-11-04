@@ -526,17 +526,18 @@
             <input type="text" id="mEmoji" placeholder="Emoji (☕)" value="☕" style="max-width:80px;">
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-            <input type="text" id="mDesc" placeholder="Ürün açıklaması..." style="flex:1; min-width:160px;">
+            <input type="text" id="mDesc" placeholder="Kısa açıklama..." style="flex:1; min-width:140px;">
+            <input type="text" id="mIngredients" placeholder="Katmanlar / Malzemeler (| ile ayırın: Dana Köfte | Cheddar | Marul...)" style="flex:1.4; min-width:200px;">
             <input type="file" id="mImageFile" accept="image/*" style="display:none;" onchange="handleNewItemImage(event)">
             <button type="button" class="btn-img-upload" onclick="document.getElementById('mImageFile').click()">
-              📷 Ürün Resmi Ekle
+              📷 Resim
             </button>
             <div id="newImgPreviewBox" style="display:none; align-items:center; gap:6px; background:#090d16; padding:4px 8px; border-radius:8px; border:1px solid #38bdf8;">
               <img id="newImgPreview" src="" alt="Önizleme" style="width:28px; height:28px; object-fit:cover; border-radius:5px;">
-              <span style="font-size:0.75rem; color:#38bdf8; font-weight:700;">Resim Seçildi</span>
+              <span style="font-size:0.75rem; color:#38bdf8; font-weight:700;">Resim</span>
               <button type="button" onclick="clearNewItemImage()" style="background:none; border:none; color:#fca5a5; cursor:pointer; font-weight:800; font-size:0.8rem;">✕</button>
             </div>
-            <button type="submit" class="btn-add">+ Yeni Ürün Ekle</button>
+            <button type="submit" class="btn-add">+ Ürün Ekle</button>
           </div>
         </form>
         <input type="file" id="rowImageInput" accept="image/*" style="display:none;" onchange="handleRowImageSelected(event)">
@@ -716,6 +717,11 @@
       const thumbHtml = i.image_url
         ? `<img src="${i.image_url}" class="menu-thumb" alt="${i.name}">`
         : `<div class="menu-emoji-box">${i.emoji}</div>`;
+      const ingChips = (i.ingredients || "").split("|").map(s => s.trim()).filter(Boolean);
+      const ingHtml = ingChips.length > 0
+        ? `<div style="display:flex; flex-wrap:wrap; gap:3px; margin-top:4px;">${ingChips.slice(0, 3).map(c => `<span style="font-size:0.68rem; background:#1e293b; color:#94a3b8; padding:1px 6px; border-radius:4px;">${c.split(':')[0]}</span>`).join("")}${ingChips.length > 3 ? `<span style="font-size:0.68rem; color:var(--amber);">+${ingChips.length - 3}</span>` : ""}</div>`
+        : "";
+
       return `
         <tr>
           <td>
@@ -724,6 +730,7 @@
               <div>
                 <b>${i.emoji} ${i.name}</b>
                 <div style="font-size:0.74rem;color:var(--muted);">${i.description || ""}</div>
+                ${ingHtml}
               </div>
             </div>
           </td>
@@ -731,8 +738,11 @@
           <td><b>${i.price} ₺</b></td>
           <td>
             <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+              <button type="button" class="btn-img-sm" style="background:rgba(245,158,11,0.15); color:#fbbf24; border-color:#f59e0b;" onclick="editItemIngredients(${i.id}, '${(i.ingredients || "").replace(/'/g, "\\'")}')">
+                ✨ Katmanlar
+              </button>
               <button type="button" class="btn-img-sm" onclick="triggerRowImageUpload(${i.id})">
-                📷 ${i.image_url ? "Resmi Değiştir" : "Resim Ekle"}
+                📷 ${i.image_url ? "Resim" : "+ Resim"}
               </button>
               ${i.image_url ? `<button type="button" class="btn-sm" title="Resmi Kaldır" onclick="removeRowImage(${i.id})">🖼️✕</button>` : ""}
               <button type="button" class="btn-sm" onclick="deleteMenuItem(${i.id})">Sil</button>
@@ -743,6 +753,17 @@
     }).join("");
   }
 
+  async function editItemIngredients(id, currentIngs) {
+    const newVal = prompt("Ürün İçerik ve Katmanları (| ile ayırarak yazın):\nÖrnek: POTATO SLICES: Patates Dilimleri | JUICY BEEF PATTY: Dana Köfte | MELTED CHEESE: Cheddar Peyniri", currentIngs || "");
+    if (newVal === null) return;
+    await fetch(`/api/menu/${id}/ingredients`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ingredients: newVal.trim() })
+    });
+    loadMenu();
+  }
+
   async function addMenuItem(e) {
     e.preventDefault();
     const payload = {
@@ -751,6 +772,7 @@
       price: parseFloat(document.getElementById("mPrice").value),
       emoji: document.getElementById("mEmoji").value.trim() || "☕",
       description: document.getElementById("mDesc").value.trim(),
+      ingredients: (document.getElementById("mIngredients") ? document.getElementById("mIngredients").value.trim() : ""),
       image_data: pendingNewImageData
     };
     const res = await fetch("/api/menu", {
@@ -762,6 +784,7 @@
       document.getElementById("mName").value = "";
       document.getElementById("mPrice").value = "";
       document.getElementById("mDesc").value = "";
+      if (document.getElementById("mIngredients")) document.getElementById("mIngredients").value = "";
       clearNewItemImage();
       loadMenu();
     }

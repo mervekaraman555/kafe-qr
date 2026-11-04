@@ -64,11 +64,36 @@ DEFAULT_MENU = [
     ("Tiramisu", "Tatlılar", 155, "🍮", "Mascarpone peynirli ve espresso ıslatmalı"),
     ("Sıcak Brownie", "Tatlılar", 150, "🍫", "Vanilyalı dondurma topu ile"),
     ("Kruvasan", "Tatlılar", 95, "🥐", "Tereyağlı çıtır Fransız kruvasanı"),
-    # Atıştırmalık & Kahvaltı
+    # Atıştırmalık & Yiyecekler
+    ("Artisan Gurme Burger", "Yiyecekler", 240, "🍔", "150g Sulu Dana Köfte, Çıtır Dana Füme, Erimiş Cheddar Peyniri, Taze Domates ve Çıtır Marul ile (Patates Dilimleri ve Özel Hardal Sosu Eşliğinde)"),
     ("Avokadolu Poşe Yumurta Tost", "Yiyecekler", 185, "🥑", "Ekşi mayalı ekmek üzerinde"),
     ("Kaşarlı & Sucuklu Bazlama Tost", "Yiyecekler", 145, "🥪", "Yanında kiraz domates ve yeşillik ile"),
     ("Mozzarella & Pesto Sandviç", "Yiyecekler", 160, "🥖", "Taze fesleğen soslu ciabatta"),
 ]
+
+DEFAULT_INGREDIENTS = {
+    "Artisan Gurme Burger": "POTATO SLICES: 🥔 Baharatlı Patates Dilimleri | MUSTARD CREAM: 🍯 Hardal Kreması & Özel Sos | TOMATO PUREE: 🍅 Köz Domates Püresi | JUICY BEEF PATTY: 🥩 150g Sulu Dana Burger Köftesi | CRISPY BACON: 🥓 Çıtır Dana Füme | MELTED CHEESE: 🧀 Erimiş Cheddar Peyniri | RIPE TOMATO: 🍅 Taze Domates Dilimi | CRISP LETTUCE: 🥬 Taze Çıtır Marul | BUN: 🍞 Susamlı Burger Ekmeği | FINISHED PRODUCT: 🍽️ Servis Tabağı Sunumu",
+    "Avokadolu Poşe Yumurta Tost": "BREAD: 🍞 Ekşi Mayalı Köy Ekmeği | GUACAMOLE: 🥑 Taze Avokado Püresi | POACHED EGG: 🥚 Organik Akışkan Poşe Yumurta | HERBS: 🌿 Mikro Filizler & Çörekotu | OLIVE OIL: 🫒 Soğuk Sıkım Sızma Zeytinyağı",
+    "Kaşarlı & Sucuklu Bazlama Tost": "BAZLAMA: 🍞 Taş Fırın Bazlama Ekmeği | SUCUK: 🥩 Doğal Kasap Sucuğu | KASAR CHEESE: 🧀 Hakiki Erimeyen Kaşar Peyniri | BUTTER: 🧈 Köy Tereyağı | TOMATO: 🍅 Kiraz Domates Eşliği",
+    "Mozzarella & Pesto Sandviç": "CIABATTA: 🥖 Çıtır Ciabatta Ekmeği | MOZZARELLA: 🧀 Taze Dilim Süt Mozzarella | PESTO SAUCE: 🌿 Ev Yapımı Fesleğen Pesto | SUN TOMATO: 🍅 Güneşte Kurutulmuş Domates | OLIVE OIL: 🫒 Sızma Zeytinyağı",
+    "Türk Kahvesi": "COFFEE: ☕ Taze Çekilmiş İnce Türk Kahvesi | WATER: 💧 Özel Arıtılmış Soğuk Su | FOAM: 🫧 Bol Kadife Köpük | TREAT: 🍬 Çifte Kavrulmuş Antep Fıstıklı Lokum",
+    "Americano": "ESPRESSO: ☕ Çift Shot Taze Çekilmiş Espresso | HOT WATER: 💧 92°C Özel Filtre Sıcak Su",
+    "Caffe Latte": "ESPRESSO: ☕ Taze Single Espresso Shot | STEAMED MILK: 🥛 65°C Buharlanmış Süt | FOAM: ☁️ Kadifemsi Mikro Süt Köpüğü | ART: 🎨 Barista Latte Sanatı",
+    "Cappuccino": "ESPRESSO: ☕ Yoğun İtalyan Espresso | MILK: 🥛 Kıvamlı Buharlanmış Süt | RICH FOAM: ☁️ Yoğun Tepeleme Süt Köpüğü | COCOA: 🍫 İnce Kakao Pudrası",
+    "Flat White": "RISTRETTO: ☕ Çift Shot Ristretto | VELVET MILK: 🥛 Yoğunlaştırılmış Mikro Köpüklü Süt",
+    "Demleme Çay": "TEA LEAVES: 🫖 Rize Mayıs Hasadı Çay Yaprağı | PURE WATER: 💧 Kaynak Suyu ile Taze Demleme",
+    "Sahlep": "SALEP: 🥣 Doğal Dağ Salebi | MILK: 🥛 Yağlı Taze Süt | CINNAMON: 🍂 Taze Çekilmiş Toz Tarçın",
+    "Iced Latte": "ICE: 🧊 Kristal Buz Küpleri | COLD MILK: 🥛 Soğuk Taze Süt | FRESH ESPRESSO: ☕ Üzerine Süzülen Double Espresso",
+    "Iced Americano": "ICE: 🧊 Kristal Buz | COLD WATER: 💧 Soğuk Su | ESPRESSO: ☕ Taze Double Espresso Shot",
+    "Ev Yapımı Limonata": "LEMON: 🍋 Taze Sıkılmış Köy Limonları | MINT: 🌿 Taze Nane Yaprakları | CRUSHED ICE: 🧊 Kırılmış Buz | CITRUS: 🍯 Doğal Pancar Şerbeti",
+    "Taze Portakal Suyu": "ORANGES: 🍊 Sipariş Anında Sıkılan Finike Portakalları | PULP: 🍹 Doğal Meyve Parçacıkları",
+    "Soğuk Hibiskus Çayı": "HIBISCUS: 🌺 Demlenmiş Hibiskus Çiçeği | BERRIES: 🍓 Orman Meyveleri Aroması | ICE: 🧊 Buz",
+    "San Sebastian Cheesecake": "CREAM CHEESE: 🧀 Taze Krem Peynir | BAKED TOP: 🔥 Karamelize Yanık Üst Katman | CHOCOLATE: 🍫 Sıcak Akışkan Belçika Çikolatası Sosu",
+    "Tiramisu": "LADYFINGERS: ☕ Espresso ile Islatılmış Kedidili | MASCARPONE: 🧀 İtalyan Mascarpone Kreması | COCOA: 🍫 Yoğun Hollanda Kakaosu",
+    "Sıcak Brownie": "DARK CHOCOLATE: 🍫 %70 Bitter Belçika Çikolatası | WALNUTS: 🌰 İri Kavrulmuş Ceviz | ICE CREAM: 🍦 Madagaskar Vanilyalı Dondurma Topu",
+    "Kruvasan": "PASTRY: 🥐 Kat Kat Açılmış Fransız Hamuru | BUTTER: 🧈 %82 Yağlı Fransız Tereyağı | CRISP CRUST: 🍯 Altın Sarısı Çıtır Kabuk",
+    "meyveli pasta": "SPONGE: 🍰 Yumuşak Sünger Pandispanya | CREAM: 🥛 Hafif Pasta Kreması | FRESH FRUITS: 🍓 Çilek, Kivi ve Muz Dilimleri | GLAZE: 🍯 Parlatıcı Meyve Jeli"
+}
 
 
 def get_lan_ip() -> str:
@@ -202,6 +227,10 @@ def init_db():
         cur.execute("ALTER TABLE menu ADD COLUMN image_url TEXT DEFAULT ''")
     except sqlite3.OperationalError:
         pass
+    try:
+        cur.execute("ALTER TABLE menu ADD COLUMN ingredients TEXT DEFAULT ''")
+    except sqlite3.OperationalError:
+        pass
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS orders (
@@ -262,6 +291,29 @@ def init_db():
         cur.executemany(
             "INSERT INTO menu (name, category, price, emoji, description) VALUES (?, ?, ?, ?, ?)",
             DEFAULT_MENU,
+        )
+    # Artisan Gurme Burger yoksa ekle
+    burger_exists = cur.execute("SELECT id FROM menu WHERE name = 'Artisan Gurme Burger'").fetchone()
+    if not burger_exists:
+        cur.execute(
+            """
+            INSERT INTO menu (name, category, price, emoji, description, ingredients)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "Artisan Gurme Burger",
+                "Yiyecekler",
+                240,
+                "🍔",
+                "150g Sulu Dana Köfte, Çıtır Dana Füme, Erimiş Cheddar Peyniri, Taze Domates ve Çıtır Marul ile (Patates Dilimleri ve Özel Hardal Sosu Eşliğinde)",
+                DEFAULT_INGREDIENTS.get("Artisan Gurme Burger", ""),
+            ),
+        )
+    # Boş veya eksik içerikleri DEFAULT_INGREDIENTS ile doldur
+    for m_name, ings in DEFAULT_INGREDIENTS.items():
+        cur.execute(
+            "UPDATE menu SET ingredients = ? WHERE name = ? AND (ingredients = '' OR ingredients IS NULL)",
+            (ings, m_name),
         )
     user_count = cur.execute("SELECT COUNT(*) FROM users").fetchone()[0]
     if user_count == 0:
@@ -1108,18 +1160,29 @@ class PersonelHandler(BaseKafeHandler):
             price = float(payload.get("price", 0))
             emoji = str(payload.get("emoji", "☕")).strip() or "☕"
             description = str(payload.get("description", "")).strip()
+            ingredients = str(payload.get("ingredients", "")).strip()
             raw_image = str(payload.get("image_url", "") or payload.get("image_data", "")).strip()
             image_url = save_uploaded_image(raw_image)
             if not name or price <= 0:
                 return self._send_json({"error": "Geçersiz ürün bilgisi"}, status=400)
             conn = db_conn()
             conn.execute(
-                "INSERT INTO menu (name, category, price, emoji, description, image_url) VALUES (?, ?, ?, ?, ?, ?)",
-                (name, category, price, emoji, description, image_url),
+                "INSERT INTO menu (name, category, price, emoji, description, image_url, ingredients) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (name, category, price, emoji, description, image_url, ingredients),
             )
             conn.commit()
             conn.close()
             return self._send_json({"ok": True, "image_url": image_url}, status=201)
+
+        if path.startswith("/api/menu/") and path.endswith("/ingredients"):
+            parts = path.strip("/").split("/")
+            item_id = int(parts[2])
+            ingredients = str(payload.get("ingredients", "")).strip()
+            conn = db_conn()
+            conn.execute("UPDATE menu SET ingredients = ? WHERE id = ?", (ingredients, item_id))
+            conn.commit()
+            conn.close()
+            return self._send_json({"ok": True, "ingredients": ingredients})
 
         if path.startswith("/api/menu/") and path.endswith("/image"):
             parts = path.strip("/").split("/")

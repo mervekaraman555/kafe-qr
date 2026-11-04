@@ -365,6 +365,112 @@
   .lightbox-media .big-emoji {
     font-size: 6.5rem; filter: drop-shadow(0 10px 24px rgba(0,0,0,0.4));
   }
+  /* Görseldeki gibi Exploded View / Malzeme Katmanları Tasarımı */
+  .exploded-modal-overlay {
+    position: fixed; inset: 0; background: rgba(10, 8, 7, 0.94);
+    backdrop-filter: blur(8px); z-index: 10000; display: none;
+    align-items: center; justify-content: center; padding: 14px;
+    animation: fadeInModal 0.18s ease-out;
+  }
+  .exploded-modal-overlay.open { display: flex; }
+
+  .exploded-modal-box {
+    position: relative; width: 100%; max-width: 580px; max-height: 94vh;
+    background: radial-gradient(circle at 50% 25%, #3d2a1d 0%, #1e140d 55%, #0b0806 100%);
+    border-radius: 24px; box-shadow: 0 30px 80px rgba(0,0,0,0.85);
+    border: 1.5px solid rgba(245, 158, 11, 0.4); color: #fff;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  .exploded-header {
+    padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.12);
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(0,0,0,0.35);
+  }
+  .exploded-title-area h3 {
+    font-size: 1.15rem; font-weight: 900; color: #fbbf24; display: flex; align-items: center; gap: 8px;
+  }
+  .exploded-title-area p {
+    font-size: 0.74rem; color: #c2b29f; margin-top: 3px;
+  }
+
+  .exploded-content-scroll {
+    padding: 24px 16px 16px; overflow-y: auto; flex: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    position: relative;
+  }
+
+  .exploded-spine {
+    position: absolute; top: 30px; bottom: 80px; left: 50%;
+    width: 2px; border-left: 2px dashed rgba(255,255,255,0.2);
+    transform: translateX(-50%); pointer-events: none;
+  }
+
+  .exploded-layer-row {
+    width: 100%; max-width: 500px; display: grid;
+    grid-template-columns: 1fr 64px 1fr; align-items: center; gap: 10px;
+    position: relative; z-index: 2;
+  }
+
+  .exploded-badge {
+    background: rgba(0,0,0,0.72); border: 1.5px solid rgba(255,255,255,0.4);
+    padding: 6px 12px; border-radius: 999px; font-size: 0.74rem;
+    font-weight: 900; letter-spacing: 0.6px; text-transform: uppercase;
+    color: #fff; display: inline-flex; align-items: center; gap: 6px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer;
+    transition: all 0.2s ease; user-select: none;
+  }
+  .exploded-badge:hover {
+    border-color: #fbbf24; color: #fbbf24; transform: scale(1.04);
+  }
+  .exploded-badge.excluded {
+    background: rgba(239, 68, 68, 0.3) !important; border-color: #ef4444 !important; color: #fca5a5 !important;
+    text-decoration: line-through; opacity: 0.7;
+  }
+
+  .exploded-icon-node {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: radial-gradient(circle, #2a1f18 0%, #15100c 100%);
+    border: 2px solid rgba(245, 158, 11, 0.45); box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    display: flex; align-items: center; justify-content: center; font-size: 1.75rem;
+    margin: 0 auto; transition: transform 0.2s ease;
+  }
+  .exploded-icon-node:hover {
+    transform: scale(1.12); border-color: #fbbf24;
+  }
+
+  .exploded-arrow-left {
+    display: flex; align-items: center; justify-content: flex-end; gap: 6px; text-align: right;
+  }
+  .exploded-arrow-right {
+    display: flex; align-items: center; justify-content: flex-start; gap: 6px; text-align: left;
+  }
+  .arrow-svg {
+    width: 24px; height: 16px; stroke: rgba(255,255,255,0.75); fill: none; stroke-width: 2;
+  }
+
+  .exploded-footer {
+    padding: 14px 20px; border-top: 1px solid rgba(255,255,255,0.12);
+    background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  }
+
+  .btn-see-layers {
+    background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);
+    padding: 4px 9px; border-radius: 7px; font-size: 0.72rem; font-weight: 800; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px; margin-top: 6px;
+    transition: all 0.15s ease;
+  }
+  .btn-see-layers:hover {
+    background: #f59e0b; color: #1f1a17; border-color: #f59e0b;
+  }
+  .item-ingredients-chips {
+    display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px;
+  }
+  .ing-chip {
+    font-size: 0.68rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+    color: #cbd5e1; padding: 2px 7px; border-radius: 999px; font-weight: 600;
+  }
+
   .lightbox-info {
     padding: 18px 20px; background: #1f1a17;
     display: flex; flex-direction: column; gap: 10px;
@@ -554,10 +660,37 @@
       <div class="lightbox-cat" id="lightboxCat"></div>
       <div class="lightbox-title" id="lightboxTitle"></div>
       <div class="lightbox-desc" id="lightboxDesc"></div>
+      <div id="lightboxIngredientsArea" style="margin-top:6px;"></div>
       <div class="lightbox-footer">
         <span class="lightbox-price" id="lightboxPrice">0 ₺</span>
         <div class="lightbox-qty-ctrl" id="lightboxQtyCtrl"></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Görseldeki Gibi Malzeme Katmanları (Exploded View) Tam Ekran Modalı -->
+<div class="exploded-modal-overlay" id="explodedModal" onclick="handleExplodedBackdrop(event)">
+  <div class="exploded-modal-box">
+    <div class="exploded-header">
+      <div class="exploded-title-area">
+        <h3 id="explodedHeaderTitle">🍔 Ürün İçerik & Malzeme Katmanları</h3>
+        <p id="explodedHeaderSub">İstemediğiniz malzemeye dokunarak siparişten çıkarabilirsiniz</p>
+      </div>
+      <button type="button" class="lightbox-close" style="position:static;" onclick="closeExplodedModal()">✕</button>
+    </div>
+
+    <div class="exploded-content-scroll" id="explodedContentArea">
+      <div class="exploded-spine"></div>
+      <!-- Katman satırları JS tarafından doldurulacak -->
+    </div>
+
+    <div class="exploded-footer">
+      <div>
+        <div style="font-size:0.75rem; color:#cbd5e1;" id="explodedCustomNoteText">Tüm malzemeler dahil</div>
+        <div style="font-size:1.25rem; font-weight:900; color:#fbbf24;" id="explodedFooterPrice">0 ₺</div>
+      </div>
+      <div id="explodedFooterActionBtn"></div>
     </div>
   </div>
 </div>
@@ -789,6 +922,31 @@
   }
 
   let currentModalItemId = null;
+  let explodedCurrentItemId = null;
+  let excludedIngredientsSet = new Set();
+
+  function parseIngredientsList(raw) {
+    if (!raw) return [];
+    return raw.split("|").map(s => s.trim()).filter(Boolean).map(part => {
+      let title = "";
+      let detail = part;
+      let icon = "✨";
+      if (part.includes(":")) {
+        const colonIdx = part.indexOf(":");
+        title = part.substring(0, colonIdx).trim();
+        detail = part.substring(colonIdx + 1).trim();
+      }
+      // Detay içinden emoji ayıklamaya çalışalım
+      const m = detail.match(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u);
+      if (m) {
+        icon = m[0];
+      }
+      if (!title) {
+        title = detail.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").trim();
+      }
+      return { title, detail, icon, original: part };
+    });
+  }
 
   function renderMenu() {
     const items = activeCategory === "Tümü" ? menu : menu.filter(i => i.category === activeCategory);
@@ -804,13 +962,27 @@
              ${item.emoji}
              <span class="zoom-hint">🔍</span>
            </div>`;
+
+      const ings = parseIngredientsList(item.ingredients);
+      let ingredientsHtml = "";
+      if (ings.length > 0) {
+        const topChips = ings.slice(0, 3).map(x => `<span class="ing-chip">${x.icon} ${x.title}</span>`).join("");
+        ingredientsHtml = `
+          <div class="item-ingredients-chips">${topChips}</div>
+          <button type="button" class="btn-see-layers" onclick="event.stopPropagation(); openExplodedModal(${item.id})">
+            ✨ Malzeme Katmanları (Exploded View)
+          </button>
+        `;
+      }
+
       return `
         <div class="item-card">
           <div class="item-top">
             ${visualHtml}
-            <div>
+            <div style="flex:1;">
               <div class="item-name" style="cursor:pointer;" onclick="openProductModal(${item.id})">${item.name}</div>
-              <div class="item-desc">${item.description}</div>
+              <div class="item-desc">${item.description || ""}</div>
+              ${ingredientsHtml}
             </div>
           </div>
           <div class="item-bottom">
@@ -839,9 +1011,166 @@
     document.getElementById("lightboxTitle").textContent = item.name;
     document.getElementById("lightboxDesc").textContent = item.description || "";
     document.getElementById("lightboxPrice").textContent = `${item.price} ₺`;
+
+    const ings = parseIngredientsList(item.ingredients);
+    const ingsArea = document.getElementById("lightboxIngredientsArea");
+    if (ingsArea) {
+      if (ings.length > 0) {
+        ingsArea.innerHTML = `
+          <div style="margin-top:4px;">
+            <div style="font-size:0.75rem; color:#94a3b8; font-weight:700; margin-bottom:5px; text-transform:uppercase;">
+              🥞 İçerik Malzemeleri (${ings.length} Katman):
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;">
+              ${ings.map(x => `<span style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:#f8fafc; font-size:0.75rem; padding:3px 9px; border-radius:999px;">${x.icon} ${x.title}</span>`).join("")}
+            </div>
+            <button type="button" onclick="closeProductModal(); openExplodedModal(${item.id});" style="background:linear-gradient(135deg, #f59e0b, #d97706); color:#000; border:none; padding:8px 14px; border-radius:10px; font-weight:900; font-size:0.8rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+              🔍 Malzeme Katmanlarını Gör (Exploded View)
+            </button>
+          </div>
+        `;
+      } else {
+        ingsArea.innerHTML = "";
+      }
+    }
+
     updateLightboxQtyUI();
     document.getElementById("productLightbox").classList.add("open");
     document.body.style.overflow = "hidden";
+  }
+
+  function openExplodedModal(itemId) {
+    const item = menu.find(x => x.id === Number(itemId));
+    if (!item) return;
+    explodedCurrentItemId = item.id;
+    excludedIngredientsSet.clear();
+
+    document.getElementById("explodedHeaderTitle").innerHTML = `${item.emoji} ${item.name} — Malzeme Katmanları`;
+    document.getElementById("explodedHeaderSub").textContent = `${item.category} · İstemediğiniz malzemeye dokunarak çıkarabilirsiniz`;
+    document.getElementById("explodedFooterPrice").textContent = `${item.price} ₺`;
+
+    renderExplodedLayers(item);
+    document.getElementById("explodedModal").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function renderExplodedLayers(item) {
+    const ings = parseIngredientsList(item.ingredients);
+    const contentArea = document.getElementById("explodedContentArea");
+
+    if (ings.length === 0) {
+      contentArea.innerHTML = `
+        <div style="padding:40px 20px; text-align:center; color:#cbd5e1;">
+          <div style="font-size:3rem; margin-bottom:10px;">${item.emoji}</div>
+          <div style="font-size:1.1rem; font-weight:800;">${item.name}</div>
+          <p style="font-size:0.85rem; color:#94a3b8; margin-top:6px;">${item.description || "Özel tarifimizle taze hazırlanır."}</p>
+        </div>
+      `;
+    } else {
+      let rowsHtml = `<div class="exploded-spine"></div>`;
+      ings.forEach((ing, idx) => {
+        const isLeft = idx % 2 === 0;
+        const isExcluded = excludedIngredientsSet.has(ing.title);
+
+        const badgeHtml = `
+          <div class="exploded-badge ${isExcluded ? 'excluded' : ''}" onclick="toggleExcludeIngredient('${ing.title.replace(/'/g, "\\'")}')" title="İstemiyorsanız dokunun">
+            <span>${ing.title}</span>
+            ${isExcluded ? '<span style="font-size:0.65rem; color:#fca5a5;">(İSTEMİYORUM ✕)</span>' : ''}
+          </div>
+        `;
+
+        const arrowLeft = isLeft
+          ? `<div class="exploded-arrow-left">
+               ${badgeHtml}
+               <svg class="arrow-svg" viewBox="0 0 24 16"><path d="M2 8 C 10 4, 14 12, 22 8 M 16 4 L 22 8 L 16 12"/></svg>
+             </div>`
+          : `<div></div>`;
+
+        const iconNode = `
+          <div class="exploded-icon-node" onclick="toggleExcludeIngredient('${ing.title.replace(/'/g, "\\'")}')" title="${ing.detail}">
+            ${ing.icon}
+          </div>
+        `;
+
+        const arrowRight = !isLeft
+          ? `<div class="exploded-arrow-right">
+               <svg class="arrow-svg" viewBox="0 0 24 16"><path d="M22 8 C 14 4, 10 12, 2 8 M 8 4 L 2 8 L 8 12"/></svg>
+               ${badgeHtml}
+             </div>`
+          : `<div></div>`;
+
+        rowsHtml += `
+          <div class="exploded-layer-row">
+            ${arrowLeft}
+            ${iconNode}
+            ${arrowRight}
+          </div>
+        `;
+      });
+
+      contentArea.innerHTML = rowsHtml;
+    }
+
+    updateExplodedFooterState(item);
+  }
+
+  function toggleExcludeIngredient(title) {
+    if (excludedIngredientsSet.has(title)) {
+      excludedIngredientsSet.delete(title);
+    } else {
+      excludedIngredientsSet.add(title);
+    }
+    const item = menu.find(x => x.id === explodedCurrentItemId);
+    if (item) renderExplodedLayers(item);
+  }
+
+  function updateExplodedFooterState(item) {
+    const noteEl = document.getElementById("explodedCustomNoteText");
+    if (excludedIngredientsSet.size > 0) {
+      const arr = Array.from(excludedIngredientsSet);
+      noteEl.innerHTML = `<span style="color:#f87171; font-weight:800;">Çıkarılanlar:</span> ${arr.join(", ")} olmadan hazırlanacak`;
+    } else {
+      noteEl.textContent = "Tüm malzemeler eksiksiz ve taze hazırlanır";
+    }
+
+    const actionBtn = document.getElementById("explodedFooterActionBtn");
+    actionBtn.innerHTML = `
+      <button type="button" onclick="addExplodedItemToCart()" style="background:#22c55e; color:#052e16; border:none; padding:12px 22px; border-radius:12px; font-weight:900; font-size:0.95rem; cursor:pointer; display:flex; align-items:center; gap:8px;">
+        🛒 Sepete Ekle
+      </button>
+    `;
+  }
+
+  function addExplodedItemToCart() {
+    if (!explodedCurrentItemId) return;
+    const item = menu.find(x => x.id === explodedCurrentItemId);
+    if (!item) return;
+
+    changeQty(item.id, 1);
+
+    if (excludedIngredientsSet.size > 0) {
+      const noteInput = document.getElementById("orderNoteInput");
+      const excludedStr = `${item.name} (${Array.from(excludedIngredientsSet).join(", ")} istemiyorum)`;
+      if (noteInput) {
+        const cur = noteInput.value.trim();
+        noteInput.value = cur ? `${cur} | ${excludedStr}` : excludedStr;
+      }
+    }
+
+    closeExplodedModal();
+  }
+
+  function closeExplodedModal() {
+    explodedCurrentItemId = null;
+    excludedIngredientsSet.clear();
+    document.getElementById("explodedModal").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  function handleExplodedBackdrop(e) {
+    if (e.target.id === "explodedModal") {
+      closeExplodedModal();
+    }
   }
 
   function updateLightboxQtyUI() {
