@@ -796,8 +796,8 @@ class BaseKafeHandler(BaseHTTPRequestHandler):
                     os.makedirs(os.path.dirname(target_path), exist_ok=True)
                     urllib.request.urlretrieve(f"{raw_base}/{fn}", target_path)
                     downloaded += 1
-                except Exception:
-                    pass
+                except Exception as e:
+                    logs.append(f"Hata {fn}: {e}")
             if downloaded > 0:
                 logs.append(f"{downloaded} dosya GitHub üzerinden güncellendi.")
             else:
